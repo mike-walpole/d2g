@@ -1,0 +1,1633 @@
+{
+ "Description": "Dock2Gdansk infrastructure with DynamoDB, Cognito, SES, API Gateway, and Lambdas",
+ "Resources": {
+  "FormSubmissionsTable236C0FD5": {
+   "Type": "AWS::DynamoDB::Table",
+   "Properties": {
+    "AttributeDefinitions": [
+     {
+      "AttributeName": "id",
+      "AttributeType": "S"
+     },
+     {
+      "AttributeName": "timestamp",
+      "AttributeType": "S"
+     }
+    ],
+    "BillingMode": "PAY_PER_REQUEST",
+    "KeySchema": [
+     {
+      "AttributeName": "id",
+      "KeyType": "HASH"
+     },
+     {
+      "AttributeName": "timestamp",
+      "KeyType": "RANGE"
+     }
+    ],
+    "PointInTimeRecoverySpecification": {
+     "PointInTimeRecoveryEnabled": true
+    },
+    "TableName": "d2g-form-submissions"
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "D2GStack/FormSubmissionsTable/Resource"
+   }
+  },
+  "FormSchemasTableDE010A3F": {
+   "Type": "AWS::DynamoDB::Table",
+   "Properties": {
+    "AttributeDefinitions": [
+     {
+      "AttributeName": "formId",
+      "AttributeType": "S"
+     },
+     {
+      "AttributeName": "version",
+      "AttributeType": "S"
+     }
+    ],
+    "BillingMode": "PAY_PER_REQUEST",
+    "KeySchema": [
+     {
+      "AttributeName": "formId",
+      "KeyType": "HASH"
+     },
+     {
+      "AttributeName": "version",
+      "KeyType": "RANGE"
+     }
+    ],
+    "PointInTimeRecoverySpecification": {
+     "PointInTimeRecoveryEnabled": true
+    },
+    "TableName": "d2g-form-schemas"
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "D2GStack/FormSchemasTable/Resource"
+   }
+  },
+  "D2GUserPool139E2CC7": {
+   "Type": "AWS::Cognito::UserPool",
+   "Properties": {
+    "AccountRecoverySetting": {
+     "RecoveryMechanisms": [
+      {
+       "Name": "verified_email",
+       "Priority": 1
+      }
+     ]
+    },
+    "AdminCreateUserConfig": {
+     "AllowAdminCreateUserOnly": false
+    },
+    "AutoVerifiedAttributes": [
+     "email"
+    ],
+    "EmailVerificationMessage": "The verification code to your new account is {####}",
+    "EmailVerificationSubject": "Verify your new account",
+    "Policies": {
+     "PasswordPolicy": {
+      "MinimumLength": 8,
+      "RequireLowercase": true,
+      "RequireNumbers": true,
+      "RequireSymbols": true,
+      "RequireUppercase": true
+     }
+    },
+    "Schema": [
+     {
+      "Mutable": true,
+      "Name": "email",
+      "Required": true
+     }
+    ],
+    "SmsVerificationMessage": "The verification code to your new account is {####}",
+    "UserPoolName": "d2g-user-pool",
+    "UsernameAttributes": [
+     "email"
+    ],
+    "VerificationMessageTemplate": {
+     "DefaultEmailOption": "CONFIRM_WITH_CODE",
+     "EmailMessage": "The verification code to your new account is {####}",
+     "EmailSubject": "Verify your new account",
+     "SmsMessage": "The verification code to your new account is {####}"
+    }
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "D2GStack/D2GUserPool/Resource"
+   }
+  },
+  "D2GUserPoolClient197F85BA": {
+   "Type": "AWS::Cognito::UserPoolClient",
+   "Properties": {
+    "AllowedOAuthFlows": [
+     "implicit"
+    ],
+    "AllowedOAuthFlowsUserPoolClient": true,
+    "AllowedOAuthScopes": [
+     "openid",
+     "email"
+    ],
+    "CallbackURLs": [
+     "https://example.com"
+    ],
+    "ClientName": "d2g-client",
+    "ExplicitAuthFlows": [
+     "ALLOW_USER_PASSWORD_AUTH",
+     "ALLOW_ADMIN_USER_PASSWORD_AUTH",
+     "ALLOW_USER_SRP_AUTH",
+     "ALLOW_REFRESH_TOKEN_AUTH"
+    ],
+    "GenerateSecret": false,
+    "SupportedIdentityProviders": [
+     "COGNITO"
+    ],
+    "UserPoolId": {
+     "Ref": "D2GUserPool139E2CC7"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "D2GStack/D2GUserPoolClient/Resource"
+   }
+  },
+  "AdminGroup": {
+   "Type": "AWS::Cognito::UserPoolGroup",
+   "Properties": {
+    "Description": "Administrators with access to kapitanat dashboard",
+    "GroupName": "admin",
+    "UserPoolId": {
+     "Ref": "D2GUserPool139E2CC7"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "D2GStack/AdminGroup"
+   }
+  },
+  "SubmitFormLambdaServiceRole6F326A06": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "D2GStack/SubmitFormLambda/ServiceRole/Resource"
+   }
+  },
+  "SubmitFormLambdaServiceRoleDefaultPolicy1EF68260": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "dynamodb:BatchWriteItem",
+        "dynamodb:DeleteItem",
+        "dynamodb:DescribeTable",
+        "dynamodb:PutItem",
+        "dynamodb:UpdateItem"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "FormSubmissionsTable236C0FD5",
+          "Arn"
+         ]
+        },
+        {
+         "Ref": "AWS::NoValue"
+        }
+       ]
+      },
+      {
+       "Action": [
+        "dynamodb:BatchGetItem",
+        "dynamodb:ConditionCheckItem",
+        "dynamodb:DescribeTable",
+        "dynamodb:GetItem",
+        "dynamodb:GetRecords",
+        "dynamodb:GetShardIterator",
+        "dynamodb:Query",
+        "dynamodb:Scan"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "FormSchemasTableDE010A3F",
+          "Arn"
+         ]
+        },
+        {
+         "Ref": "AWS::NoValue"
+        }
+       ]
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "SubmitFormLambdaServiceRoleDefaultPolicy1EF68260",
+    "Roles": [
+     {
+      "Ref": "SubmitFormLambdaServiceRole6F326A06"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "D2GStack/SubmitFormLambda/ServiceRole/DefaultPolicy/Resource"
+   }
+  },
+  "SubmitFormLambdaA015CC73": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": {
+      "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-ap-east-1"
+     },
+     "S3Key": "8143c4e37e89d005f8939794dcc0abe063020be0fbca7c227da21c2bf1c2fd58.zip"
+    },
+    "Environment": {
+     "Variables": {
+      "DYNAMODB_TABLE": {
+       "Ref": "FormSubmissionsTable236C0FD5"
+      },
+      "SCHEMAS_TABLE": {
+       "Ref": "FormSchemasTableDE010A3F"
+      },
+      "USER_POOL_ID": {
+       "Ref": "D2GUserPool139E2CC7"
+      },
+      "USER_POOL_CLIENT_ID": {
+       "Ref": "D2GUserPoolClient197F85BA"
+      }
+     }
+    },
+    "FunctionName": "d2g-submit-form",
+    "Handler": "submit_form.handler",
+    "MemorySize": 256,
+    "Role": {
+     "Fn::GetAtt": [
+      "SubmitFormLambdaServiceRole6F326A06",
+      "Arn"
+     ]
+    },
+    "Runtime": "python3.11",
+    "Timeout": 30
+   },
+   "DependsOn": [
+    "SubmitFormLambdaServiceRoleDefaultPolicy1EF68260",
+    "SubmitFormLambdaServiceRole6F326A06"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "D2GStack/SubmitFormLambda/Resource",
+    "aws:asset:path": "asset.8143c4e37e89d005f8939794dcc0abe063020be0fbca7c227da21c2bf1c2fd58",
+    "aws:asset:is-bundled": false,
+    "aws:asset:property": "Code"
+   }
+  },
+  "GetSchemaLambdaServiceRoleDB354D6B": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "D2GStack/GetSchemaLambda/ServiceRole/Resource"
+   }
+  },
+  "GetSchemaLambdaServiceRoleDefaultPolicy434A6154": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "dynamodb:BatchGetItem",
+        "dynamodb:ConditionCheckItem",
+        "dynamodb:DescribeTable",
+        "dynamodb:GetItem",
+        "dynamodb:GetRecords",
+        "dynamodb:GetShardIterator",
+        "dynamodb:Query",
+        "dynamodb:Scan"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "FormSchemasTableDE010A3F",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::GetAtt": [
+          "FormSubmissionsTable236C0FD5",
+          "Arn"
+         ]
+        },
+        {
+         "Ref": "AWS::NoValue"
+        }
+       ]
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "GetSchemaLambdaServiceRoleDefaultPolicy434A6154",
+    "Roles": [
+     {
+      "Ref": "GetSchemaLambdaServiceRoleDB354D6B"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "D2GStack/GetSchemaLambda/ServiceRole/DefaultPolicy/Resource"
+   }
+  },
+  "GetSchemaLambda0F96AA6F": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": {
+      "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-ap-east-1"
+     },
+     "S3Key": "8143c4e37e89d005f8939794dcc0abe063020be0fbca7c227da21c2bf1c2fd58.zip"
+    },
+    "Environment": {
+     "Variables": {
+      "DYNAMODB_TABLE": {
+       "Ref": "FormSubmissionsTable236C0FD5"
+      },
+      "SCHEMAS_TABLE": {
+       "Ref": "FormSchemasTableDE010A3F"
+      }
+     }
+    },
+    "FunctionName": "d2g-get-schema",
+    "Handler": "get_schema.handler",
+    "MemorySize": 256,
+    "Role": {
+     "Fn::GetAtt": [
+      "GetSchemaLambdaServiceRoleDB354D6B",
+      "Arn"
+     ]
+    },
+    "Runtime": "python3.11",
+    "Timeout": 30
+   },
+   "DependsOn": [
+    "GetSchemaLambdaServiceRoleDefaultPolicy434A6154",
+    "GetSchemaLambdaServiceRoleDB354D6B"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "D2GStack/GetSchemaLambda/Resource",
+    "aws:asset:path": "asset.8143c4e37e89d005f8939794dcc0abe063020be0fbca7c227da21c2bf1c2fd58",
+    "aws:asset:is-bundled": false,
+    "aws:asset:property": "Code"
+   }
+  },
+  "GetConfigLambdaServiceRole527E8D43": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "D2GStack/GetConfigLambda/ServiceRole/Resource"
+   }
+  },
+  "GetConfigLambdaServiceRoleDefaultPolicyD3BB4DF4": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "dynamodb:BatchGetItem",
+        "dynamodb:ConditionCheckItem",
+        "dynamodb:DescribeTable",
+        "dynamodb:GetItem",
+        "dynamodb:GetRecords",
+        "dynamodb:GetShardIterator",
+        "dynamodb:Query",
+        "dynamodb:Scan"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "FormSchemasTableDE010A3F",
+          "Arn"
+         ]
+        },
+        {
+         "Ref": "AWS::NoValue"
+        }
+       ]
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "GetConfigLambdaServiceRoleDefaultPolicyD3BB4DF4",
+    "Roles": [
+     {
+      "Ref": "GetConfigLambdaServiceRole527E8D43"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "D2GStack/GetConfigLambda/ServiceRole/DefaultPolicy/Resource"
+   }
+  },
+  "GetConfigLambda6D307F1E": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": {
+      "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-ap-east-1"
+     },
+     "S3Key": "8143c4e37e89d005f8939794dcc0abe063020be0fbca7c227da21c2bf1c2fd58.zip"
+    },
+    "Environment": {
+     "Variables": {
+      "SCHEMAS_TABLE": {
+       "Ref": "FormSchemasTableDE010A3F"
+      }
+     }
+    },
+    "FunctionName": "d2g-get-config",
+    "Handler": "get_config.handler",
+    "MemorySize": 256,
+    "Role": {
+     "Fn::GetAtt": [
+      "GetConfigLambdaServiceRole527E8D43",
+      "Arn"
+     ]
+    },
+    "Runtime": "python3.11",
+    "Timeout": 30
+   },
+   "DependsOn": [
+    "GetConfigLambdaServiceRoleDefaultPolicyD3BB4DF4",
+    "GetConfigLambdaServiceRole527E8D43"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "D2GStack/GetConfigLambda/Resource",
+    "aws:asset:path": "asset.8143c4e37e89d005f8939794dcc0abe063020be0fbca7c227da21c2bf1c2fd58",
+    "aws:asset:is-bundled": false,
+    "aws:asset:property": "Code"
+   }
+  },
+  "ManageSchemaLambdaServiceRole882AF0BB": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "D2GStack/ManageSchemaLambda/ServiceRole/Resource"
+   }
+  },
+  "ManageSchemaLambdaServiceRoleDefaultPolicy4AE08929": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": "dynamodb:*",
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "FormSchemasTableDE010A3F",
+          "Arn"
+         ]
+        },
+        {
+         "Ref": "AWS::NoValue"
+        }
+       ]
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "ManageSchemaLambdaServiceRoleDefaultPolicy4AE08929",
+    "Roles": [
+     {
+      "Ref": "ManageSchemaLambdaServiceRole882AF0BB"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "D2GStack/ManageSchemaLambda/ServiceRole/DefaultPolicy/Resource"
+   }
+  },
+  "ManageSchemaLambda918D4622": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": {
+      "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-ap-east-1"
+     },
+     "S3Key": "8143c4e37e89d005f8939794dcc0abe063020be0fbca7c227da21c2bf1c2fd58.zip"
+    },
+    "Environment": {
+     "Variables": {
+      "SCHEMAS_TABLE": {
+       "Ref": "FormSchemasTableDE010A3F"
+      }
+     }
+    },
+    "FunctionName": "d2g-manage-schema",
+    "Handler": "manage_schema.handler",
+    "MemorySize": 256,
+    "Role": {
+     "Fn::GetAtt": [
+      "ManageSchemaLambdaServiceRole882AF0BB",
+      "Arn"
+     ]
+    },
+    "Runtime": "python3.11",
+    "Timeout": 30
+   },
+   "DependsOn": [
+    "ManageSchemaLambdaServiceRoleDefaultPolicy4AE08929",
+    "ManageSchemaLambdaServiceRole882AF0BB"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "D2GStack/ManageSchemaLambda/Resource",
+    "aws:asset:path": "asset.8143c4e37e89d005f8939794dcc0abe063020be0fbca7c227da21c2bf1c2fd58",
+    "aws:asset:is-bundled": false,
+    "aws:asset:property": "Code"
+   }
+  },
+  "AdminKapitanatLambdaServiceRoleD445CEFA": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "D2GStack/AdminKapitanatLambda/ServiceRole/Resource"
+   }
+  },
+  "AdminKapitanatLambdaServiceRoleDefaultPolicyC2166EFF": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": "dynamodb:*",
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "FormSchemasTableDE010A3F",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::GetAtt": [
+          "FormSubmissionsTable236C0FD5",
+          "Arn"
+         ]
+        },
+        {
+         "Ref": "AWS::NoValue"
+        }
+       ]
+      },
+      {
+       "Action": [
+        "cognito-idp:AdminAddUserToGroup",
+        "cognito-idp:AdminCreateUser",
+        "cognito-idp:AdminDeleteUser",
+        "cognito-idp:AdminListGroupsForUser",
+        "cognito-idp:AdminRemoveUserFromGroup",
+        "cognito-idp:GetUser",
+        "cognito-idp:ListUsers"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::GetAtt": [
+         "D2GUserPool139E2CC7",
+         "Arn"
+        ]
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "AdminKapitanatLambdaServiceRoleDefaultPolicyC2166EFF",
+    "Roles": [
+     {
+      "Ref": "AdminKapitanatLambdaServiceRoleD445CEFA"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "D2GStack/AdminKapitanatLambda/ServiceRole/DefaultPolicy/Resource"
+   }
+  },
+  "AdminKapitanatLambdaBB12F481": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": {
+      "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-ap-east-1"
+     },
+     "S3Key": "8143c4e37e89d005f8939794dcc0abe063020be0fbca7c227da21c2bf1c2fd58.zip"
+    },
+    "Environment": {
+     "Variables": {
+      "DYNAMODB_TABLE": {
+       "Ref": "FormSubmissionsTable236C0FD5"
+      },
+      "SCHEMAS_TABLE": {
+       "Ref": "FormSchemasTableDE010A3F"
+      },
+      "USER_POOL_ID": {
+       "Ref": "D2GUserPool139E2CC7"
+      },
+      "USER_POOL_CLIENT_ID": {
+       "Ref": "D2GUserPoolClient197F85BA"
+      }
+     }
+    },
+    "FunctionName": "d2g-admin-kapitanat",
+    "Handler": "admin_kapitanat.handler",
+    "MemorySize": 512,
+    "Role": {
+     "Fn::GetAtt": [
+      "AdminKapitanatLambdaServiceRoleD445CEFA",
+      "Arn"
+     ]
+    },
+    "Runtime": "python3.11",
+    "Timeout": 30
+   },
+   "DependsOn": [
+    "AdminKapitanatLambdaServiceRoleDefaultPolicyC2166EFF",
+    "AdminKapitanatLambdaServiceRoleD445CEFA"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "D2GStack/AdminKapitanatLambda/Resource",
+    "aws:asset:path": "asset.8143c4e37e89d005f8939794dcc0abe063020be0fbca7c227da21c2bf1c2fd58",
+    "aws:asset:is-bundled": false,
+    "aws:asset:property": "Code"
+   }
+  },
+  "D2GHttpApi01FB84D6": {
+   "Type": "AWS::ApiGatewayV2::Api",
+   "Properties": {
+    "CorsConfiguration": {
+     "AllowHeaders": [
+      "Content-Type",
+      "Authorization"
+     ],
+     "AllowMethods": [
+      "*"
+     ],
+     "AllowOrigins": [
+      "*"
+     ],
+     "MaxAge": 86400
+    },
+    "Name": "d2g-api",
+    "ProtocolType": "HTTP"
+   },
+   "Metadata": {
+    "aws:cdk:path": "D2GStack/D2GHttpApi/Resource"
+   }
+  },
+  "D2GHttpApiDefaultStageFCC88911": {
+   "Type": "AWS::ApiGatewayV2::Stage",
+   "Properties": {
+    "ApiId": {
+     "Ref": "D2GHttpApi01FB84D6"
+    },
+    "AutoDeploy": true,
+    "StageName": "$default"
+   },
+   "Metadata": {
+    "aws:cdk:path": "D2GStack/D2GHttpApi/DefaultStage/Resource"
+   }
+  },
+  "D2GHttpApiPOSTsubmitformSubmitFormIntegrationC0B7B231": {
+   "Type": "AWS::ApiGatewayV2::Integration",
+   "Properties": {
+    "ApiId": {
+     "Ref": "D2GHttpApi01FB84D6"
+    },
+    "IntegrationType": "AWS_PROXY",
+    "IntegrationUri": {
+     "Fn::GetAtt": [
+      "SubmitFormLambdaA015CC73",
+      "Arn"
+     ]
+    },
+    "PayloadFormatVersion": "2.0"
+   },
+   "Metadata": {
+    "aws:cdk:path": "D2GStack/D2GHttpApi/POST--submit-form/SubmitFormIntegration/Resource"
+   }
+  },
+  "D2GHttpApiPOSTsubmitformSubmitFormIntegrationPermission30CFD3F8": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "SubmitFormLambdaA015CC73",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:ap-east-1:",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":",
+       {
+        "Ref": "D2GHttpApi01FB84D6"
+       },
+       "/*/*/submit-form"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "D2GStack/D2GHttpApi/POST--submit-form/SubmitFormIntegration-Permission"
+   }
+  },
+  "D2GHttpApiPOSTsubmitform7ED63243": {
+   "Type": "AWS::ApiGatewayV2::Route",
+   "Properties": {
+    "ApiId": {
+     "Ref": "D2GHttpApi01FB84D6"
+    },
+    "AuthorizationType": "NONE",
+    "RouteKey": "POST /submit-form",
+    "Target": {
+     "Fn::Join": [
+      "",
+      [
+       "integrations/",
+       {
+        "Ref": "D2GHttpApiPOSTsubmitformSubmitFormIntegrationC0B7B231"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "D2GStack/D2GHttpApi/POST--submit-form/Resource"
+   }
+  },
+  "D2GHttpApiGETschemaGetSchemaIntegration1605F191": {
+   "Type": "AWS::ApiGatewayV2::Integration",
+   "Properties": {
+    "ApiId": {
+     "Ref": "D2GHttpApi01FB84D6"
+    },
+    "IntegrationType": "AWS_PROXY",
+    "IntegrationUri": {
+     "Fn::GetAtt": [
+      "GetSchemaLambda0F96AA6F",
+      "Arn"
+     ]
+    },
+    "PayloadFormatVersion": "2.0"
+   },
+   "Metadata": {
+    "aws:cdk:path": "D2GStack/D2GHttpApi/GET--schema/GetSchemaIntegration/Resource"
+   }
+  },
+  "D2GHttpApiGETschemaGetSchemaIntegrationPermission4FB2CB7E": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "GetSchemaLambda0F96AA6F",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:ap-east-1:",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":",
+       {
+        "Ref": "D2GHttpApi01FB84D6"
+       },
+       "/*/*/schema"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "D2GStack/D2GHttpApi/GET--schema/GetSchemaIntegration-Permission"
+   }
+  },
+  "D2GHttpApiGETschemaE7B5DFE1": {
+   "Type": "AWS::ApiGatewayV2::Route",
+   "Properties": {
+    "ApiId": {
+     "Ref": "D2GHttpApi01FB84D6"
+    },
+    "AuthorizationType": "NONE",
+    "RouteKey": "GET /schema",
+    "Target": {
+     "Fn::Join": [
+      "",
+      [
+       "integrations/",
+       {
+        "Ref": "D2GHttpApiGETschemaGetSchemaIntegration1605F191"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "D2GStack/D2GHttpApi/GET--schema/Resource"
+   }
+  },
+  "D2GHttpApiGETconfigGetConfigIntegration0349A2FA": {
+   "Type": "AWS::ApiGatewayV2::Integration",
+   "Properties": {
+    "ApiId": {
+     "Ref": "D2GHttpApi01FB84D6"
+    },
+    "IntegrationType": "AWS_PROXY",
+    "IntegrationUri": {
+     "Fn::GetAtt": [
+      "GetConfigLambda6D307F1E",
+      "Arn"
+     ]
+    },
+    "PayloadFormatVersion": "2.0"
+   },
+   "Metadata": {
+    "aws:cdk:path": "D2GStack/D2GHttpApi/GET--config/GetConfigIntegration/Resource"
+   }
+  },
+  "D2GHttpApiGETconfigGetConfigIntegrationPermission7F3BAE66": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "GetConfigLambda6D307F1E",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:ap-east-1:",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":",
+       {
+        "Ref": "D2GHttpApi01FB84D6"
+       },
+       "/*/*/config"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "D2GStack/D2GHttpApi/GET--config/GetConfigIntegration-Permission"
+   }
+  },
+  "D2GHttpApiGETconfigB8BD7D80": {
+   "Type": "AWS::ApiGatewayV2::Route",
+   "Properties": {
+    "ApiId": {
+     "Ref": "D2GHttpApi01FB84D6"
+    },
+    "AuthorizationType": "NONE",
+    "RouteKey": "GET /config",
+    "Target": {
+     "Fn::Join": [
+      "",
+      [
+       "integrations/",
+       {
+        "Ref": "D2GHttpApiGETconfigGetConfigIntegration0349A2FA"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "D2GStack/D2GHttpApi/GET--config/Resource"
+   }
+  },
+  "D2GHttpApiGETmanageschemaManageSchemaIntegration2D5EEC8A": {
+   "Type": "AWS::ApiGatewayV2::Integration",
+   "Properties": {
+    "ApiId": {
+     "Ref": "D2GHttpApi01FB84D6"
+    },
+    "IntegrationType": "AWS_PROXY",
+    "IntegrationUri": {
+     "Fn::GetAtt": [
+      "ManageSchemaLambda918D4622",
+      "Arn"
+     ]
+    },
+    "PayloadFormatVersion": "2.0"
+   },
+   "Metadata": {
+    "aws:cdk:path": "D2GStack/D2GHttpApi/GET--manage-schema/ManageSchemaIntegration/Resource"
+   }
+  },
+  "D2GHttpApiGETmanageschemaManageSchemaIntegrationPermission531D7FC3": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "ManageSchemaLambda918D4622",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:ap-east-1:",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":",
+       {
+        "Ref": "D2GHttpApi01FB84D6"
+       },
+       "/*/*/manage-schema"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "D2GStack/D2GHttpApi/GET--manage-schema/ManageSchemaIntegration-Permission"
+   }
+  },
+  "D2GHttpApiGETmanageschemaB322C297": {
+   "Type": "AWS::ApiGatewayV2::Route",
+   "Properties": {
+    "ApiId": {
+     "Ref": "D2GHttpApi01FB84D6"
+    },
+    "AuthorizationType": "NONE",
+    "RouteKey": "GET /manage-schema",
+    "Target": {
+     "Fn::Join": [
+      "",
+      [
+       "integrations/",
+       {
+        "Ref": "D2GHttpApiGETmanageschemaManageSchemaIntegration2D5EEC8A"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "D2GStack/D2GHttpApi/GET--manage-schema/Resource"
+   }
+  },
+  "D2GHttpApiPOSTmanageschemaManageSchemaIntegrationPermission5BE1202C": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "ManageSchemaLambda918D4622",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:ap-east-1:",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":",
+       {
+        "Ref": "D2GHttpApi01FB84D6"
+       },
+       "/*/*/manage-schema"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "D2GStack/D2GHttpApi/POST--manage-schema/ManageSchemaIntegration-Permission"
+   }
+  },
+  "D2GHttpApiPOSTmanageschema336376E0": {
+   "Type": "AWS::ApiGatewayV2::Route",
+   "Properties": {
+    "ApiId": {
+     "Ref": "D2GHttpApi01FB84D6"
+    },
+    "AuthorizationType": "NONE",
+    "RouteKey": "POST /manage-schema",
+    "Target": {
+     "Fn::Join": [
+      "",
+      [
+       "integrations/",
+       {
+        "Ref": "D2GHttpApiGETmanageschemaManageSchemaIntegration2D5EEC8A"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "D2GStack/D2GHttpApi/POST--manage-schema/Resource"
+   }
+  },
+  "D2GHttpApiPUTmanageschemaManageSchemaIntegrationPermissionBA0210F2": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "ManageSchemaLambda918D4622",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:ap-east-1:",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":",
+       {
+        "Ref": "D2GHttpApi01FB84D6"
+       },
+       "/*/*/manage-schema"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "D2GStack/D2GHttpApi/PUT--manage-schema/ManageSchemaIntegration-Permission"
+   }
+  },
+  "D2GHttpApiPUTmanageschemaD87EC617": {
+   "Type": "AWS::ApiGatewayV2::Route",
+   "Properties": {
+    "ApiId": {
+     "Ref": "D2GHttpApi01FB84D6"
+    },
+    "AuthorizationType": "NONE",
+    "RouteKey": "PUT /manage-schema",
+    "Target": {
+     "Fn::Join": [
+      "",
+      [
+       "integrations/",
+       {
+        "Ref": "D2GHttpApiGETmanageschemaManageSchemaIntegration2D5EEC8A"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "D2GStack/D2GHttpApi/PUT--manage-schema/Resource"
+   }
+  },
+  "D2GHttpApiDELETEmanageschemaManageSchemaIntegrationPermissionB4DA3351": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "ManageSchemaLambda918D4622",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:ap-east-1:",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":",
+       {
+        "Ref": "D2GHttpApi01FB84D6"
+       },
+       "/*/*/manage-schema"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "D2GStack/D2GHttpApi/DELETE--manage-schema/ManageSchemaIntegration-Permission"
+   }
+  },
+  "D2GHttpApiDELETEmanageschema0D3796BF": {
+   "Type": "AWS::ApiGatewayV2::Route",
+   "Properties": {
+    "ApiId": {
+     "Ref": "D2GHttpApi01FB84D6"
+    },
+    "AuthorizationType": "NONE",
+    "RouteKey": "DELETE /manage-schema",
+    "Target": {
+     "Fn::Join": [
+      "",
+      [
+       "integrations/",
+       {
+        "Ref": "D2GHttpApiGETmanageschemaManageSchemaIntegration2D5EEC8A"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "D2GStack/D2GHttpApi/DELETE--manage-schema/Resource"
+   }
+  },
+  "D2GHttpApiGETkapitanatproxyAdminKapitanatIntegrationE126380C": {
+   "Type": "AWS::ApiGatewayV2::Integration",
+   "Properties": {
+    "ApiId": {
+     "Ref": "D2GHttpApi01FB84D6"
+    },
+    "IntegrationType": "AWS_PROXY",
+    "IntegrationUri": {
+     "Fn::GetAtt": [
+      "AdminKapitanatLambdaBB12F481",
+      "Arn"
+     ]
+    },
+    "PayloadFormatVersion": "2.0"
+   },
+   "Metadata": {
+    "aws:cdk:path": "D2GStack/D2GHttpApi/GET--kapitanat--{proxy+}/AdminKapitanatIntegration/Resource"
+   }
+  },
+  "D2GHttpApiGETkapitanatproxyAdminKapitanatIntegrationPermission2A99AE9B": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "AdminKapitanatLambdaBB12F481",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:ap-east-1:",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":",
+       {
+        "Ref": "D2GHttpApi01FB84D6"
+       },
+       "/*/*/kapitanat/{proxy+}"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "D2GStack/D2GHttpApi/GET--kapitanat--{proxy+}/AdminKapitanatIntegration-Permission"
+   }
+  },
+  "D2GHttpApiGETkapitanatproxy9662058E": {
+   "Type": "AWS::ApiGatewayV2::Route",
+   "Properties": {
+    "ApiId": {
+     "Ref": "D2GHttpApi01FB84D6"
+    },
+    "AuthorizationType": "NONE",
+    "RouteKey": "GET /kapitanat/{proxy+}",
+    "Target": {
+     "Fn::Join": [
+      "",
+      [
+       "integrations/",
+       {
+        "Ref": "D2GHttpApiGETkapitanatproxyAdminKapitanatIntegrationE126380C"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "D2GStack/D2GHttpApi/GET--kapitanat--{proxy+}/Resource"
+   }
+  },
+  "D2GHttpApiPOSTkapitanatproxyAdminKapitanatIntegrationPermission301EB192": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "AdminKapitanatLambdaBB12F481",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:ap-east-1:",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":",
+       {
+        "Ref": "D2GHttpApi01FB84D6"
+       },
+       "/*/*/kapitanat/{proxy+}"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "D2GStack/D2GHttpApi/POST--kapitanat--{proxy+}/AdminKapitanatIntegration-Permission"
+   }
+  },
+  "D2GHttpApiPOSTkapitanatproxy5907B56D": {
+   "Type": "AWS::ApiGatewayV2::Route",
+   "Properties": {
+    "ApiId": {
+     "Ref": "D2GHttpApi01FB84D6"
+    },
+    "AuthorizationType": "NONE",
+    "RouteKey": "POST /kapitanat/{proxy+}",
+    "Target": {
+     "Fn::Join": [
+      "",
+      [
+       "integrations/",
+       {
+        "Ref": "D2GHttpApiGETkapitanatproxyAdminKapitanatIntegrationE126380C"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "D2GStack/D2GHttpApi/POST--kapitanat--{proxy+}/Resource"
+   }
+  },
+  "D2GHttpApiPUTkapitanatproxyAdminKapitanatIntegrationPermission9A53A01F": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "AdminKapitanatLambdaBB12F481",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:ap-east-1:",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":",
+       {
+        "Ref": "D2GHttpApi01FB84D6"
+       },
+       "/*/*/kapitanat/{proxy+}"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "D2GStack/D2GHttpApi/PUT--kapitanat--{proxy+}/AdminKapitanatIntegration-Permission"
+   }
+  },
+  "D2GHttpApiPUTkapitanatproxyBDAA5B9D": {
+   "Type": "AWS::ApiGatewayV2::Route",
+   "Properties": {
+    "ApiId": {
+     "Ref": "D2GHttpApi01FB84D6"
+    },
+    "AuthorizationType": "NONE",
+    "RouteKey": "PUT /kapitanat/{proxy+}",
+    "Target": {
+     "Fn::Join": [
+      "",
+      [
+       "integrations/",
+       {
+        "Ref": "D2GHttpApiGETkapitanatproxyAdminKapitanatIntegrationE126380C"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "D2GStack/D2GHttpApi/PUT--kapitanat--{proxy+}/Resource"
+   }
+  },
+  "D2GHttpApiDELETEkapitanatproxyAdminKapitanatIntegrationPermissionC2A7E6B4": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "AdminKapitanatLambdaBB12F481",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:ap-east-1:",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":",
+       {
+        "Ref": "D2GHttpApi01FB84D6"
+       },
+       "/*/*/kapitanat/{proxy+}"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "D2GStack/D2GHttpApi/DELETE--kapitanat--{proxy+}/AdminKapitanatIntegration-Permission"
+   }
+  },
+  "D2GHttpApiDELETEkapitanatproxyA8BF4930": {
+   "Type": "AWS::ApiGatewayV2::Route",
+   "Properties": {
+    "ApiId": {
+     "Ref": "D2GHttpApi01FB84D6"
+    },
+    "AuthorizationType": "NONE",
+    "RouteKey": "DELETE /kapitanat/{proxy+}",
+    "Target": {
+     "Fn::Join": [
+      "",
+      [
+       "integrations/",
+       {
+        "Ref": "D2GHttpApiGETkapitanatproxyAdminKapitanatIntegrationE126380C"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "D2GStack/D2GHttpApi/DELETE--kapitanat--{proxy+}/Resource"
+   }
+  },
+  "CDKMetadata": {
+   "Type": "AWS::CDK::Metadata",
+   "Properties": {
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/2WO3U7DMAyFn2X3mWGteIBtEj9XVB1cT24aimmbVLXDVEV5d5RUQxNcnc/28dEpoNgVcL/BC291228HaiCcBHWv8MLn0C4WR9c2EN6wGYw6ftgMUWnXWRIH4Z3NXDk3pNsvX+E4kLFye/q/eZqdn6IacGxahPDorRZyNlluuTLzSMzkbFSEI4TarYWyVm4gvWRfpqi4PCOzEYZ9EsUlHLzujRyQjcKJOhRzweW7gPAsMu0nSu9J0ngS7HL8CmlVOy8rvVgx3YzXan/G7ItR1Yadn7VRuUDKIdslw6uXyUtU1SKfzt6VsCvhYfPFRNvZW6HRQL3qD3ySUC2gAQAA"
+   },
+   "Metadata": {
+    "aws:cdk:path": "D2GStack/CDKMetadata/Default"
+   }
+  }
+ },
+ "Outputs": {
+  "ApiEndpoint": {
+   "Description": "API Gateway endpoint",
+   "Value": {
+    "Fn::GetAtt": [
+     "D2GHttpApi01FB84D6",
+     "ApiEndpoint"
+    ]
+   }
+  },
+  "UserPoolId": {
+   "Description": "Cognito User Pool ID",
+   "Value": {
+    "Ref": "D2GUserPool139E2CC7"
+   }
+  },
+  "UserPoolClientId": {
+   "Description": "Cognito User Pool Client ID",
+   "Value": {
+    "Ref": "D2GUserPoolClient197F85BA"
+   }
+  },
+  "DynamoDBTableName": {
+   "Description": "DynamoDB table name",
+   "Value": {
+    "Ref": "FormSubmissionsTable236C0FD5"
+   }
+  },
+  "SchemasTableName": {
+   "Description": "DynamoDB schemas table name",
+   "Value": {
+    "Ref": "FormSchemasTableDE010A3F"
+   }
+  }
+ },
+ "Parameters": {
+  "BootstrapVersion": {
+   "Type": "AWS::SSM::Parameter::Value<String>",
+   "Default": "/cdk-bootstrap/hnb659fds/version",
+   "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]"
+  }
+ },
+ "Rules": {
+  "CheckBootstrapVersion": {
+   "Assertions": [
+    {
+     "Assert": {
+      "Fn::Not": [
+       {
+        "Fn::Contains": [
+         [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+         ],
+         {
+          "Ref": "BootstrapVersion"
+         }
+        ]
+       }
+      ]
+     },
+     "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI."
+    }
+   ]
+  }
+ }
+}

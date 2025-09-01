@@ -1,0 +1,36 @@
+{
+  "version": "48.0.0",
+  "files": {
+    "8143c4e37e89d005f8939794dcc0abe063020be0fbca7c227da21c2bf1c2fd58": {
+      "displayName": "SubmitFormLambda/Code",
+      "source": {
+        "path": "asset.8143c4e37e89d005f8939794dcc0abe063020be0fbca7c227da21c2bf1c2fd58",
+        "packaging": "zip"
+      },
+      "destinations": {
+        "current_account-ap-east-1-6303ae98": {
+          "bucketName": "cdk-hnb659fds-assets-${AWS::AccountId}-ap-east-1",
+          "objectKey": "8143c4e37e89d005f8939794dcc0abe063020be0fbca7c227da21c2bf1c2fd58.zip",
+          "region": "ap-east-1",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-file-publishing-role-${AWS::AccountId}-ap-east-1"
+        }
+      }
+    },
+    "620d117a82ea1368b21e3cdcec325cd7c974af378b76368803b3951e53b55d45": {
+      "displayName": "D2GStack Template",
+      "source": {
+        "path": "D2GStack.template.json",
+        "packaging": "file"
+      },
+      "destinations": {
+        "current_account-ap-east-1-297e4c92": {
+          "bucketName": "cdk-hnb659fds-assets-${AWS::AccountId}-ap-east-1",
+          "objectKey": "620d117a82ea1368b21e3cdcec325cd7c974af378b76368803b3951e53b55d45.json",
+          "region": "ap-east-1",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-file-publishing-role-${AWS::AccountId}-ap-east-1"
+        }
+      }
+    }
+  },
+  "dockerImages": {}
+}

@@ -1,0 +1,128 @@
+{
+  "formId": "dock2gdansk-main",
+  "version": "1.0.0",
+  "schema": {
+    "title": {"en": "Dock2Gdansk Shipping Inquiry", "zh": "码头到格但斯克运输询盘"},
+    "description": {"en": "Submit your shipping inquiry for cargo transportation between China and Poland", "zh": "提交您的中波货物运输询盘"},
+    "fields": [
+      {
+        "id": "company",
+        "type": "text",
+        "label": {"en": "Company Name", "zh": "公司名称"},
+        "required": true,
+        "placeholder": {"en": "Enter your company name", "zh": "请输入您的公司名称"},
+        "validation": {
+          "minLength": 2,
+          "maxLength": 100
+        }
+      },
+      {
+        "id": "email",
+        "type": "email",
+        "label": {"en": "Email Address", "zh": "电子邮箱"},
+        "required": true,
+        "placeholder": {"en": "Enter your email address", "zh": "请输入您的电子邮箱"},
+        "validation": {
+          "pattern": "^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$"
+        }
+      },
+      {
+        "id": "phone_prefix",
+        "type": "select",
+        "label": {"en": "Phone Prefix", "zh": "电话区号"},
+        "required": true,
+        "defaultValue": "+86",
+        "options": [
+          {"value": "+86", "label": {"en": "+86 (China)", "zh": "+86 (中国)"}},
+          {"value": "+48", "label": {"en": "+48 (Poland)", "zh": "+48 (波兰)"}},
+          {"value": "+1", "label": {"en": "+1 (USA/Canada)", "zh": "+1 (美国/加拿大)"}},
+          {"value": "+44", "label": {"en": "+44 (UK)", "zh": "+44 (英国)"}},
+          {"value": "+49", "label": {"en": "+49 (Germany)", "zh": "+49 (德国)"}},
+          {"value": "+33", "label": {"en": "+33 (France)", "zh": "+33 (法国)"}},
+          {"value": "+39", "label": {"en": "+39 (Italy)", "zh": "+39 (意大利)"}},
+          {"value": "+31", "label": {"en": "+31 (Netherlands)", "zh": "+31 (荷兰)"}},
+          {"value": "+7", "label": {"en": "+7 (Russia)", "zh": "+7 (俄罗斯)"}},
+          {"value": "+81", "label": {"en": "+81 (Japan)", "zh": "+81 (日本)"}},
+          {"value": "+82", "label": {"en": "+82 (South Korea)", "zh": "+82 (韩国)"}},
+          {"value": "+91", "label": {"en": "+91 (India)", "zh": "+91 (印度)"}}
+        ]
+      },
+      {
+        "id": "phone",
+        "type": "text",
+        "label": {"en": "Phone Number", "zh": "电话号码"},
+        "required": true,
+        "placeholder": {"en": "Example: 13712345678", "zh": "例如：13712345678"},
+        "validation": {
+          "pattern": "^[0-9]{7,15}$"
+        }
+      },
+      {
+        "id": "cargo_type",
+        "type": "select",
+        "label": {"en": "Cargo Type", "zh": "货物类型"},
+        "required": true,
+        "placeholder": {"en": "Select cargo type", "zh": "请选择货物类型"},
+        "options_source": "cargo_types",
+        "configurable": true,
+        "adminNote": "Cargo types are configurable in admin panel"
+      },
+      {
+        "id": "inquiry_content",
+        "type": "textarea",
+        "label": {"en": "Inquiry Details", "zh": "询盘详情"},
+        "required": true,
+        "placeholder": {"en": "Please describe your shipping requirements in detail", "zh": "请详细描述您的运输需求"},
+        "rows": 5,
+        "validation": {
+          "minLength": 10,
+          "maxLength": 2000
+        }
+      },
+      {
+        "id": "privacy_consent",
+        "type": "checkbox",
+        "label": {"en": "Privacy Policy Consent", "zh": "隐私政策同意"},
+        "required": true,
+        "description": {"en": "I have read and agree to the Privacy Policy and consent to the processing of my personal data for handling this inquiry, in accordance with PIPL and GDPR.", "zh": "我已阅读并同意隐私政策，同意为处理此询盘而处理我的个人数据，符合PIPL和GDPR规定。"},
+        "validation": {
+          "mustBeTrue": true
+        }
+      },
+      {
+        "id": "terms_consent",
+        "type": "checkbox",
+        "label": {"en": "Terms of Service", "zh": "服务条款"},
+        "required": true,
+        "description": {"en": "I accept the terms of service", "zh": "我接受服务条款"},
+        "validation": {
+          "mustBeTrue": true
+        }
+      },
+      {
+        "id": "cross_border_consent",
+        "type": "checkbox",
+        "label": {"en": "Cross-border Data Transfer Consent", "zh": "跨境数据传输同意"},
+        "required": true,
+        "description": {"en": "I consent to the transfer of my personal data to Poland for the purpose of handling this inquiry", "zh": "我同意将我的个人数据传输到波兰以处理此询盘"},
+        "validation": {
+          "mustBeTrue": true
+        }
+      }
+    ],
+    "submitButton": {
+      "text": {"en": "Submit Inquiry", "zh": "提交询盘"},
+      "type": "submit",
+      "style": "primary"
+    },
+    "settings": {
+      "enableCaptcha": true,
+      "autoResponder": true,
+      "notificationEmail": "admin@dock2gdansk.com",
+      "supportedLanguages": ["en", "zh"]
+    }
+  },
+  "createdAt": "2024-01-01T00:00:00Z",
+  "isActive": true,
+  "description": "Main shipping inquiry form for Dock2Gdansk with bilingual support (EN/ZH)"
+}
