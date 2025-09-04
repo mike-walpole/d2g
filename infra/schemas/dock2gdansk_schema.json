@@ -68,6 +68,13 @@
         "adminNote": "Cargo types are configurable in admin panel"
       },
       {
+        "id": "imo_cargo",
+        "type": "checkbox",
+        "label": {"en": "IMO Cargo", "zh": "IMO货物"},
+        "required": false,
+        "description": {"en": "Check this box if your cargo contains dangerous goods (IMO classified)", "zh": "如果您的货物包含危险品（IMO分类），请选中此框"}
+      },
+      {
         "id": "inquiry_content",
         "type": "textarea",
         "label": {"en": "Inquiry Details", "zh": "询盘详情"},
@@ -108,6 +115,19 @@
         "validation": {
           "mustBeTrue": true
         }
+      },
+      {
+        "id": "referral_source",
+        "type": "select",
+        "label": {"en": "Where did you hear about us?", "zh": "您是如何了解我们的？"},
+        "required": false,
+        "placeholder": {"en": "Please select", "zh": "请选择"},
+        "options": [
+          {"value": "china_representative", "label": {"en": "China Representative", "zh": "中国代表"}},
+          {"value": "clif_2025", "label": {"en": "CLIF 2025", "zh": "CLIF 2025"}},
+          {"value": "port_gdansk_employee", "label": {"en": "Port Gdansk employee", "zh": "格但斯克港员工"}},
+          {"value": "other", "label": {"en": "Other", "zh": "其他"}}
+        ]
       }
     ],
     "submitButton": {

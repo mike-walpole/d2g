@@ -5,27 +5,108 @@
 	// Removed carbon icons to avoid import issues
 	import { currentLanguage, translations, switchLanguage, t } from '$lib/stores/config.js';
 	import { onMount } from 'svelte';
+	import { page } from '$app/stores';
+	import { detectLanguageFromGeolocation } from '$lib/utils/geolocation.js';
+	import { getDomainLanguage, shouldOverrideGeolocation, getDomainMetadata } from '$lib/utils/domain.js';
+	import { browser } from '$app/environment';
 
 	let { children } = $props();
 	
-	onMount(() => {
-		// Initialize config loading
+	// Domain-specific metadata
+	let domainMetadata = { title: '', description: '' };
+	
+	$: if (browser) {
+		const hostname = window.location.hostname;
+		domainMetadata = getDomainMetadata(hostname);
+	}
+	
+	onMount(async () => {
+		if (!browser) return;
+		
+		const hostname = window.location.hostname;
+		console.log('🌐 Current domain:', hostname);
+		
+		// Check for user language preferences first
+		const userPreference = localStorage.getItem('preferred-language');
+		const userOverride = localStorage.getItem('language-override');
+		
+		// Check if domain should override geolocation
+		const domainOverride = shouldOverrideGeolocation(hostname);
+		const domainLanguage = getDomainLanguage(hostname);
+		
+		let finalLanguage = null;
+		
+		if (domainOverride) {
+			// Domain-specific language (e.g., .cn always Chinese, .pl always English)
+			console.log(`🎯 Domain ${hostname} forces language:`, domainLanguage);
+			finalLanguage = domainLanguage;
+		} else if (userOverride && userPreference) {
+			// User has manually set preference
+			console.log('🔧 User has manually overridden language:', userPreference);
+			finalLanguage = userPreference;
+		} else {
+			// Use geolocation detection
+			let detectedLanguage = null;
+			
+			// Try server-side geolocation first (Vercel headers)
+			const geolocationData = $page.data?.geolocation;
+			
+			if (geolocationData?.detectedLanguage) {
+				console.log('🌍 Server-side geolocation detected:', geolocationData.detectedLanguage);
+				detectedLanguage = geolocationData.detectedLanguage;
+			} else {
+				// Fallback to client-side geolocation
+				console.log('📍 Server-side geolocation not available, trying client-side...');
+				detectedLanguage = await detectLanguageFromGeolocation();
+				console.log('🔍 Client-side geolocation detected:', detectedLanguage);
+			}
+			
+			finalLanguage = detectedLanguage || domainLanguage || 'en';
+			
+			if (detectedLanguage) {
+				localStorage.setItem('language-geolocation', detectedLanguage);
+			}
+		}
+		
+		// Apply the determined language
+		if (finalLanguage) {
+			console.log('✅ Final language decision:', finalLanguage);
+			switchLanguage(finalLanguage);
+		}
+		
+		// Initialize config loading with current language
 		import('$lib/stores/config.js').then(module => {
 			module.loadConfig($currentLanguage);
 		});
 	});
+	
+	// Enhanced language switching with override tracking
+	function handleLanguageSwitch(lang) {
+		console.log('🔄 User manually switched to language:', lang);
+		switchLanguage(lang);
+		// Mark that user has manually chosen a language (override geolocation)
+		localStorage.setItem('language-override', 'true');
+		localStorage.setItem('preferred-language', lang);
+	}
 </script>
 
 <svelte:head>
 	<link rel="icon" href={favicon} />
-	<title>{t('site_title', 'Dock2Gdansk')} - {t('site_tagline', 'Professional Cargo Transportation')}</title>
+	<title>{domainMetadata.title || t('site_title', 'Dock2Gdansk') + ' - ' + t('site_tagline', 'Professional Cargo Transportation')}</title>
+	<meta name="description" content={domainMetadata.description || t('site_description', 'Reliable, efficient, and professional shipping services connecting Asia to Europe')} />
+	<meta property="og:title" content={domainMetadata.title || t('site_title', 'Dock2Gdansk')} />
+	<meta property="og:description" content={domainMetadata.description || t('site_description', 'Reliable, efficient, and professional shipping services connecting Asia to Europe')} />
+	<meta property="og:type" content="website" />
+	{#if browser}
+		<meta property="og:url" content={window.location.href} />
+	{/if}
 </svelte:head>
 
 <Header company="Dock2Gdansk" platformName={t('site_tagline', 'Professional Cargo Transportation')}>
 	<HeaderNav>
 		
-		<HeaderNavItem onclick={() => switchLanguage('en')} text={t('EN', 'EN')} />
-		<HeaderNavItem onclick={() => switchLanguage('zh')} text={t('中文', '中文')} />
+		<HeaderNavItem onclick={() => handleLanguageSwitch('en')} text={t('EN', 'EN')} />
+		<HeaderNavItem onclick={() => handleLanguageSwitch('zh')} text={t('中文', '中文')} />
 	
 	
 	</HeaderNav>

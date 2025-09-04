@@ -82,9 +82,19 @@ export function switchLanguage(lang) {
 	}
 }
 
-// Initialize language from localStorage
+// Initialize language - will be overridden by geolocation in layout
 if (browser) {
-	const savedLang = localStorage.getItem('preferred-language') || 'en';
-	currentLanguage.set(savedLang);
-	loadConfig(savedLang);
+	// Only use saved language if user has manually overridden geolocation
+	const userOverride = localStorage.getItem('language-override');
+	const savedLang = localStorage.getItem('preferred-language');
+	
+	if (userOverride && savedLang) {
+		console.log('🔧 User has overridden language, using saved preference:', savedLang);
+		currentLanguage.set(savedLang);
+		loadConfig(savedLang);
+	} else {
+		// Don't load yet - wait for geolocation in layout
+		console.log('⏳ Waiting for geolocation detection...');
+		currentLanguage.set('en'); // Temporary default
+	}
 }

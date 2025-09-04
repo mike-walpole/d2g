@@ -1,20 +1,13 @@
 {
   "cargoTypes": [
-    {"id": "100", "name": {"en": "Foodstuff", "zh": "食品"}, "active": true},
-    {"id": "101", "name": {"en": "Dry Bulk Cargo", "zh": "干散货"}, "active": true},
-    {"id": "102", "name": {"en": "Oils and Gas", "zh": "石油天然气"}, "active": true},
-    {"id": "103", "name": {"en": "Metals", "zh": "金属"}, "active": true},
-    {"id": "104", "name": {"en": "Grains", "zh": "谷物"}, "active": true},
-    {"id": "105", "name": {"en": "Cement", "zh": "水泥"}, "active": true},
-    {"id": "106", "name": {"en": "Sugar", "zh": "糖"}, "active": true},
-    {"id": "107", "name": {"en": "Fertilizers and Chemicals", "zh": "化肥化工品"}, "active": true},
-    {"id": "108", "name": {"en": "Wood", "zh": "木材"}, "active": true},
-    {"id": "109", "name": {"en": "Containers Normal", "zh": "普通集装箱"}, "active": true},
-    {"id": "110", "name": {"en": "Containers (IMO)", "zh": "危险品集装箱"}, "active": true},
-    {"id": "111", "name": {"en": "Paper", "zh": "纸张"}, "active": true},
-    {"id": "112", "name": {"en": "Vehicles (RoRo)", "zh": "滚装车辆"}, "active": true},
-    {"id": "113", "name": {"en": "Project Cargo", "zh": "项目货物"}, "active": true}
+    {"id": "100", "name": {"en": "Dry Containers", "zh": "干货集装箱"}, "active": true},
+    {"id": "101", "name": {"en": "Reefer Containers", "zh": "冷藏集装箱"}, "active": true},
+    {"id": "102", "name": {"en": "Tank Containers", "zh": "罐式集装箱"}, "active": true},
+    {"id": "103", "name": {"en": "Solid Bulk Cargo", "zh": "固体散装货物"}, "active": true},
+    {"id": "104", "name": {"en": "Liquid Bulk Cargo", "zh": "液体散装货物"}, "active": true},
+    {"id": "105", "name": {"en": "Ro-Ro Cargo (Roll-on/Roll-off)", "zh": "滚装货物"}, "active": true},
+    {"id": "106", "name": {"en": "Project / Oversized Cargo", "zh": "项目/超大货物"}, "active": true}
   ],
-  "nextId": 114,
+  "nextId": 107,
   "lastUpdated": "2024-01-01T00:00:00Z"
 }
