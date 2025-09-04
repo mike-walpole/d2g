@@ -13,12 +13,14 @@
 	let { children } = $props();
 	
 	// Domain-specific metadata
-	let domainMetadata = { title: '', description: '' };
+	let domainMetadata = $state({ title: '', description: '' });
 	
-	$: if (browser) {
-		const hostname = window.location.hostname;
-		domainMetadata = getDomainMetadata(hostname);
-	}
+	$effect(() => {
+		if (browser) {
+			const hostname = window.location.hostname;
+			domainMetadata = getDomainMetadata(hostname);
+		}
+	});
 	
 	onMount(async () => {
 		if (!browser) return;
