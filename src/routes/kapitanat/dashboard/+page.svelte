@@ -111,6 +111,7 @@
 						email: submission.formData.email,
 						phone: `${submission.formData.phone_prefix} ${submission.formData.phone}`,
 						cargoType: submission.formData.cargo_type,
+						hearAboutUs: submission.formData.hear_about_us || submission.formData.referral_source || 'N/A',
 						inquiryContent: submission.formData.inquiry_content,
 						timestamp: submission.timestamp
 					}));
@@ -156,6 +157,7 @@
 		{ key: 'email', value: 'Email' },
 		{ key: 'phone', value: 'Phone' },
 		{ key: 'cargoType', value: 'Cargo Type' },
+		{ key: 'hearAboutUs', value: 'Where did you hear about us' },
 		{ key: 'inquiryContent', value: 'Inquiry' },
 		{ key: 'timestamp', value: 'Submitted' }
 	];
@@ -165,9 +167,7 @@
 		return new Date(timestamp).toLocaleDateString('en-US', {
 			year: 'numeric',
 			month: 'short',
-			day: 'numeric',
-			hour: '2-digit',
-			minute: '2-digit'
+			day: 'numeric'
 		});
 	}
 
