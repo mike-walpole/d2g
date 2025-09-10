@@ -79,6 +79,11 @@
 				console.log('📊 Frontend: Number of fields:', formSchema?.fields?.length || 0);
 				console.log('🌐 Frontend: Current language:', $currentLanguage);
 				
+				// Debug: Check if referral_source field is required
+				const referralField = formSchema?.fields?.find(f => f.id === 'referral_source');
+				console.log('🔍 Referral source field:', referralField);
+				console.log('🔍 Referral source required:', referralField?.required);
+				
 				// Initialize form data with new schema
 				initializeFormData();
 			} else {
@@ -141,12 +146,19 @@
 		const missingFields = [];
 		formSchema.fields.forEach(field => {
 			if (field.required) {
+				console.log(`🔍 Checking required field: ${field.id} (${field.type}) = "${formData[field.id]}"`);
 				if (field.type === 'checkbox') {
 					if (!formData[field.id]) {
+						console.log(`❌ Missing checkbox: ${field.id}`);
 						missingFields.push(getLocalizedText(field.label, field.id));
 					}
 				} else {
-					if (!formData[field.id] || formData[field.id].trim() === '') {
+					// Handle select fields and text fields
+					const fieldValue = formData[field.id];
+					const isEmpty = !fieldValue || (typeof fieldValue === 'string' && fieldValue.trim() === '');
+					
+					if (isEmpty) {
+						console.log(`❌ Missing field: ${field.id} (value: "${fieldValue}")`);
 						missingFields.push(getLocalizedText(field.label, field.id));
 					}
 				}
