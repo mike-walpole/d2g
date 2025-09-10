@@ -1399,11 +1399,11 @@ Please share these credentials securely with the new team member. They will be r
 						Manage Sources
 					</Button>
 					<Button 
-						kind="secondary" 
+						kind="tertiary" 
 						on:click={downloadSchema}
 						class="action-button"
 					>
-						📥 Download Schema
+						Download Schema
 					</Button>
 				</div>
 			</Tile>
