@@ -100,13 +100,26 @@
 		: 'Reliable, efficient, and professional shipping services connecting Asia to Europe';
 
 	onMount(async () => {
-		// Load config data first and wait for it
+		// Load config data and schema in parallel for faster loading
 		const configModule = await import('$lib/stores/config.js');
-		await configModule.loadConfig($currentLanguage);
-		console.log('✅ Config data loaded');
 		
-		// Load schema once when page loads
-		loadFormSchema();
+		// Start both loads simultaneously (parallel, not sequential)
+		const [configResult, schemaResult] = await Promise.allSettled([
+			configModule.loadConfig($currentLanguage),
+			loadFormSchema()
+		]);
+		
+		if (configResult.status === 'fulfilled') {
+			console.log('✅ Config data loaded');
+		} else {
+			console.error('❌ Config loading failed:', configResult.reason);
+		}
+		
+		if (schemaResult.status === 'fulfilled') {
+			console.log('✅ Schema loaded');
+		} else {
+			console.error('❌ Schema loading failed:', schemaResult.reason);
+		}
 	});
 
 	async function handleSubmit() {

@@ -220,6 +220,8 @@ class D2GStack(Stack):
                 resources=[self.user_pool.user_pool_arn]
             )
         )
+        
+# Note: Submit form lambda no longer needs Cognito permissions - it uses Analysis Email Recipients from DynamoDB
 
         # HTTP API Gateway
         self.api = apigatewayv2.HttpApi(
