@@ -145,7 +145,9 @@
 		// Check all required fields
 		const missingFields = [];
 		formSchema.fields.forEach(field => {
-			if (field.required) {
+			// Force referral_source to be required (frontend-only)
+			const isRequired = field.required || field.id === 'referral_source';
+			if (isRequired) {
 				console.log(`🔍 Checking required field: ${field.id} (${field.type}) = "${formData[field.id]}"`);
 				if (field.type === 'checkbox') {
 					if (!formData[field.id]) {
@@ -326,25 +328,25 @@
 											{#if field.type === 'text' || field.type === 'email' || field.type === 'tel'}
 												<TextInput
 													type={field.type}
-													labelText={(getLocalizedText(field.label, field.id)) + (field.required ? ' *' : '')}
+													labelText={(getLocalizedText(field.label, field.id)) + ((field.required || field.id === 'referral_source') ? ' *' : '')}
 													placeholder={field.placeholder ? getLocalizedText(field.placeholder, '') : ''}
 													bind:value={formData[field.id]}
-													required={field.required}
+													required={field.required || field.id === 'referral_source'}
 												/>
 											{:else if field.type === 'textarea'}
 												<TextArea
-													labelText={(getLocalizedText(field.label, field.id)) + (field.required ? ' *' : '')}
+													labelText={(getLocalizedText(field.label, field.id)) + ((field.required || field.id === 'referral_source') ? ' *' : '')}
 													placeholder={field.placeholder ? getLocalizedText(field.placeholder, '') : ''}
 													bind:value={formData[field.id]}
 													rows={field.rows || 4}
-													required={field.required}
+													required={field.required || field.id === 'referral_source'}
 												/>
 											{:else if field.type === 'select'}
 												<Select
-													labelText={(getLocalizedText(field.label, field.id)) + (field.required ? ' *' : '')}
+													labelText={(getLocalizedText(field.label, field.id)) + ((field.required || field.id === 'referral_source') ? ' *' : '')}
 													placeholder={field.placeholder ? getLocalizedText(field.placeholder, '') : ''}
 													bind:selected={formData[field.id]}
-													required={field.required}
+													required={field.required || field.id === 'referral_source'}
 												>
 													{#if field.id === 'cargo_type'}
 														<!-- Add placeholder option for cargo type -->
@@ -368,7 +370,7 @@
 												<Checkbox
 													labelText={(field.description ? getLocalizedText(field.description, field.id) : getLocalizedText(field.label, field.id)) + (field.required ? ' *' : '')}
 													bind:checked={formData[field.id]}
-													required={field.required}
+													required={field.required || field.id === 'referral_source'}
 												/>
 											{/if}
 										</div>
