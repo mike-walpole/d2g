@@ -47,20 +47,24 @@
 			console.log('🔧 User has manually overridden language:', userPreference);
 			finalLanguage = userPreference;
 		} else {
-			// Use geolocation detection
+			// Use server-side geolocation data from Vercel middleware
 			let detectedLanguage = null;
 			
-			// Try server-side geolocation first (Vercel headers)
-			const geolocationData = $page.data?.geolocation;
+			const serverGeolocation = $page.data?.geolocation;
 			
-			if (geolocationData?.detectedLanguage) {
-				console.log('🌍 Server-side geolocation detected:', geolocationData.detectedLanguage);
-				detectedLanguage = geolocationData.detectedLanguage;
+			if (serverGeolocation?.detectedLanguage) {
+				detectedLanguage = serverGeolocation.detectedLanguage;
+				console.log(`🎯 Server-side geolocation: ${serverGeolocation.country || 'unknown'} -> ${detectedLanguage}`);
+				
+				// Store geolocation info for debugging
+				if (serverGeolocation.country) {
+					localStorage.setItem('user-country', serverGeolocation.country);
+					localStorage.setItem('user-city', serverGeolocation.city || '');
+				}
 			} else {
-				// Fallback to client-side geolocation
-				console.log('📍 Server-side geolocation not available, trying client-side...');
+				console.log('⚠️ Server-side geolocation not available, trying fallback...');
+				// Fallback to old client-side geolocation
 				detectedLanguage = await detectLanguageFromGeolocation();
-				console.log('🔍 Client-side geolocation detected:', detectedLanguage);
 			}
 			
 			finalLanguage = detectedLanguage || domainLanguage || 'en';
