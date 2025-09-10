@@ -2,7 +2,7 @@
   "formId": "dock2gdansk-main",
   "version": "1.0.0",
   "schema": {
-    "title": {"en": "Dock2Gdansk Shipping Inquiry", "zh": "码头到格但斯克运输询盘"},
+    "title": {"en": "Dock2Gdansk Shipping Inquiry", "zh": "格但斯克港货物运输询盘"},
     "description": {"en": "Submit your shipping inquiry for cargo transportation between China and Poland", "zh": "提交您的中波货物运输询盘"},
     "fields": [
       {

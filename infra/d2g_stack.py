@@ -197,6 +197,7 @@ class D2GStack(Stack):
         # Grant permissions to Lambda functions
         self.form_submissions_table.grant_write_data(self.submit_form_lambda)
         self.form_schemas_table.grant_read_data(self.submit_form_lambda)  # For schema version lookup
+        self.form_schemas_table.grant_write_data(self.submit_form_lambda)  # For counter updates
         self.form_submissions_table.grant_read_data(self.get_schema_lambda)
         self.form_schemas_table.grant_read_data(self.get_schema_lambda)
         self.form_schemas_table.grant_read_data(self.get_config_lambda)  # For config data

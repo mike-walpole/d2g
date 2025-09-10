@@ -221,6 +221,12 @@
        "Resource": [
         {
          "Fn::GetAtt": [
+          "FormSchemasTableDE010A3F",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::GetAtt": [
           "FormSubmissionsTable236C0FD5",
           "Arn"
          ]
@@ -275,7 +281,7 @@
      "S3Bucket": {
       "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-ap-east-1"
      },
-     "S3Key": "262f48104909fcd3332f5284a57445797cc4183d5098d1e75fcadbc21ac01901.zip"
+     "S3Key": "8d66cf06b3b96ca0767e1c2e3241090ad24ab09c618854efd1cb74bde4383fdf.zip"
     },
     "Environment": {
      "Variables": {
@@ -311,7 +317,7 @@
    ],
    "Metadata": {
     "aws:cdk:path": "D2GStack/SubmitFormLambda/Resource",
-    "aws:asset:path": "asset.262f48104909fcd3332f5284a57445797cc4183d5098d1e75fcadbc21ac01901",
+    "aws:asset:path": "asset.8d66cf06b3b96ca0767e1c2e3241090ad24ab09c618854efd1cb74bde4383fdf",
     "aws:asset:is-bundled": false,
     "aws:asset:property": "Code"
    }
@@ -406,7 +412,7 @@
      "S3Bucket": {
       "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-ap-east-1"
      },
-     "S3Key": "262f48104909fcd3332f5284a57445797cc4183d5098d1e75fcadbc21ac01901.zip"
+     "S3Key": "8d66cf06b3b96ca0767e1c2e3241090ad24ab09c618854efd1cb74bde4383fdf.zip"
     },
     "Environment": {
      "Variables": {
@@ -436,7 +442,7 @@
    ],
    "Metadata": {
     "aws:cdk:path": "D2GStack/GetSchemaLambda/Resource",
-    "aws:asset:path": "asset.262f48104909fcd3332f5284a57445797cc4183d5098d1e75fcadbc21ac01901",
+    "aws:asset:path": "asset.8d66cf06b3b96ca0767e1c2e3241090ad24ab09c618854efd1cb74bde4383fdf",
     "aws:asset:is-bundled": false,
     "aws:asset:property": "Code"
    }
@@ -525,7 +531,7 @@
      "S3Bucket": {
       "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-ap-east-1"
      },
-     "S3Key": "262f48104909fcd3332f5284a57445797cc4183d5098d1e75fcadbc21ac01901.zip"
+     "S3Key": "8d66cf06b3b96ca0767e1c2e3241090ad24ab09c618854efd1cb74bde4383fdf.zip"
     },
     "Environment": {
      "Variables": {
@@ -552,7 +558,7 @@
    ],
    "Metadata": {
     "aws:cdk:path": "D2GStack/GetConfigLambda/Resource",
-    "aws:asset:path": "asset.262f48104909fcd3332f5284a57445797cc4183d5098d1e75fcadbc21ac01901",
+    "aws:asset:path": "asset.8d66cf06b3b96ca0767e1c2e3241090ad24ab09c618854efd1cb74bde4383fdf",
     "aws:asset:is-bundled": false,
     "aws:asset:property": "Code"
    }
@@ -632,7 +638,7 @@
      "S3Bucket": {
       "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-ap-east-1"
      },
-     "S3Key": "262f48104909fcd3332f5284a57445797cc4183d5098d1e75fcadbc21ac01901.zip"
+     "S3Key": "8d66cf06b3b96ca0767e1c2e3241090ad24ab09c618854efd1cb74bde4383fdf.zip"
     },
     "Environment": {
      "Variables": {
@@ -659,7 +665,7 @@
    ],
    "Metadata": {
     "aws:cdk:path": "D2GStack/ManageSchemaLambda/Resource",
-    "aws:asset:path": "asset.262f48104909fcd3332f5284a57445797cc4183d5098d1e75fcadbc21ac01901",
+    "aws:asset:path": "asset.8d66cf06b3b96ca0767e1c2e3241090ad24ab09c618854efd1cb74bde4383fdf",
     "aws:asset:is-bundled": false,
     "aws:asset:property": "Code"
    }
@@ -763,7 +769,7 @@
      "S3Bucket": {
       "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-ap-east-1"
      },
-     "S3Key": "262f48104909fcd3332f5284a57445797cc4183d5098d1e75fcadbc21ac01901.zip"
+     "S3Key": "8d66cf06b3b96ca0767e1c2e3241090ad24ab09c618854efd1cb74bde4383fdf.zip"
     },
     "Environment": {
      "Variables": {
@@ -799,7 +805,7 @@
    ],
    "Metadata": {
     "aws:cdk:path": "D2GStack/AdminKapitanatLambda/Resource",
-    "aws:asset:path": "asset.262f48104909fcd3332f5284a57445797cc4183d5098d1e75fcadbc21ac01901",
+    "aws:asset:path": "asset.8d66cf06b3b96ca0767e1c2e3241090ad24ab09c618854efd1cb74bde4383fdf",
     "aws:asset:is-bundled": false,
     "aws:asset:property": "Code"
    }
