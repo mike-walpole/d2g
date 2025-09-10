@@ -20,6 +20,12 @@
 	let submitMessage = '';
 	let submitStatus = 'info'; // 'success', 'error', 'info'
 
+	// Select all checkboxes functionality
+	let selectAllConsent = false;
+	
+	// List of consent checkboxes that should be controlled by select all
+	const consentCheckboxIds = ['privacy_consent', 'terms_consent', 'cross_border_consent'];
+
 	// Helper function to get localized text from schema (reactive)
 	$: getLocalizedText = (textObj, fallback = '') => {
 		if (!textObj) return fallback;
@@ -42,7 +48,10 @@
 			if (field.type === 'checkbox') {
 				newFormData[field.id] = false;
 			} else if (field.type === 'select' && field.id === 'phone_prefix') {
-				newFormData[field.id] = '+86'; // Default phone prefix
+				newFormData[field.id] = '+86'; // Keep default phone prefix
+			} else if (field.type === 'select') {
+				// Other select fields (cargo_type, referral_source) start empty
+				newFormData[field.id] = '';
 			} else {
 				newFormData[field.id] = '';
 			}
@@ -167,6 +176,29 @@
 			isSubmitting = false;
 		}
 	}
+	
+	// Handle select all consent checkboxes
+	function handleSelectAllConsent() {
+		consentCheckboxIds.forEach(id => {
+			if (formData[id] !== undefined) {
+				formData[id] = selectAllConsent;
+			}
+		});
+	}
+	
+	// Update select all state when individual checkboxes change
+	$: {
+		if (formData && consentCheckboxIds.length > 0) {
+			const allChecked = consentCheckboxIds.every(id => formData[id] === true);
+			const anyChecked = consentCheckboxIds.some(id => formData[id] === true);
+			
+			if (allChecked) {
+				selectAllConsent = true;
+			} else if (!anyChecked) {
+				selectAllConsent = false;
+			}
+		}
+	}
 </script>
 
 <svelte:window bind:innerWidth />
@@ -213,20 +245,36 @@
 					<form on:submit|preventDefault={handleSubmit} class="space-y-6">
 						<Grid condensed>
 							{#if formSchema?.fields}
-								{#each formSchema.fields as field}
+								{#each formSchema.fields as field, index}
+									<!-- Add Select All checkbox after inquiry_content and before consent checkboxes -->
+									{#if field.id === 'privacy_consent' && formSchema.fields.some(f => consentCheckboxIds.includes(f.id))}
+										<Column sm={4} md={8} lg={16}>
+											<div style="margin-bottom: 24px; padding: 16px; background-color: #f0f8ff; border: 2px dashed #0066cc; border-radius: 8px;">
+												<Checkbox
+													labelText={$currentLanguage === 'zh' ? '选择所有必需的同意条款' : 'Select all required consents'}
+													bind:checked={selectAllConsent}
+													on:change={handleSelectAllConsent}
+												/>
+												<p style="margin: 8px 0 0 0; font-size: 12px; color: #666; font-style: italic;">
+													{$currentLanguage === 'zh' ? '选中此框可一次性选择所有同意条款复选框' : 'Check this box to select all consent checkboxes at once'}
+												</p>
+											</div>
+										</Column>
+									{/if}
+									
 									<Column sm={4} md={8} lg={16}>
 										<div style="margin-bottom: 24px;">
 											{#if field.type === 'text' || field.type === 'email' || field.type === 'tel'}
 												<TextInput
 													type={field.type}
-													labelText={getLocalizedText(field.label, field.id)}
+													labelText={(getLocalizedText(field.label, field.id)) + (field.required ? ' *' : '')}
 													placeholder={field.placeholder ? getLocalizedText(field.placeholder, '') : ''}
 													bind:value={formData[field.id]}
 													required={field.required}
 												/>
 											{:else if field.type === 'textarea'}
 												<TextArea
-													labelText={getLocalizedText(field.label, field.id)}
+													labelText={(getLocalizedText(field.label, field.id)) + (field.required ? ' *' : '')}
 													placeholder={field.placeholder ? getLocalizedText(field.placeholder, '') : ''}
 													bind:value={formData[field.id]}
 													rows={field.rows || 4}
@@ -234,14 +282,22 @@
 												/>
 											{:else if field.type === 'select'}
 												<Select
-													labelText={getLocalizedText(field.label, field.id)}
+													labelText={(getLocalizedText(field.label, field.id)) + (field.required ? ' *' : '')}
 													placeholder={field.placeholder ? getLocalizedText(field.placeholder, '') : ''}
 													bind:selected={formData[field.id]}
 													required={field.required}
 												>
 													{#if field.id === 'cargo_type'}
+														<!-- Add placeholder option for cargo type -->
+														<SelectItem value="" text={$currentLanguage === 'zh' ? '请选择货物类型' : 'Please select cargo type'} disabled />
 														{#each $cargoTypes as cargoType}
 															<SelectItem value={cargoType.id} text={cargoType.name} />
+														{/each}
+													{:else if field.id === 'referral_source'}
+														<!-- Add placeholder option for referral source -->
+														<SelectItem value="" text={$currentLanguage === 'zh' ? '请选择' : 'Please select'} disabled />
+														{#each field.options as option}
+															<SelectItem value={option.value} text={getLocalizedText(option.label, option.value)} />
 														{/each}
 													{:else if field.options}
 														{#each field.options as option}
@@ -251,7 +307,7 @@
 												</Select>
 											{:else if field.type === 'checkbox'}
 												<Checkbox
-													labelText={field.description ? getLocalizedText(field.description, field.id) : getLocalizedText(field.label, field.id)}
+													labelText={(field.description ? getLocalizedText(field.description, field.id) : getLocalizedText(field.label, field.id)) + (field.required ? ' *' : '')}
 													bind:checked={formData[field.id]}
 													required={field.required}
 												/>

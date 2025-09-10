@@ -1,7 +1,7 @@
 <script>
 	import { 
 		Button, Tile, Grid, Column, DataTable, Toolbar, ToolbarContent,
-		ToolbarSearch, ToolbarMenu, ToolbarMenuItem, Breadcrumb, BreadcrumbItem,
+		Breadcrumb, BreadcrumbItem,
 		Tag, ProgressBar, ClickableTile, Modal, TextInput, TextArea, Select, SelectItem, Checkbox
 	} from 'carbon-components-svelte';
 	// Removed carbon icons to avoid import issues
@@ -22,6 +22,7 @@
 	let showManageFormModal = false;
 	let showManageCargoModal = false;
 	let showManageTeamModal = false;
+	let showManageEmailsModal = false;
 
 	// Form data for modals
 	let newCargoType = { 
@@ -35,6 +36,13 @@
 	// Team management data
 	let teamMembers = [];
 	let isLoadingTeam = false;
+	let newUserCredentials = null; // Store credentials for newly created user
+	let showCredentials = false; // Show credentials modal
+	
+	// Email management data
+	let clientEmails = [];
+	let newEmail = '';
+	let isLoadingEmails = false;
 	
 	// Form schema management
 	let editingSchema = null;
@@ -86,6 +94,7 @@
 		loadCargoTypes();
 		loadFormSchema();
 		loadTeamMembers();
+		loadClientEmails();
 	});
 
 	async function loadDashboardData() {
@@ -120,7 +129,9 @@
 						totalSubmissions: data.count || data.submissions.length,
 						totalSchemas: 3,
 						totalUsers: 8,
-						recentSubmissions: mappedSubmissions.slice(0, 5) // Show last 5
+						recentSubmissions: mappedSubmissions
+						.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)) // Sort latest first
+						.slice(0, 5) // Show last 5
 					};
 					console.log('✅ Successfully loaded submissions:', dashboardData.totalSubmissions);
 					return;
@@ -170,6 +181,33 @@
 			day: 'numeric'
 		});
 	}
+	
+	// Helper function to get cargo type name from ID
+	function getCargoTypeName(cargoTypeId) {
+		if (!cargoTypeId) return 'Unknown';
+		if (!cargoTypes || cargoTypes.length === 0) return cargoTypeId; // Fallback to ID if cargo types not loaded
+		
+		const cargoType = cargoTypes.find(ct => 
+			ct.id === cargoTypeId || ct.value === cargoTypeId
+		);
+		
+		if (cargoType) {
+			const name = cargoType.name?.en || cargoType.name || cargoType.label || 'Unknown';
+			return `${name} (${cargoTypeId})`;
+		}
+		
+		return cargoTypeId; // Fallback to ID if not found
+	}
+	
+	// Reactive computed property for enhanced submissions with cargo type names
+	$: enhancedSubmissions = dashboardData.recentSubmissions.map(submission => ({
+		...submission,
+		cargoType: getCargoTypeName(submission.cargoType),
+		inquiryContent: submission.inquiryContent.length > 50 ? 
+			submission.inquiryContent.substring(0, 50) + '...' : 
+			submission.inquiryContent,
+		timestamp: formatDate(submission.timestamp)
+	}));
 
 	// Load real cargo types
 	async function loadCargoTypes() {
@@ -327,7 +365,7 @@
 		isLoadingTeam = true;
 		try {
 			console.log('🔄 Loading team members from AWS Cognito...');
-			const response = await fetch('https://9u6shrsot7.execute-api.ap-east-1.amazonaws.com/kapitanat/team', {
+			const response = await fetch('https://9u6shrsot7.execute-api.ap-east-1.amazonaws.com/kapitanat/team-members', {
 				headers: {
 					'Authorization': `Bearer ${localStorage.getItem('admin-token')}`
 				}
@@ -339,8 +377,8 @@
 				const data = await response.json();
 				console.log('👥 Team Members Data:', data);
 				
-				if (data.success && data.teamMembers) {
-					teamMembers = data.teamMembers;
+				if (data.success && data.users) {
+					teamMembers = data.users;
 					console.log('✅ Successfully loaded team members:', teamMembers.length);
 				} else {
 					console.warn('⚠️ Team API returned unsuccessful response:', data);
@@ -375,7 +413,7 @@
 		try {
 			console.log('🔄 Adding team member via AWS Cognito API:', newTeamMember);
 			
-			const response = await fetch('https://9u6shrsot7.execute-api.ap-east-1.amazonaws.com/kapitanat/team', {
+			const response = await fetch('https://9u6shrsot7.execute-api.ap-east-1.amazonaws.com/kapitanat/team-members', {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
@@ -383,14 +421,22 @@
 				},
 				body: JSON.stringify({
 					email: newTeamMember.email,
-					role: newTeamMember.role,
-					sendInvite: true
+					isAdmin: newTeamMember.role === 'admin',
+					temporaryPassword: 'TempPass123!'
 				})
 			});
 			
 			if (response.ok) {
 				const result = await response.json();
 				console.log('✅ Team member added successfully:', result);
+				
+				// Store credentials for display
+				newUserCredentials = {
+					email: newTeamMember.email,
+					temporaryPassword: result.temporaryPassword || 'TempPass123!',
+					loginUrl: 'https://www.dock2gdansk.com/kapitanat'
+				};
+				showCredentials = true;
 				
 				// Reload team members from API
 				await loadTeamMembers();
@@ -422,15 +468,11 @@
 		try {
 			console.log('🔄 Removing team member via AWS Cognito API:', userEmail);
 			
-			const response = await fetch('https://9u6shrsot7.execute-api.ap-east-1.amazonaws.com/kapitanat/team', {
+			const response = await fetch(`https://9u6shrsot7.execute-api.ap-east-1.amazonaws.com/kapitanat/team-members?username=${encodeURIComponent(userEmail)}`, {
 				method: 'DELETE',
 				headers: {
-					'Content-Type': 'application/json',
 					'Authorization': `Bearer ${localStorage.getItem('admin-token')}`
-				},
-				body: JSON.stringify({
-					email: userEmail
-				})
+				}
 			});
 			
 			if (response.ok) {
@@ -457,7 +499,7 @@
 		try {
 			console.log('🔄 Updating team member role via AWS Cognito API:', userEmail, newRole);
 			
-			const response = await fetch('https://9u6shrsot7.execute-api.ap-east-1.amazonaws.com/kapitanat/team', {
+			const response = await fetch('https://9u6shrsot7.execute-api.ap-east-1.amazonaws.com/kapitanat/team-members', {
 				method: 'PUT',
 				headers: {
 					'Content-Type': 'application/json',
@@ -666,6 +708,285 @@
 		const patch = parseInt(parts[2]) || 0;
 		return `${major}.${minor}.${patch + 1}`;
 	}
+
+	// Email management functions
+	async function loadClientEmails() {
+		isLoadingEmails = true;
+		try {
+			console.log('🔄 Loading client emails from API...');
+			const response = await fetch('https://9u6shrsot7.execute-api.ap-east-1.amazonaws.com/kapitanat/emails', {
+				headers: {
+					'Authorization': `Bearer ${localStorage.getItem('admin-token')}`
+				}
+			});
+			
+			console.log('📡 Client Emails API Response:', response.status, response.statusText);
+			
+			if (response.ok) {
+				const data = await response.json();
+				console.log('📧 Client Emails Data:', data);
+				
+				if (data.success && data.emails) {
+					clientEmails = data.emails;
+					console.log('✅ Successfully loaded client emails:', clientEmails.length);
+				} else {
+					console.warn('⚠️ Client emails API returned unsuccessful response:', data);
+					// Initialize with default emails if none exist
+					clientEmails = [
+						{ 
+							id: '1',
+							email: 'Marek.Machalski@portgdansk.pl',
+							name: 'Marek Machalski',
+							addedAt: new Date().toISOString(),
+							active: true
+						},
+						{ 
+							id: '2',
+							email: 'michal@dagodigital.com',
+							name: 'Michal',
+							addedAt: new Date().toISOString(),
+							active: true
+						}
+					];
+				}
+			} else {
+				console.error('❌ Client emails API request failed:', response.status, response.statusText);
+				// Initialize with default emails on API failure
+				clientEmails = [
+					{ 
+						id: '1',
+						email: 'Marek.Machalski@portgdansk.pl',
+						name: 'Marek Machalski',
+						addedAt: new Date().toISOString(),
+						active: true
+					},
+					{ 
+						id: '2',
+						email: 'michal@dagodigital.com',
+						name: 'Michal',
+						addedAt: new Date().toISOString(),
+						active: true
+					}
+				];
+			}
+		} catch (error) {
+			console.error('💥 Error fetching client emails:', error);
+			// Initialize with default emails on error
+			clientEmails = [
+				{ 
+					id: '1',
+					email: 'Marek.Machalski@portgdansk.pl',
+					name: 'Marek Machalski',
+					addedAt: new Date().toISOString(),
+					active: true
+				},
+				{ 
+					id: '2',
+					email: 'michal@dagodigital.com',
+					name: 'Michal',
+					addedAt: new Date().toISOString(),
+					active: true
+				}
+			];
+		} finally {
+			isLoadingEmails = false;
+		}
+	}
+
+	async function addClientEmail() {
+		if (!newEmail.trim()) {
+			console.error('❌ Email is required');
+			return;
+		}
+		
+		// Basic email validation
+		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+		if (!emailRegex.test(newEmail)) {
+			console.error('❌ Invalid email format');
+			return;
+		}
+		
+		// Check if email already exists
+		if (clientEmails.some(e => e.email.toLowerCase() === newEmail.toLowerCase())) {
+			console.error('❌ Email already exists');
+			return;
+		}
+		
+		isLoadingEmails = true;
+		try {
+			console.log('🔄 Adding client email via API:', newEmail);
+			
+			const response = await fetch('https://9u6shrsot7.execute-api.ap-east-1.amazonaws.com/kapitanat/emails', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${localStorage.getItem('admin-token')}`
+				},
+				body: JSON.stringify({
+					email: newEmail.trim(),
+					name: newEmail.split('@')[0], // Extract name from email
+					active: true
+				})
+			});
+			
+			if (response.ok) {
+				const result = await response.json();
+				console.log('✅ Client email added successfully:', result);
+				
+				// Reload client emails from API
+				await loadClientEmails();
+				
+				// Reset form
+				newEmail = '';
+				showManageEmailsModal = false;
+			} else {
+				const errorData = await response.json();
+				console.error('❌ Failed to add client email:', response.status, response.statusText, errorData);
+				
+				// Fallback: add locally if API fails
+				const newEmailObj = {
+					id: Date.now().toString(),
+					email: newEmail.trim(),
+					name: newEmail.split('@')[0],
+					addedAt: new Date().toISOString(),
+					active: true
+				};
+				clientEmails = [...clientEmails, newEmailObj];
+				newEmail = '';
+				showManageEmailsModal = false;
+			}
+		} catch (error) {
+			console.error('💥 Error adding client email:', error);
+			
+			// Fallback: add locally if API fails
+			const newEmailObj = {
+				id: Date.now().toString(),
+				email: newEmail.trim(),
+				name: newEmail.split('@')[0],
+				addedAt: new Date().toISOString(),
+				active: true
+			};
+			clientEmails = [...clientEmails, newEmailObj];
+			newEmail = '';
+			showManageEmailsModal = false;
+		} finally {
+			isLoadingEmails = false;
+		}
+	}
+
+	async function removeClientEmail(emailId) {
+		if (!emailId) return;
+		
+		isLoadingEmails = true;
+		try {
+			console.log('🔄 Removing client email via API:', emailId);
+			
+			const response = await fetch('https://9u6shrsot7.execute-api.ap-east-1.amazonaws.com/kapitanat/emails', {
+				method: 'DELETE',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${localStorage.getItem('admin-token')}`
+				},
+				body: JSON.stringify({
+					id: emailId
+				})
+			});
+			
+			if (response.ok) {
+				const result = await response.json();
+				console.log('✅ Client email removed successfully:', result);
+				
+				// Reload client emails from API
+				await loadClientEmails();
+			} else {
+				const errorData = await response.json();
+				console.error('❌ Failed to remove client email:', response.status, response.statusText, errorData);
+				
+				// Fallback: remove locally if API fails
+				clientEmails = clientEmails.filter(e => e.id !== emailId);
+			}
+		} catch (error) {
+			console.error('💥 Error removing client email:', error);
+			
+			// Fallback: remove locally if API fails
+			clientEmails = clientEmails.filter(e => e.id !== emailId);
+		} finally {
+			isLoadingEmails = false;
+		}
+	}
+
+	async function toggleEmailStatus(emailId, newStatus) {
+		if (!emailId) return;
+		
+		isLoadingEmails = true;
+		try {
+			console.log('🔄 Updating client email status via API:', emailId, newStatus);
+			
+			const response = await fetch('https://9u6shrsot7.execute-api.ap-east-1.amazonaws.com/kapitanat/emails', {
+				method: 'PUT',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${localStorage.getItem('admin-token')}`
+				},
+				body: JSON.stringify({
+					id: emailId,
+					active: newStatus
+				})
+			});
+			
+			if (response.ok) {
+				const result = await response.json();
+				console.log('✅ Client email status updated successfully:', result);
+				
+				// Reload client emails from API
+				await loadClientEmails();
+			} else {
+				const errorData = await response.json();
+				console.error('❌ Failed to update client email status:', response.status, response.statusText, errorData);
+				
+				// Fallback: update locally if API fails
+				clientEmails = clientEmails.map(e => 
+					e.id === emailId ? {...e, active: newStatus} : e
+				);
+			}
+		} catch (error) {
+			console.error('💥 Error updating client email status:', error);
+			
+			// Fallback: update locally if API fails
+			clientEmails = clientEmails.map(e => 
+				e.id === emailId ? {...e, active: newStatus} : e
+			);
+		} finally {
+			isLoadingEmails = false;
+		}
+	}
+
+	// Copy credentials to clipboard
+	async function copyCredentials() {
+		if (!newUserCredentials) return;
+		
+		const credentialsText = `New Team Member Login Credentials:
+
+Email: ${newUserCredentials.email}
+Temporary Password: ${newUserCredentials.temporaryPassword}
+Login URL: ${newUserCredentials.loginUrl}
+
+Please share these credentials securely with the new team member. They will be required to change their password on first login.`;
+		
+		try {
+			await navigator.clipboard.writeText(credentialsText);
+			console.log('✅ Credentials copied to clipboard');
+		} catch (err) {
+			console.error('❌ Failed to copy credentials:', err);
+			// Fallback: select text for manual copy
+			const textArea = document.createElement('textarea');
+			textArea.value = credentialsText;
+			document.body.appendChild(textArea);
+			textArea.select();
+			document.execCommand('copy');
+			document.body.removeChild(textArea);
+		}
+	}
 </script>
 
 <svelte:head>
@@ -725,6 +1046,13 @@
 					>
 						Manage Team
 					</Button>
+					<Button 
+						kind="tertiary" 
+						on:click={() => showManageEmailsModal = true}
+						class="action-button"
+					>
+						Manage Analysis Emails
+					</Button>
 				</div>
 			</Tile>
 		</div>
@@ -762,28 +1090,8 @@
 		
 		<DataTable
 			{headers}
-			rows={dashboardData.recentSubmissions.map(submission => ({
-				...submission,
-				inquiryContent: submission.inquiryContent.length > 50 ? 
-					submission.inquiryContent.substring(0, 50) + '...' : 
-					submission.inquiryContent,
-				timestamp: formatDate(submission.timestamp)
-			}))}
-		>
-			<Toolbar>
-				<ToolbarContent>
-					<ToolbarSearch />
-					<ToolbarMenu>
-						<ToolbarMenuItem primaryFocus href="/kapitanat/submissions">
-							View All Submissions
-						</ToolbarMenuItem>
-						<ToolbarMenuItem href="/kapitanat/submissions/export">
-							Export Data
-						</ToolbarMenuItem>
-					</ToolbarMenu>
-				</ToolbarContent>
-			</Toolbar>
-		</DataTable>
+			rows={enhancedSubmissions}
+		/>
 		
 		{#if dashboardData.recentSubmissions.length === 0}
 			<div style="text-align: center; padding: 32px; color: #666;">
@@ -1118,9 +1426,6 @@
 					<SelectItem value="viewer" text="Viewer" />
 				</Select>
 			</div>
-			<div style="margin-top: 8px; padding: 8px; background: rgba(0,0,0,0.05); border-radius: 4px; font-size: 12px; color: #666;">
-				<strong>Note:</strong> New members will receive an invitation email and must accept it to join the team.
-			</div>
 		</div>
 		
 		<!-- Current Team Members Section -->
@@ -1228,6 +1533,160 @@
 			</div>
 		</div>
 	</Modal>
+
+	<!-- Manage Analysis Emails Modal -->
+	<Modal
+		bind:open={showManageEmailsModal}
+		modalHeading="Manage Analysis Email Recipients"
+		primaryButtonText="Add Email"
+		secondaryButtonText="Cancel"
+		on:click:button--secondary={() => showManageEmailsModal = false}
+		on:click:button--primary={addClientEmail}
+		primaryButtonDisabled={!newEmail.trim() || isLoadingEmails || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newEmail)}
+		size="lg"
+	>
+		<!-- Add New Email Section -->
+		<div style="margin-bottom: 24px; padding: 16px; background: #e8f4fd; border-radius: 6px;">
+			<h4 style="margin: 0 0 16px 0;">📧 Add New Email Recipient</h4>
+			<div style="margin-bottom: 12px;">
+				<TextInput
+					type="email"
+					labelText="Email Address *"
+					placeholder="client@example.com"
+					bind:value={newEmail}
+					disabled={isLoadingEmails}
+					invalid={newEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newEmail)}
+					invalidText="Please enter a valid email address"
+				/>
+			</div>
+			<div style="margin-top: 8px; padding: 8px; background: rgba(0,0,0,0.05); border-radius: 4px; font-size: 12px; color: #666;">
+				<strong>Purpose:</strong> These emails will receive analysis reports and notifications about form submissions for further review.
+			</div>
+		</div>
+		
+		<!-- Current Email Recipients Section -->
+		<div style="margin-bottom: 16px;">
+			<h4>Current Email Recipients ({clientEmails.length})</h4>
+			{#if isLoadingEmails}
+				<div style="text-align: center; padding: 32px; color: #666;">
+					<div style="font-size: 24px; margin-bottom: 8px;">⏳</div>
+					<p style="margin: 0;">Loading email recipients...</p>
+				</div>
+			{:else if clientEmails.length > 0}
+				<div style="max-height: 400px; overflow-y: auto; border: 1px solid #ddd; border-radius: 6px; margin-top: 8px;">
+					{#each clientEmails as email, index}
+						<div style="padding: 16px; border-bottom: 1px solid #eee; {index === clientEmails.length - 1 ? 'border-bottom: none;' : ''}">
+							<div style="display: flex; justify-content: space-between; align-items: center;">
+								<!-- Email Info -->
+								<div style="flex: 1;">
+									<div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+										<strong style="color: #333;">{email.email}</strong>
+										{#if email.name && email.name !== email.email.split('@')[0]}
+											<span style="color: #666;">({email.name})</span>
+										{/if}
+										<span style="background: {email.active ? '#d4edda' : '#f8d7da'}; color: {email.active ? '#155724' : '#721c24'}; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 500;">
+											{email.active ? 'Active' : 'Inactive'}
+										</span>
+									</div>
+									<div style="font-size: 12px; color: #666;">
+										{#if email.addedAt}
+											Added: {new Date(email.addedAt).toLocaleDateString()}
+										{/if}
+									</div>
+								</div>
+								
+								<!-- Email Actions -->
+								<div style="display: flex; align-items: center; gap: 8px;">
+									<!-- Toggle Active Status -->
+									<Button 
+										kind={email.active ? "ghost" : "tertiary"}
+										size="sm"
+										on:click={() => toggleEmailStatus(email.id, !email.active)}
+										disabled={isLoadingEmails}
+										title={email.active ? "Deactivate email" : "Activate email"}
+									>
+										{email.active ? '⏸️' : '▶️'}
+									</Button>
+									
+									<!-- Remove Button -->
+									<Button 
+										kind="danger-ghost" 
+										size="sm"
+										on:click={() => removeClientEmail(email.id)}
+										disabled={isLoadingEmails}
+										title="Remove email recipient"
+									>
+										🗑️
+									</Button>
+								</div>
+							</div>
+						</div>
+					{/each}
+				</div>
+			{:else}
+				<div style="text-align: center; padding: 32px; color: #666;">
+					<div style="font-size: 24px; margin-bottom: 8px;">📧</div>
+					<p style="margin: 0;">No email recipients configured</p>
+					<p style="margin: 4px 0 0 0; font-size: 12px; color: #999;">Add email addresses using the form above</p>
+				</div>
+			{/if}
+		</div>
+		
+		<!-- Info Section -->
+		<div style="margin-top: 16px; padding: 12px; background: #f0f8ff; border: 1px solid #b3d9ff; border-radius: 4px;">
+			<div style="font-size: 14px; color: #0066cc;">
+				<strong>💡 Analysis Email Management:</strong>
+				<ul style="margin: 8px 0 0 20px; font-size: 12px;">
+					<li>Active recipients receive notifications about new form submissions</li>
+					<li>Inactive recipients are temporarily excluded from notifications</li>
+					<li>Analysis reports include submission trends and insights</li>
+					<li>Default recipients: Marek.Machalski@portgdansk.pl and michal@dagodigital.com</li>
+				</ul>
+			</div>
+		</div>
+	</Modal>
+
+	<!-- New User Credentials Modal -->
+	<Modal
+		bind:open={showCredentials}
+		modalHeading="✅ Team Member Added Successfully"
+		primaryButtonText="Copy Credentials"
+		secondaryButtonText="Close"
+		on:click:button--secondary={() => {
+			showCredentials = false;
+			newUserCredentials = null;
+		}}
+		on:click:button--primary={copyCredentials}
+		size="md"
+	>
+		{#if newUserCredentials}
+			<div style="margin-bottom: 24px;">
+				<p style="margin-bottom: 16px; color: #155724; background: #d4edda; padding: 12px; border-radius: 4px; font-weight: 500;">
+					✅ New team member has been successfully added to the system!
+				</p>
+				
+				<div style="background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 6px; padding: 16px; font-family: monospace;">
+					<h4 style="margin: 0 0 12px 0; color: #333;">Login Credentials:</h4>
+					<div style="line-height: 1.6;">
+						<strong>Email:</strong> {newUserCredentials.email}<br>
+						<strong>Temporary Password:</strong> {newUserCredentials.temporaryPassword}<br>
+						<strong>Login URL:</strong> {newUserCredentials.loginUrl}
+					</div>
+				</div>
+				
+				<div style="margin-top: 16px; padding: 12px; background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 4px;">
+					<p style="margin: 0; font-size: 14px; color: #856404;">
+						<strong>⚠️ Important:</strong>
+					</p>
+					<ul style="margin: 8px 0 0 20px; font-size: 12px; color: #856404;">
+						<li>Share these credentials securely with the new team member</li>
+						<li>They will be required to change their password on first login</li>
+						<li>No automatic invitation email was sent</li>
+					</ul>
+				</div>
+			</div>
+		{/if}
+	</Modal>
 </div>
 {:else}
 <div class="flex items-center justify-center min-h-screen">
@@ -1307,15 +1766,21 @@
 
 	/* Button Grid */
 	.button-grid {
-		display: flex;
-		flex-direction: column;
+		display: grid;
 		gap: 12px;
+		grid-template-columns: 1fr;
 	}
 
 	@media (min-width: 768px) {
 		.button-grid {
-			flex-direction: row;
+			grid-template-columns: repeat(2, 1fr);
 			gap: 16px;
+		}
+	}
+
+	@media (min-width: 1024px) {
+		.button-grid {
+			grid-template-columns: repeat(4, 1fr);
 		}
 	}
 

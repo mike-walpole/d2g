@@ -107,62 +107,41 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         
         # Send admin notification email with dynamic subject and JSON attachment
         try:
-            # Get cargo type name for subject line
-            cargo_type_name = "Unknown"
-            if 'cargo_type' in form_data and form_data['cargo_type']:
-                try:
-                    # Get cargo types from config
-                    schemas_table = dynamodb.Table(os.environ['SCHEMAS_TABLE'])
-                    cargo_response = schemas_table.get_item(
-                        Key={'formId': 'config', 'version': 'cargo-types'}
-                    )
-                    if 'Item' in cargo_response:
-                        cargo_types = cargo_response['Item']['schema']['cargoTypes']
-                        for cargo in cargo_types:
-                            if cargo['id'] == form_data['cargo_type']:
-                                if isinstance(cargo['name'], dict):
-                                    cargo_type_name = cargo['name'].get('en', cargo['name'].get('zh', 'Unknown'))
-                                else:
-                                    cargo_type_name = cargo['name']
-                                break
-                except Exception as e:
-                    print(f"Warning: Could not get cargo type name: {str(e)}")
+            # Get company name from form data
+            company_name = form_data.get('company_name', form_data.get('companyName', 'Unknown Company'))
             
-            # Format current date and time
+            # Format current date in DD/MM/YYYY format
             current_time = datetime.utcnow()
-            date_str = current_time.strftime('%Y-%m-%d')
-            time_str = current_time.strftime('%H:%M')
+            date_str = current_time.strftime('%d/%m/%Y')
             
-            # Create dynamic subject line
-            subject = f"Nowe zapytanie {cargo_type_name} {date_str} {time_str}"
+            # Create subject line with format: "Dock2Gdansk {company name}, {date DD/MM/YYYY}"
+            subject = f"Dock2Gdansk {company_name}, {date_str}"
             
-            # Create email body with form data
-            email_body = f"""
-Nowe zapytanie otrzymane:
-
-ID Zgłoszenia: {submission_id}
-Email użytkownika: {user_email}
-Data i czas: {date_str} {time_str}
-Wersja schematu: {schema_version}
-
-Dane formularza:
-"""
-            
-            # Add form fields to email body
-            for field_id, value in form_data.items():
-                if value:  # Only show non-empty fields
-                    email_body += f"{field_id}: {value}\n"
-            
-            # Create JSON attachment data
+            # Create full JSON data with all fields
             json_data = {
-                'submission_id': submission_id,
+                'id': submission_id,
                 'timestamp': timestamp,
-                'user_email': user_email,
-                'form_id': form_id,
-                'schema_version': schema_version,
-                'form_data': form_data,
-                'cargo_type_name': cargo_type_name
+                'userEmail': user_email,
+                'formData': form_data,
+                'formId': form_id,
+                'schemaVersion': schema_version,
+                'status': 'submitted',
+                'submittedAt': timestamp,
+                'companyName': company_name
             }
+            
+            # Create email body with full JSON included
+            email_body = f"""New Dock2Gdansk submission received:
+
+Company: {company_name}
+Date: {date_str}
+Submission ID: {submission_id}
+User Email: {user_email}
+Schema Version: {schema_version}
+
+FULL SUBMISSION DATA (JSON):
+{json.dumps(json_data, indent=2, ensure_ascii=False)}
+"""
             
             # Convert JSON to base64 for attachment
             import base64
@@ -181,7 +160,7 @@ Dane formularza:
                         'text': email_body,
                         'attachments': [
                             {
-                                'filename': f'submission_{submission_id}_{date_str}_{time_str}.json',
+                                'filename': f'dock2gdansk_{company_name.replace(" ", "_")}_{date_str.replace("/", "-")}.json',
                                 'content': json_base64
                             }
                         ]

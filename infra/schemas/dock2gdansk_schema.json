@@ -120,7 +120,7 @@
         "id": "referral_source",
         "type": "select",
         "label": {"en": "Where did you hear about us?", "zh": "您是如何了解我们的？"},
-        "required": false,
+        "required": true,
         "placeholder": {"en": "Please select", "zh": "请选择"},
         "options": [
           {"value": "china_representative", "label": {"en": "China Representative", "zh": "中国代表"}},
