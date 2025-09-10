@@ -91,10 +91,13 @@
 		}
 	}
 
-	// Reactive translations for hero section - simplified to prevent loops
-	$: currentTranslations = $configData?.translations?.[$currentLanguage] || $configData?.translations?.en || {};
-	$: heroTitle = currentTranslations?.hero?.title || 'Your Trusted Partner for China-Poland Cargo Transportation';
-	$: heroSubtitle = currentTranslations?.hero?.subtitle || 'Reliable, efficient, and professional shipping services connecting Asia to Europe';
+	// Reactive translations for hero section with direct language support
+	$: heroTitle = $currentLanguage === 'zh' 
+		? '您值得信赖的中波货运合作伙伴' 
+		: 'Your Trusted Partner for China-Poland Cargo Transportation';
+	$: heroSubtitle = $currentLanguage === 'zh' 
+		? '连接亚洲与欧洲的可靠、高效、专业的运输服务'
+		: 'Reliable, efficient, and professional shipping services connecting Asia to Europe';
 
 	onMount(async () => {
 		// Load config data first and wait for it
@@ -109,7 +112,14 @@
 	async function handleSubmit() {
 		// Validate required fields dynamically
 		if (!formSchema?.fields) {
-			submitMessage = t('form.error', 'Form schema not loaded');
+			// Multilingual schema error message
+			const schemaErrorMessages = {
+				en: 'Form schema not loaded',
+				zh: '表单架构未加载',
+				pl: 'Schemat formularza nie został załadowany'
+			};
+			
+			submitMessage = `${schemaErrorMessages.en} / ${schemaErrorMessages.zh} / ${schemaErrorMessages.pl}`;
 			submitStatus = 'error';
 			return;
 		}
@@ -131,7 +141,14 @@
 		});
 		
 		if (missingFields.length > 0) {
-			submitMessage = t('form.error', 'Please fill in all required fields') + ': ' + missingFields.join(', ');
+			// Multilingual error message
+			const errorMessages = {
+				en: 'Please fill in all required fields',
+				zh: '请填写所有必填字段',
+				pl: 'Proszę wypełnić wszystkie wymagane pola'
+			};
+			
+			submitMessage = `${errorMessages.en} / ${errorMessages.zh} / ${errorMessages.pl}: ${missingFields.join(', ')}`;
 			submitStatus = 'error';
 			return;
 		}
@@ -159,18 +176,39 @@
 			const result = await response.json();
 
 			if (result.success) {
-				submitMessage = t('form.success', 'Thank you! Your inquiry has been submitted successfully.');
+				// Multilingual success message
+			const successMessages = {
+				en: 'Thank you! Your inquiry has been submitted successfully.',
+				zh: '谢谢！您的询盘已成功提交。',
+				pl: 'Dziękujemy! Twoje zapytanie zostało pomyślnie przesłane.'
+			};
+			
+			submitMessage = `${successMessages.en} / ${successMessages.zh} / ${successMessages.pl}`;
 				submitStatus = 'success';
 				
 				// Reset form using current schema
 				initializeFormData();
 			} else {
-				submitMessage = result.error || t('form.error', 'An error occurred. Please try again.');
+				// Multilingual error message
+			const errorMessages = {
+				en: 'An error occurred. Please try again.',
+				zh: '发生错误。请重试。',
+				pl: 'Wystąpił błąd. Spróbuj ponownie.'
+			};
+			
+			submitMessage = result.error || `${errorMessages.en} / ${errorMessages.zh} / ${errorMessages.pl}`;
 				submitStatus = 'error';
 			}
 		} catch (error) {
 			console.error('Submit error:', error);
-			submitMessage = t('form.error', 'An error occurred. Please try again.');
+			// Multilingual error message  
+		const errorMessages = {
+			en: 'An error occurred. Please try again.',
+			zh: '发生错误。请重试。',
+			pl: 'Wystąpił błąd. Spróbuj ponownie.'
+		};
+		
+		submitMessage = `${errorMessages.en} / ${errorMessages.zh} / ${errorMessages.pl}`;
 			submitStatus = 'error';
 		} finally {
 			isSubmitting = false;
@@ -208,16 +246,22 @@
 </svelte:head>
 
 <!-- Hero Section -->
-<section style="background: #0043ce; color: white; padding: 120px 0 64px 0; margin-top: 48px;">
-	<div style="max-width: 1200px; margin: 0 auto; padding: 0 16px; text-align: center;">
-		
+<section style="background-image: url('/hero.avif'); background-size: cover; background-position: center; background-repeat: no-repeat; color: white; padding: 120px 0 64px 0; margin-top: 48px; position: relative;">
+	<!-- Dark overlay for better text readability -->
+	<div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 67, 206, 0.7);"></div>
+	
+	<!-- Logo positioned in top right -->
+	<div style="position: absolute; top: 0px; right: 20px; z-index: 2;">
+		<img src="/logo.png" alt="Dock2Gdansk Logo" style="height: 120px; width: auto;" />
+	</div>
+	
+	<div style="max-width: 1200px; margin: 0 auto; padding: 0 16px; text-align: center; position: relative; z-index: 1;">
 		<h1 style="font-size: 48px; font-weight: normal; margin-bottom: 16px; line-height: 1.2;">
 			{heroTitle}
 		</h1>
 		<p style="font-size: 20px; margin-bottom: 32px; max-width: 800px; margin-left: auto; margin-right: auto;">
 			{heroSubtitle}
 		</p>
-		
 	</div>
 </section>
 

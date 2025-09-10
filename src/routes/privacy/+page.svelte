@@ -1,13 +1,30 @@
 <script>
-	import { Button } from 'carbon-components-svelte';
-	import { t } from '$lib/stores/config.js';
+	import { Button, Header, HeaderNav, HeaderNavItem } from 'carbon-components-svelte';
+	import { t, currentLanguage, switchLanguage } from '$lib/stores/config.js';
 	import { goto } from '$app/navigation';
+	
+	// Enhanced language switching with override tracking
+	function handleLanguageSwitch(lang) {
+		console.log('🔄 User manually switched to language:', lang);
+		switchLanguage(lang);
+		// Mark that user has manually chosen a language (override geolocation)
+		localStorage.setItem('language-override', 'true');
+		localStorage.setItem('preferred-language', lang);
+	}
 </script>
 
 <svelte:head>
 	<title>Privacy Policy - Dock2Gdansk</title>
 	<meta name="description" content="Privacy Policy for Dock2Gdansk - Professional Cargo Transportation Services" />
 </svelte:head>
+
+<Header company="Dock2Gdansk" platformName={t('site_tagline', 'Professional Cargo Transportation')}>
+	<HeaderNav>
+		<HeaderNavItem href="/" text={t('nav.home', 'Home')} />
+		<HeaderNavItem onclick={() => handleLanguageSwitch('en')} text={t('EN', 'EN')} />
+		<HeaderNavItem onclick={() => handleLanguageSwitch('zh')} text={t('中文', '中文')} />
+	</HeaderNav>
+</Header>
 
 <!-- Hero Section -->
 <section style="background: #0043ce; color: white; padding: 120px 0 64px 0; margin-top: 48px;">
@@ -493,4 +510,11 @@
 			padding: 36px 24px;
 		}
 	}
+
+/* Match main layout header styles */
+:global(.bx--header) {
+	position: fixed !important;
+	top: 0 !important;
+	z-index: 1000 !important;
+}
 </style>
