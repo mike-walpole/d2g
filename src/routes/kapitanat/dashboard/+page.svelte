@@ -1272,6 +1272,53 @@ Please share these credentials securely with the new team member. They will be r
 			document.body.removeChild(textArea);
 		}
 	}
+
+	// Download Schema function
+	async function downloadSchema() {
+		try {
+			console.log('🔄 Downloading current schema...');
+			
+			const response = await fetch(`https://g753am6ace.execute-api.ap-east-1.amazonaws.com/kapitanat/download-schema?version=current`, {
+				method: 'GET',
+				headers: {
+					'Authorization': 'Bearer mock-jwt-token-dev-admin'
+				}
+			});
+
+			if (response.ok) {
+				// Get the filename from Content-Disposition header or create a default
+				const contentDisposition = response.headers.get('Content-Disposition');
+				let filename = 'd2g-schema-current.json';
+				
+				if (contentDisposition) {
+					const filenameMatch = contentDisposition.match(/filename="(.+)"/);
+					if (filenameMatch) {
+						filename = filenameMatch[1];
+					}
+				}
+
+				// Get the JSON content
+				const jsonData = await response.text();
+				
+				// Create blob and download
+				const blob = new Blob([jsonData], { type: 'application/json' });
+				const url = window.URL.createObjectURL(blob);
+				const a = document.createElement('a');
+				a.href = url;
+				a.download = filename;
+				document.body.appendChild(a);
+				a.click();
+				window.URL.revokeObjectURL(url);
+				document.body.removeChild(a);
+				
+				console.log('✅ Schema downloaded successfully:', filename);
+			} else {
+				console.error('❌ Failed to download schema:', response.status, response.statusText);
+			}
+		} catch (error) {
+			console.error('❌ Error downloading schema:', error);
+		}
+	}
 </script>
 
 <svelte:head>
@@ -1350,6 +1397,13 @@ Please share these credentials securely with the new team member. They will be r
 						class="action-button"
 					>
 						Manage Sources
+					</Button>
+					<Button 
+						kind="secondary" 
+						on:click={downloadSchema}
+						class="action-button"
+					>
+						📥 Download Schema
 					</Button>
 				</div>
 			</Tile>
