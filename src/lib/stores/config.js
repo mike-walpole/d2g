@@ -8,7 +8,7 @@ export const currentLanguage = writable('en');
 export const configData = writable(null);
 
 // API base URL from deployed AWS infrastructure
-export const apiBaseUrl = writable('https://9u6shrsot7.execute-api.ap-east-1.amazonaws.com');
+export const apiBaseUrl = writable('https://g753am6ace.execute-api.ap-east-1.amazonaws.com');
 
 // Load config data from AWS
 export async function loadConfig(language = 'en') {
@@ -48,6 +48,14 @@ export const cargoTypes = derived(
 	configData,
 	($configData) => {
 		return $configData?.cargoTypes || [];
+	}
+);
+
+// Derived store for referral sources
+export const referralSources = derived(
+	configData,
+	($configData) => {
+		return $configData?.referralSources || [];
 	}
 );
 

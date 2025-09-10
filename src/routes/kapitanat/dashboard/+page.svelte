@@ -23,14 +23,28 @@
 	let showManageCargoModal = false;
 	let showManageTeamModal = false;
 	let showManageEmailsModal = false;
+	let showManageSourcesModal = false;
 
 	// Form data for modals
 	let newCargoType = { 
+		id: '',
 		nameEn: '', 
 		nameZh: '', 
 		description: '' 
 	};
+	let editingCargoType = null; // For editing existing cargo types
 	let newTeamMember = { email: '', role: 'admin' };
+	
+	// Sources management data
+	let referralSources = [];
+	let newSource = { 
+		id: '',
+		nameEn: '', 
+		nameZh: '', 
+		description: '' 
+	};
+	let editingSource = null; // For editing existing sources
+	let isLoadingSources = false;
 	let selectedSchema = null;
 	
 	// Team management data
@@ -95,12 +109,13 @@
 		loadFormSchema();
 		loadTeamMembers();
 		loadClientEmails();
+		loadReferralSources();
 	});
 
 	async function loadDashboardData() {
 		try {
 			console.log('🔄 Fetching submissions from API...');
-			const response = await fetch('https://9u6shrsot7.execute-api.ap-east-1.amazonaws.com/kapitanat/submissions', {
+			const response = await fetch('https://g753am6ace.execute-api.ap-east-1.amazonaws.com/kapitanat/submissions', {
 				headers: {
 					'Authorization': `Bearer ${localStorage.getItem('admin-token')}`
 				}
@@ -182,27 +197,38 @@
 		});
 	}
 	
-	// Helper function to get cargo type name from ID
-	function getCargoTypeName(cargoTypeId) {
+	// Helper function to get cargo type display with both ID and name
+	function getCargoTypeDisplay(submission) {
+		const cargoTypeId = submission.formData?.cargo_type || submission.cargoType;
+		const cargoTypeName = submission.cargoTypeName;
+		
 		if (!cargoTypeId) return 'Unknown';
-		if (!cargoTypes || cargoTypes.length === 0) return cargoTypeId; // Fallback to ID if cargo types not loaded
 		
-		const cargoType = cargoTypes.find(ct => 
-			ct.id === cargoTypeId || ct.value === cargoTypeId
-		);
-		
-		if (cargoType) {
-			const name = cargoType.name?.en || cargoType.name || cargoType.label || 'Unknown';
-			return `${name} (${cargoTypeId})`;
+		// If we have both ID and resolved name from backend, use them
+		if (cargoTypeName && cargoTypeName !== 'Unknown') {
+			return `${cargoTypeName} (ID: ${cargoTypeId})`;
 		}
 		
-		return cargoTypeId; // Fallback to ID if not found
+		// Fallback: try to find in local cargo types data
+		if (cargoTypes && cargoTypes.length > 0) {
+			const cargoType = cargoTypes.find(ct => 
+				ct.id === cargoTypeId || ct.value === cargoTypeId
+			);
+			
+			if (cargoType) {
+				const name = cargoType.name?.en || cargoType.name || cargoType.label || 'Unknown';
+				return `${name} (ID: ${cargoTypeId})`;
+			}
+		}
+		
+		// Final fallback: just show the ID
+		return `Cargo Type ID: ${cargoTypeId}`;
 	}
 	
 	// Reactive computed property for enhanced submissions with cargo type names
 	$: enhancedSubmissions = dashboardData.recentSubmissions.map(submission => ({
 		...submission,
-		cargoType: getCargoTypeName(submission.cargoType),
+		cargoType: getCargoTypeDisplay(submission),
 		inquiryContent: submission.inquiryContent.length > 50 ? 
 			submission.inquiryContent.substring(0, 50) + '...' : 
 			submission.inquiryContent,
@@ -213,7 +239,7 @@
 	async function loadCargoTypes() {
 		try {
 			console.log('🔄 Fetching cargo types from API...');
-			const response = await fetch('https://9u6shrsot7.execute-api.ap-east-1.amazonaws.com/kapitanat/cargo-types', {
+			const response = await fetch('https://g753am6ace.execute-api.ap-east-1.amazonaws.com/kapitanat/cargo-types', {
 				headers: {
 					'Authorization': `Bearer ${localStorage.getItem('admin-token')}`
 				}
@@ -247,7 +273,7 @@
 	async function loadFormSchema() {
 		try {
 			console.log('🔄 Fetching form schema from API...');
-			const response = await fetch('https://9u6shrsot7.execute-api.ap-east-1.amazonaws.com/schema?formId=dock2gdansk-main');
+			const response = await fetch('https://g753am6ace.execute-api.ap-east-1.amazonaws.com/schema?formId=dock2gdansk-main');
 			
 			console.log('📡 Form Schema API Response:', response.status, response.statusText);
 			
@@ -274,8 +300,8 @@
 
 	// Modal functions
 	async function addCargoType() {
-		if (!newCargoType.nameEn.trim() || !newCargoType.nameZh.trim()) {
-			console.error('❌ Both English and Chinese names are required');
+		if (!newCargoType.id.trim() || !newCargoType.nameEn.trim() || !newCargoType.nameZh.trim()) {
+			console.error('❌ ID and both English and Chinese names are required');
 			return;
 		}
 		
@@ -283,13 +309,14 @@
 		try {
 			console.log('🔄 Adding cargo type via API:', newCargoType);
 			
-			const response = await fetch('https://9u6shrsot7.execute-api.ap-east-1.amazonaws.com/kapitanat/cargo-types', {
+			const response = await fetch('https://g753am6ace.execute-api.ap-east-1.amazonaws.com/kapitanat/cargo-types', {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
 					'Authorization': `Bearer ${localStorage.getItem('admin-token')}`
 				},
 				body: JSON.stringify({
+					id: newCargoType.id,
 					name: {
 						en: newCargoType.nameEn,
 						zh: newCargoType.nameZh
@@ -311,7 +338,7 @@
 				});
 				
 				// Reset form
-				newCargoType = { nameEn: '', nameZh: '', description: '' };
+				newCargoType = { id: '', nameEn: '', nameZh: '', description: '' };
 				showManageCargoModal = false;
 			} else {
 				console.error('❌ Failed to add cargo type:', response.status, response.statusText);
@@ -323,12 +350,77 @@
 		}
 	}
 
+	function startEditingCargoType(cargoType) {
+		editingCargoType = {
+			originalId: cargoType.id || cargoType.value, // Store original ID for backend reference
+			id: cargoType.id || cargoType.value,
+			nameEn: cargoType.name?.en || cargoType.name || cargoType.label || '',
+			nameZh: cargoType.name?.zh || '',
+			description: cargoType.description || ''
+		};
+	}
+
+	function cancelEditingCargoType() {
+		editingCargoType = null;
+	}
+
+	async function saveEditedCargoType() {
+		if (!editingCargoType || !editingCargoType.id.trim() || !editingCargoType.nameEn.trim() || !editingCargoType.nameZh.trim()) {
+			console.error('❌ ID and both English and Chinese names are required');
+			return;
+		}
+		
+		isLoading = true;
+		try {
+			console.log('🔄 Updating cargo type via API:', editingCargoType);
+			
+			const response = await fetch('https://g753am6ace.execute-api.ap-east-1.amazonaws.com/kapitanat/cargo-types', {
+				method: 'PUT',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${localStorage.getItem('admin-token')}`
+				},
+				body: JSON.stringify({
+					originalId: editingCargoType.originalId,
+					id: editingCargoType.id,
+					name: {
+						en: editingCargoType.nameEn,
+						zh: editingCargoType.nameZh
+					},
+					description: editingCargoType.description
+				})
+			});
+			
+			if (response.ok) {
+				const result = await response.json();
+				console.log('✅ Cargo type updated successfully:', result);
+				
+				// Reload cargo types from API
+				await loadCargoTypes();
+				
+				// Also refresh the config data so frontend gets updated cargo types
+				import('$lib/stores/config.js').then(module => {
+					module.loadConfig('en');
+				});
+				
+				// Clear editing state
+				editingCargoType = null;
+			} else {
+				console.error('❌ Failed to update cargo type:', response.status, response.statusText);
+			}
+		} catch (error) {
+			console.error('💥 Error updating cargo type:', error);
+		} finally {
+			isLoading = false;
+		}
+	}
+
 	async function deleteCargoType(cargoId) {
 		isLoading = true;
 		try {
 			console.log('🔄 Deleting cargo type via API:', cargoId);
 			
-			const response = await fetch(`https://9u6shrsot7.execute-api.ap-east-1.amazonaws.com/kapitanat/cargo-types`, {
+			const response = await fetch(`https://g753am6ace.execute-api.ap-east-1.amazonaws.com/kapitanat/cargo-types`, {
 				method: 'DELETE',
 				headers: {
 					'Content-Type': 'application/json',
@@ -365,7 +457,7 @@
 		isLoadingTeam = true;
 		try {
 			console.log('🔄 Loading team members from AWS Cognito...');
-			const response = await fetch('https://9u6shrsot7.execute-api.ap-east-1.amazonaws.com/kapitanat/team-members', {
+			const response = await fetch('https://g753am6ace.execute-api.ap-east-1.amazonaws.com/kapitanat/team-members', {
 				headers: {
 					'Authorization': `Bearer ${localStorage.getItem('admin-token')}`
 				}
@@ -413,7 +505,7 @@
 		try {
 			console.log('🔄 Adding team member via AWS Cognito API:', newTeamMember);
 			
-			const response = await fetch('https://9u6shrsot7.execute-api.ap-east-1.amazonaws.com/kapitanat/team-members', {
+			const response = await fetch('https://g753am6ace.execute-api.ap-east-1.amazonaws.com/kapitanat/team-members', {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
@@ -468,7 +560,7 @@
 		try {
 			console.log('🔄 Removing team member via AWS Cognito API:', userEmail);
 			
-			const response = await fetch(`https://9u6shrsot7.execute-api.ap-east-1.amazonaws.com/kapitanat/team-members?username=${encodeURIComponent(userEmail)}`, {
+			const response = await fetch(`https://g753am6ace.execute-api.ap-east-1.amazonaws.com/kapitanat/team-members?username=${encodeURIComponent(userEmail)}`, {
 				method: 'DELETE',
 				headers: {
 					'Authorization': `Bearer ${localStorage.getItem('admin-token')}`
@@ -499,7 +591,7 @@
 		try {
 			console.log('🔄 Updating team member role via AWS Cognito API:', userEmail, newRole);
 			
-			const response = await fetch('https://9u6shrsot7.execute-api.ap-east-1.amazonaws.com/kapitanat/team-members', {
+			const response = await fetch('https://g753am6ace.execute-api.ap-east-1.amazonaws.com/kapitanat/team-members', {
 				method: 'PUT',
 				headers: {
 					'Content-Type': 'application/json',
@@ -535,7 +627,7 @@
 		// Always fetch fresh data from DynamoDB - no caching
 		try {
 			console.log('📡 Fetching latest schema from DynamoDB...');
-			const response = await fetch('https://9u6shrsot7.execute-api.ap-east-1.amazonaws.com/schema?formId=dock2gdansk-main');
+			const response = await fetch('https://g753am6ace.execute-api.ap-east-1.amazonaws.com/schema?formId=dock2gdansk-main');
 			
 			if (response.ok) {
 				const data = await response.json();
@@ -664,7 +756,7 @@
 			console.log('Saving new schema version:', newSchema.version);
 
 			// Make API call to save new schema version
-			const response = await fetch('https://9u6shrsot7.execute-api.ap-east-1.amazonaws.com/kapitanat/schemas', {
+			const response = await fetch('https://g753am6ace.execute-api.ap-east-1.amazonaws.com/kapitanat/schemas', {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
@@ -714,7 +806,7 @@
 		isLoadingEmails = true;
 		try {
 			console.log('🔄 Loading client emails from API...');
-			const response = await fetch('https://9u6shrsot7.execute-api.ap-east-1.amazonaws.com/kapitanat/emails', {
+			const response = await fetch('https://g753am6ace.execute-api.ap-east-1.amazonaws.com/kapitanat/emails', {
 				headers: {
 					'Authorization': `Bearer ${localStorage.getItem('admin-token')}`
 				}
@@ -816,7 +908,7 @@
 		try {
 			console.log('🔄 Adding client email via API:', newEmail);
 			
-			const response = await fetch('https://9u6shrsot7.execute-api.ap-east-1.amazonaws.com/kapitanat/emails', {
+			const response = await fetch('https://g753am6ace.execute-api.ap-east-1.amazonaws.com/kapitanat/emails', {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
@@ -874,22 +966,33 @@
 		}
 	}
 
-	async function removeClientEmail(emailId) {
-		if (!emailId) return;
+	async function removeClientEmail(emailObj) {
+		if (!emailObj) return;
+		
+		// Support both old (emailId string) and new (email object) signatures
+		const emailId = typeof emailObj === 'string' ? emailObj : emailObj.id;
+		const emailAddress = typeof emailObj === 'object' ? emailObj.email : null;
+		
+		if (!emailId && !emailAddress) return;
 		
 		isLoadingEmails = true;
 		try {
-			console.log('🔄 Removing client email via API:', emailId);
+			console.log('🔄 Removing client email via API:', emailObj);
 			
-			const response = await fetch('https://9u6shrsot7.execute-api.ap-east-1.amazonaws.com/kapitanat/emails', {
+			const requestBody = {};
+			if (emailId) {
+				requestBody.id = emailId;
+			} else if (emailAddress) {
+				requestBody.email = emailAddress;
+			}
+			
+			const response = await fetch('https://g753am6ace.execute-api.ap-east-1.amazonaws.com/kapitanat/emails', {
 				method: 'DELETE',
 				headers: {
 					'Content-Type': 'application/json',
 					'Authorization': `Bearer ${localStorage.getItem('admin-token')}`
 				},
-				body: JSON.stringify({
-					id: emailId
-				})
+				body: JSON.stringify(requestBody)
 			});
 			
 			if (response.ok) {
@@ -903,13 +1006,21 @@
 				console.error('❌ Failed to remove client email:', response.status, response.statusText, errorData);
 				
 				// Fallback: remove locally if API fails
-				clientEmails = clientEmails.filter(e => e.id !== emailId);
+				if (emailId) {
+					clientEmails = clientEmails.filter(e => e.id !== emailId);
+				} else {
+					clientEmails = clientEmails.filter(e => e.email !== emailAddress);
+				}
 			}
 		} catch (error) {
 			console.error('💥 Error removing client email:', error);
 			
 			// Fallback: remove locally if API fails
-			clientEmails = clientEmails.filter(e => e.id !== emailId);
+			if (emailId) {
+				clientEmails = clientEmails.filter(e => e.id !== emailId);
+			} else {
+				clientEmails = clientEmails.filter(e => e.email !== emailAddress);
+			}
 		} finally {
 			isLoadingEmails = false;
 		}
@@ -922,7 +1033,7 @@
 		try {
 			console.log('🔄 Updating client email status via API:', emailId, newStatus);
 			
-			const response = await fetch('https://9u6shrsot7.execute-api.ap-east-1.amazonaws.com/kapitanat/emails', {
+			const response = await fetch('https://g753am6ace.execute-api.ap-east-1.amazonaws.com/kapitanat/emails', {
 				method: 'PUT',
 				headers: {
 					'Content-Type': 'application/json',
@@ -958,6 +1069,180 @@
 			);
 		} finally {
 			isLoadingEmails = false;
+		}
+	}
+
+	// Referral Sources management functions
+	async function loadReferralSources() {
+		isLoadingSources = true;
+		try {
+			console.log('🔄 Loading referral sources from API...');
+			const response = await fetch('https://g753am6ace.execute-api.ap-east-1.amazonaws.com/kapitanat/referral-sources', {
+				headers: {
+					'Authorization': `Bearer ${localStorage.getItem('admin-token')}`
+				}
+			});
+			
+			console.log('📡 Referral Sources API Response:', response.status, response.statusText);
+			
+			if (response.ok) {
+				const data = await response.json();
+				console.log('📋 Referral Sources Data:', data);
+				
+				if (data.success && data.sources) {
+					referralSources = data.sources;
+					console.log('✅ Successfully loaded referral sources:', referralSources.length);
+				} else {
+					console.warn('⚠️ Referral sources API returned unsuccessful response:', data);
+					referralSources = [];
+				}
+			} else {
+				console.error('❌ Referral sources API request failed:', response.status, response.statusText);
+				referralSources = [];
+			}
+		} catch (error) {
+			console.error('💥 Error fetching referral sources:', error);
+			referralSources = [];
+		} finally {
+			isLoadingSources = false;
+		}
+	}
+
+	async function addReferralSource() {
+		if (!newSource.id.trim() || !newSource.nameEn.trim() || !newSource.nameZh.trim()) {
+			console.error('❌ ID and both English and Chinese names are required');
+			return;
+		}
+		
+		isLoadingSources = true;
+		try {
+			console.log('🔄 Adding referral source via API:', newSource);
+			
+			const response = await fetch('https://g753am6ace.execute-api.ap-east-1.amazonaws.com/kapitanat/referral-sources', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${localStorage.getItem('admin-token')}`
+				},
+				body: JSON.stringify({
+					id: newSource.id,
+					name: {
+						en: newSource.nameEn,
+						zh: newSource.nameZh
+					},
+					description: newSource.description
+				})
+			});
+			
+			if (response.ok) {
+				const result = await response.json();
+				console.log('✅ Referral source added successfully:', result);
+				
+				// Reload referral sources from API
+				await loadReferralSources();
+				
+				// Reset form
+				newSource = { id: '', nameEn: '', nameZh: '', description: '' };
+				showManageSourcesModal = false;
+			} else {
+				console.error('❌ Failed to add referral source:', response.status, response.statusText);
+			}
+		} catch (error) {
+			console.error('💥 Error adding referral source:', error);
+		} finally {
+			isLoadingSources = false;
+		}
+	}
+
+	function startEditingSource(source) {
+		editingSource = {
+			originalId: source.id || source.value,
+			id: source.id || source.value,
+			nameEn: source.name?.en || source.name || source.label || '',
+			nameZh: source.name?.zh || '',
+			description: source.description || ''
+		};
+	}
+
+	function cancelEditingSource() {
+		editingSource = null;
+	}
+
+	async function saveEditedSource() {
+		if (!editingSource || !editingSource.id.trim() || !editingSource.nameEn.trim() || !editingSource.nameZh.trim()) {
+			console.error('❌ ID and both English and Chinese names are required');
+			return;
+		}
+		
+		isLoadingSources = true;
+		try {
+			console.log('🔄 Updating referral source via API:', editingSource);
+			
+			const response = await fetch('https://g753am6ace.execute-api.ap-east-1.amazonaws.com/kapitanat/referral-sources', {
+				method: 'PUT',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${localStorage.getItem('admin-token')}`
+				},
+				body: JSON.stringify({
+					originalId: editingSource.originalId,
+					id: editingSource.id,
+					name: {
+						en: editingSource.nameEn,
+						zh: editingSource.nameZh
+					},
+					description: editingSource.description
+				})
+			});
+			
+			if (response.ok) {
+				const result = await response.json();
+				console.log('✅ Referral source updated successfully:', result);
+				
+				// Reload referral sources from API
+				await loadReferralSources();
+				
+				// Clear editing state
+				editingSource = null;
+			} else {
+				console.error('❌ Failed to update referral source:', response.status, response.statusText);
+			}
+		} catch (error) {
+			console.error('💥 Error updating referral source:', error);
+		} finally {
+			isLoadingSources = false;
+		}
+	}
+
+	async function deleteReferralSource(sourceId) {
+		isLoadingSources = true;
+		try {
+			console.log('🔄 Deleting referral source via API:', sourceId);
+			
+			const response = await fetch(`https://g753am6ace.execute-api.ap-east-1.amazonaws.com/kapitanat/referral-sources`, {
+				method: 'DELETE',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${localStorage.getItem('admin-token')}`
+				},
+				body: JSON.stringify({
+					id: sourceId
+				})
+			});
+			
+			if (response.ok) {
+				const result = await response.json();
+				console.log('✅ Referral source deleted successfully:', result);
+				
+				// Reload referral sources from API
+				await loadReferralSources();
+			} else {
+				console.error('❌ Failed to delete referral source:', response.status, response.statusText);
+			}
+		} catch (error) {
+			console.error('💥 Error deleting referral source:', error);
+		} finally {
+			isLoadingSources = false;
 		}
 	}
 
@@ -1034,7 +1319,10 @@ Please share these credentials securely with the new team member. They will be r
 					</Button>
 					<Button 
 						kind="tertiary" 
-						on:click={() => showManageCargoModal = true}
+						on:click={() => {
+							showManageCargoModal = true;
+							editingCargoType = null;
+						}}
 						class="action-button"
 					>
 						Manage Cargo
@@ -1051,7 +1339,17 @@ Please share these credentials securely with the new team member. They will be r
 						on:click={() => showManageEmailsModal = true}
 						class="action-button"
 					>
-						Manage Analysis Emails
+						Manage Emails
+					</Button>
+					<Button 
+						kind="tertiary" 
+						on:click={() => {
+							showManageSourcesModal = true;
+							editingSource = null;
+						}}
+						class="action-button"
+					>
+						Manage Sources
 					</Button>
 				</div>
 			</Tile>
@@ -1327,58 +1625,146 @@ Please share these credentials securely with the new team member. They will be r
 	<Modal
 		bind:open={showManageCargoModal}
 		modalHeading="Manage Cargo Types"
-		primaryButtonText="Add Cargo Type"
+		primaryButtonText={editingCargoType ? "Save Changes" : "Add Cargo Type"}
 		secondaryButtonText="Cancel"
-		on:click:button--secondary={() => showManageCargoModal = false}
-		on:click:button--primary={addCargoType}
+		on:click:button--secondary={() => {
+			showManageCargoModal = false;
+			editingCargoType = null;
+			newCargoType = { id: '', nameEn: '', nameZh: '', description: '' };
+		}}
+		on:click:button--primary={editingCargoType ? saveEditedCargoType : addCargoType}
+		primaryButtonDisabled={editingCargoType ? 
+			(!editingCargoType.id.trim() || !editingCargoType.nameEn.trim() || !editingCargoType.nameZh.trim() || isLoading) :
+			(!newCargoType.id.trim() || !newCargoType.nameEn.trim() || !newCargoType.nameZh.trim() || isLoading)
+		}
+		size="lg"
 	>
-		<div style="margin-bottom: 16px;">
-			<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-				<TextInput
-					labelText="Cargo Type Name (English) *"
-					placeholder="e.g., Electronics, Textiles"
-					bind:value={newCargoType.nameEn}
-					required
-				/>
-				<TextInput
-					labelText="Cargo Type Name (Chinese) *"
-					placeholder="e.g., 电子产品, 纺织品"
-					bind:value={newCargoType.nameZh}
-					required
-				/>
+		{#if editingCargoType}
+			<!-- Edit Existing Cargo Type -->
+			<div style="margin-bottom: 24px; padding: 16px; background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 6px;">
+				<h4 style="margin: 0 0 16px 0; color: #856404;">✏️ Edit Cargo Type</h4>
+				<div style="margin-bottom: 16px;">
+					<TextInput
+						labelText="Cargo Type ID *"
+						placeholder="e.g., 105, electronics, textiles"
+						bind:value={editingCargoType.id}
+						required
+					/>
+				</div>
+				<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;">
+					<TextInput
+						labelText="Cargo Type Name (English) *"
+						placeholder="e.g., Electronics, Textiles"
+						bind:value={editingCargoType.nameEn}
+						required
+					/>
+					<TextInput
+						labelText="Cargo Type Name (Chinese) *"
+						placeholder="e.g., 电子产品, 纺织品"
+						bind:value={editingCargoType.nameZh}
+						required
+					/>
+				</div>
+				<div style="margin-bottom: 16px;">
+					<TextArea
+						labelText="Description (Optional)"
+						placeholder="Additional details about this cargo type..."
+						bind:value={editingCargoType.description}
+						rows={3}
+					/>
+				</div>
+				<Button kind="ghost" size="sm" on:click={cancelEditingCargoType}>
+					Cancel Edit
+				</Button>
 			</div>
-		</div>
-		<div style="margin-bottom: 16px;">
-			<TextArea
-				labelText="Description (Optional)"
-				placeholder="Additional details about this cargo type..."
-				bind:value={newCargoType.description}
-				rows={3}
-			/>
-		</div>
+		{:else}
+			<!-- Add New Cargo Type -->
+			<div style="margin-bottom: 24px; padding: 16px; background: #e8f4fd; border: 1px solid #b3d9ff; border-radius: 6px;">
+				<h4 style="margin: 0 0 16px 0; color: #0066cc;">➕ Add New Cargo Type</h4>
+				<div style="margin-bottom: 16px;">
+					<TextInput
+						labelText="Cargo Type ID *"
+						placeholder="e.g., 105, electronics, textiles"
+						bind:value={newCargoType.id}
+						required
+					/>
+				</div>
+				<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;">
+					<TextInput
+						labelText="Cargo Type Name (English) *"
+						placeholder="e.g., Electronics, Textiles"
+						bind:value={newCargoType.nameEn}
+						required
+					/>
+					<TextInput
+						labelText="Cargo Type Name (Chinese) *"
+						placeholder="e.g., 电子产品, 纺织品"
+						bind:value={newCargoType.nameZh}
+						required
+					/>
+				</div>
+				<div style="margin-bottom: 16px;">
+					<TextArea
+						labelText="Description (Optional)"
+						placeholder="Additional details about this cargo type..."
+						bind:value={newCargoType.description}
+						rows={3}
+					/>
+				</div>
+			</div>
+		{/if}
 		
 		<div style="margin-top: 24px;">
-			<h4>Current Cargo Types:</h4>
+			<h4>Current Cargo Types ({cargoTypes.length}):</h4>
 			{#if cargoTypes.length > 0}
-				<div style="max-height: 200px; overflow-y: auto; margin: 8px 0;">
-					{#each cargoTypes as cargoType}
-						<div style="display: flex; justify-content: space-between; align-items: center; padding: 8px; border-bottom: 1px solid #eee;">
-							<span>
-								<strong>
-									{cargoType.name?.en || cargoType.name || cargoType.label || 'Unknown'}
-								</strong>
-								{cargoType.name?.zh ? ` (${cargoType.name.zh})` : ''}
-								{cargoType.description ? `- ${cargoType.description}` : ''}
-								<small style="color: #666; margin-left: 8px;">(ID: {cargoType.id || cargoType.value})</small>
-							</span>
-							<Button 
-								kind="danger-ghost" 
-								size="sm"
-								on:click={() => deleteCargoType(cargoType.id || cargoType.value)}
-								disabled={isLoading}
-							>
-								Delete
-							</Button>
+				<div style="max-height: 400px; overflow-y: auto; border: 1px solid #ddd; border-radius: 6px; margin: 8px 0;">
+					{#each cargoTypes as cargoType, index}
+						<div style="padding: 16px; border-bottom: 1px solid #eee; {index === cargoTypes.length - 1 ? 'border-bottom: none;' : ''}">
+							<div style="display: flex; justify-content: space-between; align-items: flex-start;">
+								<!-- Cargo Type Info -->
+								<div style="flex: 1;">
+									<div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+										<strong style="color: #333; font-size: 16px;">
+											{cargoType.name?.en || cargoType.name || cargoType.label || 'Unknown'}
+										</strong>
+										<span style="background: #e3f2fd; color: #1976d2; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 500;">
+											ID: {cargoType.id || cargoType.value}
+										</span>
+									</div>
+									{#if cargoType.name?.zh}
+										<div style="color: #666; margin-bottom: 4px; font-size: 14px;">
+											中文: {cargoType.name.zh}
+										</div>
+									{/if}
+									{#if cargoType.description}
+										<div style="color: #666; font-size: 12px; font-style: italic;">
+											{cargoType.description}
+										</div>
+									{/if}
+								</div>
+								
+								<!-- Action Buttons -->
+								<div style="display: flex; align-items: center; gap: 8px; margin-left: 16px;">
+									<Button 
+										kind="tertiary" 
+										size="sm"
+										on:click={() => startEditingCargoType(cargoType)}
+										disabled={isLoading}
+										title="Edit cargo type"
+									>
+										✏️ Edit
+									</Button>
+									<Button 
+										kind="danger-ghost" 
+										size="sm"
+										on:click={() => deleteCargoType(cargoType.id || cargoType.value)}
+										disabled={isLoading}
+										title="Delete cargo type"
+									>
+										🗑️ Delete
+									</Button>
+								</div>
+							</div>
 						</div>
 					{/each}
 				</div>
@@ -1389,6 +1775,19 @@ Please share these credentials securely with the new team member. They will be r
 					<p style="margin: 4px 0 0 0; font-size: 12px; color: #999;">Check console for API errors</p>
 				</div>
 			{/if}
+		</div>
+		
+		<!-- Info Section -->
+		<div style="margin-top: 16px; padding: 12px; background: #f0f8ff; border: 1px solid #b3d9ff; border-radius: 4px;">
+			<div style="font-size: 14px; color: #0066cc;">
+				<strong>💡 Cargo Type Management:</strong>
+				<ul style="margin: 8px 0 0 20px; font-size: 12px;">
+					<li>Each cargo type requires a unique ID, English name, and Chinese name</li>
+					<li>IDs are used in form submissions and should be consistent</li>
+					<li>Use the Edit button to modify existing cargo types</li>
+					<li>Changes will be reflected in the form dropdown immediately</li>
+				</ul>
+			</div>
 		</div>
 	</Modal>
 
@@ -1612,7 +2011,7 @@ Please share these credentials securely with the new team member. They will be r
 									<Button 
 										kind="danger-ghost" 
 										size="sm"
-										on:click={() => removeClientEmail(email.id)}
+										on:click={() => removeClientEmail(email)}
 										disabled={isLoadingEmails}
 										title="Remove email recipient"
 									>
@@ -1686,6 +2085,176 @@ Please share these credentials securely with the new team member. They will be r
 				</div>
 			</div>
 		{/if}
+	</Modal>
+
+	<!-- Manage Sources Modal -->
+	<Modal
+		bind:open={showManageSourcesModal}
+		modalHeading="Manage Referral Sources"
+		primaryButtonText={editingSource ? "Save Changes" : "Add Source"}
+		secondaryButtonText="Cancel"
+		on:click:button--secondary={() => {
+			showManageSourcesModal = false;
+			editingSource = null;
+			newSource = { id: '', nameEn: '', nameZh: '', description: '' };
+		}}
+		on:click:button--primary={editingSource ? saveEditedSource : addReferralSource}
+		primaryButtonDisabled={editingSource ? 
+			(!editingSource.id.trim() || !editingSource.nameEn.trim() || !editingSource.nameZh.trim() || isLoadingSources) :
+			(!newSource.id.trim() || !newSource.nameEn.trim() || !newSource.nameZh.trim() || isLoadingSources)
+		}
+		size="lg"
+	>
+		{#if editingSource}
+			<!-- Edit Existing Source -->
+			<div style="margin-bottom: 24px; padding: 16px; background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 6px;">
+				<h4 style="margin: 0 0 16px 0; color: #856404;">✏️ Edit Referral Source</h4>
+				<div style="margin-bottom: 16px;">
+					<TextInput
+						labelText="Source ID *"
+						placeholder="e.g., google, facebook, clif_2025"
+						bind:value={editingSource.id}
+						required
+					/>
+				</div>
+				<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;">
+					<TextInput
+						labelText="Source Name (English) *"
+						placeholder="e.g., Google Search, Facebook Ad"
+						bind:value={editingSource.nameEn}
+						required
+					/>
+					<TextInput
+						labelText="Source Name (Chinese) *"
+						placeholder="e.g., 谷歌搜索, 脸书广告"
+						bind:value={editingSource.nameZh}
+						required
+					/>
+				</div>
+				<div style="margin-bottom: 16px;">
+					<TextArea
+						labelText="Description (Optional)"
+						placeholder="Additional details about this referral source..."
+						bind:value={editingSource.description}
+						rows={3}
+					/>
+				</div>
+				<Button kind="ghost" size="sm" on:click={cancelEditingSource}>
+					Cancel Edit
+				</Button>
+			</div>
+		{:else}
+			<!-- Add New Source -->
+			<div style="margin-bottom: 24px; padding: 16px; background: #e8f4fd; border: 1px solid #b3d9ff; border-radius: 6px;">
+				<h4 style="margin: 0 0 16px 0; color: #0066cc;">➕ Add New Referral Source</h4>
+				<div style="margin-bottom: 16px;">
+					<TextInput
+						labelText="Source ID *"
+						placeholder="e.g., google, facebook, clif_2025"
+						bind:value={newSource.id}
+						required
+					/>
+				</div>
+				<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;">
+					<TextInput
+						labelText="Source Name (English) *"
+						placeholder="e.g., Google Search, Facebook Ad"
+						bind:value={newSource.nameEn}
+						required
+					/>
+					<TextInput
+						labelText="Source Name (Chinese) *"
+						placeholder="e.g., 谷歌搜索, 脸书广告"
+						bind:value={newSource.nameZh}
+						required
+					/>
+				</div>
+				<div style="margin-bottom: 16px;">
+					<TextArea
+						labelText="Description (Optional)"
+						placeholder="Additional details about this referral source..."
+						bind:value={newSource.description}
+						rows={3}
+					/>
+				</div>
+			</div>
+		{/if}
+		
+		<div style="margin-top: 24px;">
+			<h4>Current Referral Sources ({referralSources.length}):</h4>
+			{#if referralSources.length > 0}
+				<div style="max-height: 400px; overflow-y: auto; border: 1px solid #ddd; border-radius: 6px; margin: 8px 0;">
+					{#each referralSources as source, index}
+						<div style="padding: 16px; border-bottom: 1px solid #eee; {index === referralSources.length - 1 ? 'border-bottom: none;' : ''}">
+							<div style="display: flex; justify-content: space-between; align-items: flex-start;">
+								<!-- Source Info -->
+								<div style="flex: 1;">
+									<div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+										<strong style="color: #333; font-size: 16px;">
+											{source.name?.en || source.name || source.label || 'Unknown'}
+										</strong>
+										<span style="background: #e3f2fd; color: #1976d2; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 500;">
+											ID: {source.id || source.value}
+										</span>
+									</div>
+									{#if source.name?.zh}
+										<div style="color: #666; margin-bottom: 4px; font-size: 14px;">
+											中文: {source.name.zh}
+										</div>
+									{/if}
+									{#if source.description}
+										<div style="color: #666; font-size: 12px; font-style: italic;">
+											{source.description}
+										</div>
+									{/if}
+								</div>
+								
+								<!-- Action Buttons -->
+								<div style="display: flex; align-items: center; gap: 8px; margin-left: 16px;">
+									<Button 
+										kind="tertiary" 
+										size="sm"
+										on:click={() => startEditingSource(source)}
+										disabled={isLoadingSources}
+										title="Edit referral source"
+									>
+										✏️ Edit
+									</Button>
+									<Button 
+										kind="danger-ghost" 
+										size="sm"
+										on:click={() => deleteReferralSource(source.id || source.value)}
+										disabled={isLoadingSources}
+										title="Delete referral source"
+									>
+										🗑️ Delete
+									</Button>
+								</div>
+							</div>
+						</div>
+					{/each}
+				</div>
+			{:else}
+				<div style="text-align: center; padding: 16px; background: #f9f9f9; border-radius: 4px; margin: 8px 0;">
+					<div style="font-size: 24px; margin-bottom: 8px;">📍</div>
+					<p style="margin: 0; color: #666;">No referral sources found</p>
+					<p style="margin: 4px 0 0 0; font-size: 12px; color: #999;">Check console for API errors</p>
+				</div>
+			{/if}
+		</div>
+		
+		<!-- Info Section -->
+		<div style="margin-top: 16px; padding: 12px; background: #f0f8ff; border: 1px solid #b3d9ff; border-radius: 4px;">
+			<div style="font-size: 14px; color: #0066cc;">
+				<strong>💡 Referral Source Management:</strong>
+				<ul style="margin: 8px 0 0 20px; font-size: 12px;">
+					<li>Each source requires a unique ID, English name, and Chinese name</li>
+					<li>Sources appear in the "Where did you hear about us?" dropdown</li>
+					<li>Use the Edit button to modify existing sources</li>
+					<li>Changes will be reflected in the form dropdown immediately</li>
+				</ul>
+			</div>
+		</div>
 	</Modal>
 </div>
 {:else}

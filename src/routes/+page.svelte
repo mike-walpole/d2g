@@ -4,7 +4,7 @@
 		Grid, Column, Tile, Loading, InlineNotification 
 	} from 'carbon-components-svelte';
 	// Removed carbon icons to avoid import issues
-	import { t, cargoTypes, apiBaseUrl, currentLanguage, configData } from '$lib/stores/config.js';
+	import { t, cargoTypes, referralSources, apiBaseUrl, currentLanguage, configData } from '$lib/stores/config.js';
 	import { onMount } from 'svelte';
 
 	// Responsive form handling
@@ -192,9 +192,9 @@
 					'Content-Type': 'application/json'
 				},
 				body: JSON.stringify({
-					formData: formData,
-					userEmail: formData.email,
-					formId: 'dock2gdansk-main'
+					form_data: formData,
+					user_email: formData.email,
+					form_id: 'dock2gdansk-main'
 				})
 			});
 
@@ -301,16 +301,6 @@
 						{formSchema ? getLocalizedText(formSchema.description, 'Fill out the form below') : t('form.description', 'Fill out the form below')}
 					</p>
 
-					{#if submitMessage}
-						<div class="mb-6">
-							<InlineNotification 
-								kind={submitStatus}
-								title={submitMessage}
-								hideCloseButton
-							/>
-						</div>
-					{/if}
-
 					<form on:submit|preventDefault={handleSubmit} class="space-y-6">
 						<Grid condensed>
 							{#if formSchema?.fields}
@@ -365,8 +355,8 @@
 													{:else if field.id === 'referral_source'}
 														<!-- Add placeholder option for referral source -->
 														<SelectItem value="" text={$currentLanguage === 'zh' ? '请选择' : 'Please select'} disabled />
-														{#each field.options as option}
-															<SelectItem value={option.value} text={getLocalizedText(option.label, option.value)} />
+														{#each $referralSources as source}
+															<SelectItem value={source.id} text={source.name} />
 														{/each}
 													{:else if field.options}
 														{#each field.options as option}
@@ -387,7 +377,7 @@
 							{/if}
 
 							<Column sm={4} md={8} lg={16}>
-								<div style="margin-top: 24px;">
+								<div class="submit-section">
 									<Button 
 										type="submit" 
 										size="lg" 
@@ -400,6 +390,16 @@
 											{formSchema?.submitButton ? getLocalizedText(formSchema.submitButton, 'Submit Inquiry') : t('form.submit', 'Submit Inquiry')}
 										{/if}
 									</Button>
+									
+									{#if submitMessage}
+										<div class="confirmation-message">
+											<InlineNotification 
+												kind={submitStatus}
+												title={submitMessage}
+												hideCloseButton
+											/>
+										</div>
+									{/if}
 								</div>
 							</Column>
 						</Grid>
@@ -425,6 +425,19 @@
 		border-radius: 8px;
 		box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 		padding: 48px;
+	}
+
+	.submit-section {
+		display: flex;
+		align-items: flex-start;
+		gap: 16px;
+		margin-top: 24px;
+		flex-wrap: wrap;
+	}
+
+	.confirmation-message {
+		flex: 1;
+		min-width: 300px;
 	}
 
 
@@ -462,6 +475,17 @@
 		:global(.bx--grid) {
 			margin-left: -4px !important;
 			margin-right: -4px !important;
+		}
+
+		/* Mobile submit section adjustments */
+		.submit-section {
+			flex-direction: column;
+			align-items: stretch;
+		}
+
+		.confirmation-message {
+			min-width: auto;
+			margin-top: 12px;
 		}
 		
 

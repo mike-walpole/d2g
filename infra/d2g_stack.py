@@ -31,7 +31,9 @@ class D2GStack(Stack):
             ),
             billing_mode=dynamodb.BillingMode.PAY_PER_REQUEST,
             removal_policy=RemovalPolicy.DESTROY,  # For development - change to RETAIN for production
-            point_in_time_recovery=True
+            point_in_time_recovery_specification=dynamodb.PointInTimeRecoverySpecification(
+                point_in_time_recovery_enabled=True
+            )
         )
 
         # DynamoDB Table for form schemas with versioning
@@ -48,7 +50,9 @@ class D2GStack(Stack):
             ),
             billing_mode=dynamodb.BillingMode.PAY_PER_REQUEST,
             removal_policy=RemovalPolicy.DESTROY,  # For development - change to RETAIN for production
-            point_in_time_recovery=True
+            point_in_time_recovery_specification=dynamodb.PointInTimeRecoverySpecification(
+                point_in_time_recovery_enabled=True
+            )
         )
 
         # Cognito User Pool
