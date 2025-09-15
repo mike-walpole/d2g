@@ -107,6 +107,14 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         
         # Extract form data
         form_data = body.get('form_data', {})
+
+        # Process form_data to handle custom phone prefix
+        processed_form_data = form_data.copy()
+        if form_data.get('phone_prefix') == 'custom' and form_data.get('custom_phone_prefix'):
+            processed_form_data['phone_prefix'] = form_data.get('custom_phone_prefix')
+            # Remove the custom_phone_prefix field since we've merged it into phone_prefix
+            processed_form_data.pop('custom_phone_prefix', None)
+
         user_email = body.get('user_email', '')
         form_id = body.get('form_id', 'dock2gdansk-main')  # Allow frontend to specify form_id
         schema_version = body.get('schema_version')  # Allow frontend to specify version used
@@ -169,13 +177,13 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         item = {
             'id': submission_id,  # Changed from 'submission_id' to 'id'
             'timestamp': timestamp,
-            'userEmail': form_data.get('email', user_email),  # Changed from 'user_email' to 'userEmail'
-            'formData': form_data,  # Changed from 'form_data' to 'formData'
+            'userEmail': processed_form_data.get('email', user_email),  # Changed from 'user_email' to 'userEmail'
+            'formData': processed_form_data,  # Use processed form data with custom phone prefix resolved
             'formId': form_id,  # Changed from 'form_id' to 'formId'
             'schemaVersion': schema_version,  # Changed from 'schema_version' to 'schemaVersion'
             'status': 'submitted',
             'submittedAt': timestamp,
-            'companyName': form_data.get('company', ''),  # Added companyName
+            'companyName': processed_form_data.get('company', ''),  # Added companyName
             'cargoTypeName': cargo_type_name  # Changed from 'cargo_type_name' to 'cargoTypeName'
         }
         
@@ -187,8 +195,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         
         # Send admin notification email with dynamic subject and JSON attachment
         try:
-            # Get company name from form data
-            company_name = form_data.get('company', 'Unknown Company')
+            # Get company name from processed form data
+            company_name = processed_form_data.get('company', 'Unknown Company')
             
             # Format current date in DD/MM/YYYY format
             current_time = datetime.utcnow()
@@ -201,10 +209,10 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             json_data = {
                 'submission_id': submission_id,
                 'timestamp': timestamp,
-                'user_email': form_data.get('email', user_email),
+                'user_email': processed_form_data.get('email', user_email),
                 'form_id': form_id,
                 'schema_version': schema_version,
-                'form_data': form_data,
+                'form_data': processed_form_data,
                 'cargo_type_name': cargo_type_name
             }
             
