@@ -487,8 +487,8 @@
 													{/if}
 												</Select>
 											{:else if field.type === 'checkbox'}
-												{#if field.id === 'privacy_consent' || field.id === 'terms_consent'}
-													<!-- Custom checkbox with HTML support for privacy/terms -->
+												{#if field.id === 'privacy_consent' || field.id === 'terms_consent' || field.id === 'cross_border_consent'}
+													<!-- Custom checkbox with HTML support for privacy/terms/cross-border -->
 													<div class="checkbox-wrapper" style="margin-bottom: 16px;">
 														<input
 															type="checkbox"
