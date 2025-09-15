@@ -89,10 +89,21 @@
 	// Enhanced language switching with override tracking
 	function handleLanguageSwitch(lang) {
 		console.log('🔄 User manually switched to language:', lang);
-		switchLanguage(lang);
-		// Mark that user has manually chosen a language (override geolocation)
-		localStorage.setItem('language-override', 'true');
-		localStorage.setItem('preferred-language', lang);
+
+		try {
+			// Force immediate language switch
+			switchLanguage(lang);
+
+			// Mark that user has manually chosen a language (override geolocation)
+			if (typeof localStorage !== 'undefined') {
+				localStorage.setItem('language-override', 'true');
+				localStorage.setItem('preferred-language', lang);
+			}
+
+			console.log('✅ Language switch completed:', lang);
+		} catch (error) {
+			console.error('❌ Language switch failed:', error);
+		}
 	}
 </script>
 
@@ -111,8 +122,8 @@
 <Header company="Dock2Gdansk" platformName={t('site_tagline', 'Professional Cargo Transportation')}>
 	<HeaderNav>
 		
-		<HeaderNavItem onclick={() => handleLanguageSwitch('en')} text={t('EN', 'EN')} />
-		<HeaderNavItem onclick={() => handleLanguageSwitch('zh')} text={t('中文', '中文')} />
+		<HeaderNavItem on:click={() => handleLanguageSwitch('en')} text={t('EN', 'EN')} />
+		<HeaderNavItem on:click={() => handleLanguageSwitch('zh')} text={t('中文', '中文')} />
 	
 	
 	</HeaderNav>
@@ -130,6 +141,9 @@
 			{t('footer.copyright', '© 2024 Dock2Gdansk. All rights reserved.')}
 		</p>
 		<div style="display: flex; justify-content: center; gap: 16px; margin-top: 8px;">
+			<a href="https://www.portgdansk.pl" target="_blank" rel="noopener noreferrer" style="font-size: 14px; color: #0043ce; text-decoration: none;">
+				{t('footer.port_website', 'Port of Gdańsk')}
+			</a>
 			<a href="/privacy" style="font-size: 14px; color: #0043ce; text-decoration: none;">
 				{t('footer.privacy', 'Privacy Policy')}
 			</a>

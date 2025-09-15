@@ -133,7 +133,7 @@
 						id: submission.id,
 						company: submission.formData.company,
 						email: submission.formData.email,
-						phone: `${submission.formData.phone_prefix} ${submission.formData.phone}`,
+						phone: `${submission.formData.phone_prefix === 'custom' ? submission.formData.custom_phone_prefix || submission.formData.phone_prefix : submission.formData.phone_prefix} ${submission.formData.phone}`,
 						cargoType: submission.formData.cargo_type,
 						hearAboutUs: submission.formData.hear_about_us || submission.formData.referral_source || 'N/A',
 						inquiryContent: submission.formData.inquiry_content,

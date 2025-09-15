@@ -26,6 +26,127 @@
 	// List of consent checkboxes that should be controlled by select all
 	const consentCheckboxIds = ['privacy_consent', 'terms_consent', 'cross_border_consent'];
 
+	// Field validation state
+	let fieldErrors = {};
+	let fieldTouched = {};
+	let showValidation = false;
+
+	// Multilingual validation messages
+	const validationMessages = {
+		en: {
+			required: 'This field is required',
+			email: 'Please enter a valid email address',
+			phone: 'Please enter a valid phone number',
+			minLength: 'Please enter at least {min} characters',
+			custom_prefix: 'Please enter a valid phone prefix (e.g., +33)',
+			select: 'Please select an option',
+			checkbox: 'This checkbox must be checked'
+		},
+		zh: {
+			required: '此字段为必填项',
+			email: '请输入有效的电子邮箱地址',
+			phone: '请输入有效的电话号码',
+			minLength: '请至少输入{min}个字符',
+			custom_prefix: '请输入有效的电话区号（例如：+33）',
+			select: '请选择一个选项',
+			checkbox: '必须勾选此复选框'
+		}
+	};
+
+	// Get validation message for field
+	const getValidationMessage = (field, errorType, params = {}) => {
+		const messages = validationMessages[$currentLanguage] || validationMessages.en;
+		let message = messages[errorType] || messages.required;
+
+		// Replace placeholders
+		Object.keys(params).forEach(key => {
+			message = message.replace(`{${key}}`, params[key]);
+		});
+
+		return message;
+	};
+
+	// Validate individual field
+	const validateField = (field) => {
+		if (!field) return null;
+
+		const value = formData[field.id];
+		const isRequired = field.required || field.id === 'referral_source';
+
+		// Check if field is empty
+		const isEmpty = !value || (typeof value === 'string' && value.trim() === '');
+
+		if (isRequired && isEmpty) {
+			if (field.type === 'checkbox') {
+				return getValidationMessage(field, 'checkbox');
+			} else if (field.type === 'select') {
+				return getValidationMessage(field, 'select');
+			} else {
+				return getValidationMessage(field, 'required');
+			}
+		}
+
+		// Custom phone prefix validation
+		if (field.id === 'custom_phone_prefix' && formData.phone_prefix === 'custom' && value) {
+			if (!field.validation?.pattern || !new RegExp(field.validation.pattern).test(value)) {
+				return getValidationMessage(field, 'custom_prefix');
+			}
+		}
+
+		// Email validation
+		if (field.type === 'email' && value && field.validation?.pattern) {
+			if (!new RegExp(field.validation.pattern).test(value)) {
+				return getValidationMessage(field, 'email');
+			}
+		}
+
+		// Phone validation
+		if (field.id === 'phone' && value && field.validation?.pattern) {
+			if (!new RegExp(field.validation.pattern).test(value)) {
+				return getValidationMessage(field, 'phone');
+			}
+		}
+
+		// Min length validation
+		if (field.validation?.minLength && value && value.length < field.validation.minLength) {
+			return getValidationMessage(field, 'minLength', { min: field.validation.minLength });
+		}
+
+		return null;
+	};
+
+	// Validate all fields
+	const validateAllFields = () => {
+		const errors = {};
+
+		formSchema?.fields?.forEach(field => {
+			// Skip custom_phone_prefix unless phone_prefix is 'custom'
+			if (field.id === 'custom_phone_prefix' && formData.phone_prefix !== 'custom') {
+				return;
+			}
+
+			const error = validateField(field);
+			if (error) {
+				errors[field.id] = error;
+			}
+		});
+
+		// Special case: custom phone prefix validation
+		if (formData.phone_prefix === 'custom') {
+			const customField = formSchema?.fields?.find(f => f.id === 'custom_phone_prefix');
+			if (customField) {
+				const error = validateField(customField);
+				if (error) {
+					errors['custom_phone_prefix'] = error;
+				}
+			}
+		}
+
+		fieldErrors = errors;
+		return Object.keys(errors).length === 0;
+	};
+
+
 	// Helper function to get localized text from schema (reactive)
 	$: getLocalizedText = (textObj, fallback = '') => {
 		if (!textObj) return fallback;
@@ -128,54 +249,23 @@
 	});
 
 	async function handleSubmit() {
-		// Validate required fields dynamically
-		if (!formSchema?.fields) {
-			// Multilingual schema error message
-			const schemaErrorMessages = {
-				en: 'Form schema not loaded',
-				zh: '表单架构未加载',
-				pl: 'Schemat formularza nie został załadowany'
-			};
-			
-			submitMessage = `${schemaErrorMessages.en} / ${schemaErrorMessages.zh} / ${schemaErrorMessages.pl}`;
-			submitStatus = 'error';
-			return;
-		}
-		
-		// Check all required fields
-		const missingFields = [];
-		formSchema.fields.forEach(field => {
-			// Force referral_source to be required (frontend-only)
-			const isRequired = field.required || field.id === 'referral_source';
-			if (isRequired) {
-				console.log(`🔍 Checking required field: ${field.id} (${field.type}) = "${formData[field.id]}"`);
-				if (field.type === 'checkbox') {
-					if (!formData[field.id]) {
-						console.log(`❌ Missing checkbox: ${field.id}`);
-						missingFields.push(getLocalizedText(field.label, field.id));
-					}
-				} else {
-					// Handle select fields and text fields
-					const fieldValue = formData[field.id];
-					const isEmpty = !fieldValue || (typeof fieldValue === 'string' && fieldValue.trim() === '');
-					
-					if (isEmpty) {
-						console.log(`❌ Missing field: ${field.id} (value: "${fieldValue}")`);
-						missingFields.push(getLocalizedText(field.label, field.id));
-					}
-				}
+		console.log('📋 Form submission started');
+
+		// Show validation and validate all fields
+		showValidation = true;
+		const isValid = validateAllFields();
+
+		if (!isValid) {
+			// Find the first error field and scroll to it
+			const firstErrorField = Object.keys(fieldErrors)[0];
+			const element = document.getElementById(firstErrorField);
+			if (element) {
+				element.scrollIntoView({ behavior: 'smooth', block: 'center' });
 			}
-		});
-		
-		if (missingFields.length > 0) {
-			// Multilingual error message
-			const errorMessages = {
-				en: 'Please fill in all required fields',
-				zh: '请填写所有必填字段',
-				pl: 'Proszę wypełnić wszystkie wymagane pola'
-			};
-			
-			submitMessage = `${errorMessages.en} / ${errorMessages.zh} / ${errorMessages.pl}: ${missingFields.join(', ')}`;
+
+			submitMessage = $currentLanguage === 'zh'
+				? '请填写所有必填字段'
+				: 'Please fill in all required fields';
 			submitStatus = 'error';
 			return;
 		}
@@ -203,39 +293,33 @@
 			const result = await response.json();
 
 			if (result.success) {
-				// Multilingual success message
-			const successMessages = {
-				en: 'Thank you! Your inquiry has been submitted successfully.',
-				zh: '谢谢！您的询盘已成功提交。',
-				pl: 'Dziękujemy! Twoje zapytanie zostało pomyślnie przesłane.'
-			};
-			
-			submitMessage = `${successMessages.en} / ${successMessages.zh} / ${successMessages.pl}`;
+				// Success message
+				const successMessages = {
+					en: 'Thank you! Your inquiry has been submitted successfully.',
+					zh: '谢谢！您的询盘已成功提交。',
+				};
+
+				submitMessage = successMessages[$currentLanguage] || successMessages.en;
 				submitStatus = 'success';
-				
-				// Reset form using current schema
+
+				// Reset form and validation state
+				formData = {};
+				fieldErrors = {};
+				fieldTouched = {};
+				showValidation = false;
 				initializeFormData();
 			} else {
-				// Multilingual error message
-			const errorMessages = {
-				en: 'An error occurred. Please try again.',
-				zh: '发生错误。请重试。',
-				pl: 'Wystąpił błąd. Spróbuj ponownie.'
-			};
-			
-			submitMessage = result.error || `${errorMessages.en} / ${errorMessages.zh} / ${errorMessages.pl}`;
-				submitStatus = 'error';
+				throw new Error(result.error || 'Submission failed');
 			}
 		} catch (error) {
-			console.error('Submit error:', error);
-			// Multilingual error message  
-		const errorMessages = {
-			en: 'An error occurred. Please try again.',
-			zh: '发生错误。请重试。',
-			pl: 'Wystąpił błąd. Spróbuj ponownie.'
-		};
-		
-		submitMessage = `${errorMessages.en} / ${errorMessages.zh} / ${errorMessages.pl}`;
+			console.error('Submission error:', error);
+
+			const errorMessages = {
+				en: 'An error occurred. Please try again.',
+				zh: '发生错误，请重试。',
+			};
+
+			submitMessage = errorMessages[$currentLanguage] || errorMessages.en;
 			submitStatus = 'error';
 		} finally {
 			isSubmitting = false;
@@ -277,17 +361,15 @@
 	<!-- Dark overlay for better text readability -->
 	<div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 67, 206, 0.7);"></div>
 	
-	<!-- Logo positioned in top right -->
-	<div style="position: absolute; top: 0px; right: 20px; z-index: 2;">
-		<img src="/logo.png" alt="Dock2Gdansk Logo" style="height: 120px; width: auto;" />
-	</div>
-	
 	<div style="max-width: 1200px; margin: 0 auto; padding: 0 16px; text-align: center; position: relative; z-index: 1;">
+		<!-- Centered logo -->
+		<img src="/logo.png" alt="Port of Gdańsk Logo" style="height: 180px; width: auto; margin: 0 auto 40px auto; display: block;" />
+
 		<h1 style="font-size: 48px; font-weight: normal; margin-bottom: 16px; line-height: 1.2;">
 			{heroTitle}
 		</h1>
 		<p style="font-size: 20px; margin-bottom: 32px; max-width: 800px; margin-left: auto; margin-right: auto;">
-			{heroSubtitle}
+			{heroSubtitle}{$currentLanguage === 'zh' ? ' — 由格但斯克港提供' : ' – delivered by Port of Gdańsk.'}
 		</p>
 	</div>
 </section>
@@ -323,30 +405,68 @@
 										</Column>
 									{/if}
 									
+									<!-- Skip custom_phone_prefix field in main loop - handled separately -->
+									{#if field.id !== 'custom_phone_prefix'}
 									<Column sm={4} md={8} lg={16}>
 										<div style="margin-bottom: 24px;">
 											{#if field.type === 'text' || field.type === 'email' || field.type === 'tel'}
 												<TextInput
+													id={field.id}
 													type={field.type}
 													labelText={(getLocalizedText(field.label, field.id)) + ((field.required || field.id === 'referral_source') ? ' *' : '')}
 													placeholder={field.placeholder ? getLocalizedText(field.placeholder, '') : ''}
 													bind:value={formData[field.id]}
-													required={field.required || field.id === 'referral_source'}
+													invalid={showValidation && fieldErrors[field.id]}
+													invalidText={fieldErrors[field.id]}
+													on:blur={() => {
+														fieldTouched[field.id] = true;
+														const error = validateField(field);
+														if (error) {
+															fieldErrors[field.id] = error;
+														} else {
+															delete fieldErrors[field.id];
+														}
+														fieldErrors = fieldErrors; // trigger reactivity
+													}}
 												/>
 											{:else if field.type === 'textarea'}
 												<TextArea
+													id={field.id}
 													labelText={(getLocalizedText(field.label, field.id)) + ((field.required || field.id === 'referral_source') ? ' *' : '')}
 													placeholder={field.placeholder ? getLocalizedText(field.placeholder, '') : ''}
 													bind:value={formData[field.id]}
 													rows={field.rows || 4}
-													required={field.required || field.id === 'referral_source'}
+													invalid={showValidation && fieldErrors[field.id]}
+													invalidText={fieldErrors[field.id]}
+													on:blur={() => {
+														fieldTouched[field.id] = true;
+														const error = validateField(field);
+														if (error) {
+															fieldErrors[field.id] = error;
+														} else {
+															delete fieldErrors[field.id];
+														}
+														fieldErrors = fieldErrors; // trigger reactivity
+													}}
 												/>
 											{:else if field.type === 'select'}
 												<Select
+													id={field.id}
 													labelText={(getLocalizedText(field.label, field.id)) + ((field.required || field.id === 'referral_source') ? ' *' : '')}
 													placeholder={field.placeholder ? getLocalizedText(field.placeholder, '') : ''}
 													bind:selected={formData[field.id]}
-													required={field.required || field.id === 'referral_source'}
+													invalid={showValidation && fieldErrors[field.id]}
+													invalidText={fieldErrors[field.id]}
+													on:change={() => {
+														fieldTouched[field.id] = true;
+														const error = validateField(field);
+														if (error) {
+															fieldErrors[field.id] = error;
+														} else {
+															delete fieldErrors[field.id];
+														}
+														fieldErrors = fieldErrors; // trigger reactivity
+													}}
 												>
 													{#if field.id === 'cargo_type'}
 														<!-- Add placeholder option for cargo type -->
@@ -367,14 +487,88 @@
 													{/if}
 												</Select>
 											{:else if field.type === 'checkbox'}
-												<Checkbox
-													labelText={(field.description ? getLocalizedText(field.description, field.id) : getLocalizedText(field.label, field.id)) + (field.required ? ' *' : '')}
-													bind:checked={formData[field.id]}
-													required={field.required || field.id === 'referral_source'}
-												/>
+												{#if field.id === 'privacy_consent' || field.id === 'terms_consent'}
+													<!-- Custom checkbox with HTML support for privacy/terms -->
+													<div class="checkbox-wrapper" style="margin-bottom: 16px;">
+														<input
+															type="checkbox"
+															id={field.id}
+															bind:checked={formData[field.id]}
+															style="margin-right: 8px;"
+															class={showValidation && fieldErrors[field.id] ? 'error' : ''}
+															on:change={() => {
+																fieldTouched[field.id] = true;
+																const error = validateField(field);
+																if (error) {
+																	fieldErrors[field.id] = error;
+																} else {
+																	delete fieldErrors[field.id];
+																}
+																fieldErrors = fieldErrors; // trigger reactivity
+															}}
+														/>
+														<label for={field.id} style="font-size: 14px; cursor: pointer; color: {showValidation && fieldErrors[field.id] ? '#da1e28' : 'inherit'};">
+															{@html (field.description ? getLocalizedText(field.description, field.id) : getLocalizedText(field.label, field.id)) + (field.required ? ' *' : '')}
+														</label>
+														{#if showValidation && fieldErrors[field.id]}
+															<div style="color: #da1e28; font-size: 12px; margin-top: 4px;">
+																{fieldErrors[field.id]}
+															</div>
+														{/if}
+													</div>
+												{:else}
+													<Checkbox
+														id={field.id}
+														labelText={(field.description ? getLocalizedText(field.description, field.id) : getLocalizedText(field.label, field.id)) + (field.required ? ' *' : '')}
+														bind:checked={formData[field.id]}
+														invalid={showValidation && fieldErrors[field.id]}
+														invalidText={fieldErrors[field.id]}
+														on:change={() => {
+															fieldTouched[field.id] = true;
+															const error = validateField(field);
+															if (error) {
+																fieldErrors[field.id] = error;
+															} else {
+																delete fieldErrors[field.id];
+															}
+															fieldErrors = fieldErrors; // trigger reactivity
+														}}
+													/>
+												{/if}
 											{/if}
 										</div>
 									</Column>
+									{/if}
+
+									<!-- Show custom phone prefix field only when "custom" is selected -->
+									{#if field.id === 'phone_prefix' && formData.phone_prefix === 'custom'}
+										{#if formSchema?.fields.find(f => f.id === 'custom_phone_prefix')}
+											{@const customField = formSchema.fields.find(f => f.id === 'custom_phone_prefix')}
+											<Column sm={4} md={8} lg={16}>
+												<div style="margin-bottom: 24px;">
+													<TextInput
+														id="custom_phone_prefix"
+														type="text"
+														labelText={(getLocalizedText(customField.label, customField.id)) + ' *'}
+														placeholder={customField.placeholder ? getLocalizedText(customField.placeholder, '') : ''}
+														bind:value={formData.custom_phone_prefix}
+														invalid={showValidation && fieldErrors.custom_phone_prefix}
+														invalidText={fieldErrors.custom_phone_prefix}
+														on:blur={() => {
+															fieldTouched.custom_phone_prefix = true;
+															const error = validateField(customField);
+															if (error) {
+																fieldErrors.custom_phone_prefix = error;
+															} else {
+																delete fieldErrors.custom_phone_prefix;
+															}
+															fieldErrors = fieldErrors; // trigger reactivity
+														}}
+													/>
+												</div>
+											</Column>
+										{/if}
+									{/if}
 								{/each}
 							{/if}
 
@@ -431,7 +625,8 @@
 
 	.submit-section {
 		display: flex;
-		align-items: flex-start;
+		justify-content: center;
+		align-items: center;
 		gap: 16px;
 		margin-top: 24px;
 		flex-wrap: wrap;
@@ -489,8 +684,17 @@
 			min-width: auto;
 			margin-top: 12px;
 		}
-		
+	}
 
+	/* Custom checkbox error styling */
+	:global(input.error) {
+		border-color: #da1e28 !important;
+		outline-color: #da1e28 !important;
+	}
+
+	/* Required field indicator */
+	:global(.bx--label:not(.bx--label--disabled)) {
+		font-weight: 500;
 	}
 
 	/* Tablet adjustments */
