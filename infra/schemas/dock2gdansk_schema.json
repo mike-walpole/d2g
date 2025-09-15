@@ -44,8 +44,19 @@
           {"value": "+7", "label": {"en": "+7 (Russia)", "zh": "+7 (俄罗斯)"}},
           {"value": "+81", "label": {"en": "+81 (Japan)", "zh": "+81 (日本)"}},
           {"value": "+82", "label": {"en": "+82 (South Korea)", "zh": "+82 (韩国)"}},
-          {"value": "+91", "label": {"en": "+91 (India)", "zh": "+91 (印度)"}}
+          {"value": "+91", "label": {"en": "+91 (India)", "zh": "+91 (印度)"}},
+          {"value": "custom", "label": {"en": "Other (Enter your own)", "zh": "其他 (自定义输入)"}}
         ]
+      },
+      {
+        "id": "custom_phone_prefix",
+        "type": "text",
+        "label": {"en": "Custom Phone Prefix", "zh": "自定义电话区号"},
+        "required": false,
+        "placeholder": {"en": "Enter prefix (e.g., +33)", "zh": "输入区号 (例如：+33)"},
+        "validation": {
+          "pattern": "^\\+[1-9]\\d{0,3}$"
+        }
       },
       {
         "id": "phone",
@@ -91,7 +102,7 @@
         "type": "checkbox",
         "label": {"en": "Privacy Policy Consent", "zh": "隐私政策同意"},
         "required": true,
-        "description": {"en": "I have read and agree to the Privacy Policy and consent to the processing of my personal data for handling this inquiry, in accordance with PIPL and GDPR.", "zh": "我已阅读并同意隐私政策，同意为处理此询盘而处理我的个人数据，符合PIPL和GDPR规定。"},
+        "description": {"en": "I have read and agree to the <a href='/privacy' target='_blank'>Privacy Policy</a> and consent to the processing of my personal data for handling this inquiry, in accordance with PIPL and GDPR.", "zh": "我已阅读并同意<a href='/privacy' target='_blank'>隐私政策</a>，同意为处理此询盘而处理我的个人数据，符合PIPL和GDPR规定。"},
         "validation": {
           "mustBeTrue": true
         }
@@ -101,7 +112,7 @@
         "type": "checkbox",
         "label": {"en": "Terms of Service", "zh": "服务条款"},
         "required": true,
-        "description": {"en": "I accept the terms of service", "zh": "我接受服务条款"},
+        "description": {"en": "I accept the <a href='/terms' target='_blank'>terms of service</a>", "zh": "我接受<a href='/terms' target='_blank'>服务条款</a>"},
         "validation": {
           "mustBeTrue": true
         }

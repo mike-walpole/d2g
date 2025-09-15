@@ -57,6 +57,7 @@
         },
         "footer": {
           "copyright": "© 2024 Dock2Gdansk. All rights reserved.",
+          "port_website": "Port of Gdańsk",
           "privacy": "Privacy Policy",
           "terms": "Terms of Service"
         }
@@ -115,6 +116,7 @@
         },
         "footer": {
           "copyright": "© 2024 码头到格但斯克。保留所有权利。",
+          "port_website": "格但斯克港",
           "privacy": "隐私政策",
           "terms": "服务条款"
         }
