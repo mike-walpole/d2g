@@ -119,13 +119,20 @@
 	{/if}
 </svelte:head>
 
-<Header company="Dock2Gdansk" platformName={t('site_tagline', 'Professional Cargo Transportation')}>
+<Header company="Dock2Gdansk" platformName="">
 	<HeaderNav>
-		
-		<HeaderNavItem on:click={() => handleLanguageSwitch('en')} text={t('EN', 'EN')} />
-		<HeaderNavItem on:click={() => handleLanguageSwitch('zh')} text={t('中文', '中文')} />
-	
-	
+		<div class="language-selector">
+			<HeaderNavItem 
+				class={`language-btn ${$currentLanguage === 'en' ? 'active' : ''}`}
+				on:click={() => handleLanguageSwitch('en')} 
+				text={t('EN', 'EN')} 
+			/>
+			<HeaderNavItem 
+				class={`language-btn ${$currentLanguage === 'zh' ? 'active' : ''}`}
+				on:click={() => handleLanguageSwitch('zh')} 
+				text={t('中文', '中文')} 
+			/>
+		</div>
 	</HeaderNav>
 </Header>
 
@@ -155,30 +162,93 @@
 </footer>
 
 <style>
+	.language-selector {
+		display: flex;
+		gap: 8px;
+		align-items: center;
+	}
+
+	:global(.language-btn) {
+		min-width: 40px !important;
+		padding: 8px 12px !important;
+		font-size: 14px !important;
+		border-radius: 4px !important;
+		transition: all 0.2s ease !important;
+		background-color: transparent !important;
+		color: white !important;
+		border: 1px solid rgba(255, 255, 255, 0.3) !important;
+	}
+
+	:global(.language-btn:hover) {
+		background-color: rgba(255, 255, 255, 0.1) !important;
+		border-color: rgba(255, 255, 255, 0.5) !important;
+	}
+
 	:global(.language-btn.active) {
-		background-color: var(--cds-button-primary);
-		color: var(--cds-text-on-color);
+		background-color: white !important;
+		color: #0043ce !important;
+		border-color: white !important;
+	}
+
+	:global(.language-btn.active:hover) {
+		background-color: rgba(255, 255, 255, 0.95) !important;
+		color: #0043ce !important;
 	}
 	
 	main {
-	min-height: calc(100vh - 200px);
-}
+		min-height: calc(100vh - 200px);
+	}
 
-:global(.bx--header) {
-	position: fixed !important;
-	top: 0 !important;
-	z-index: 1000 !important;
-}
+	:global(.bx--header) {
+		position: fixed !important;
+		top: 0 !important;
+		z-index: 1000 !important;
+	}
 
-/* Fix dropdown to show only one chevron */
-:global(.bx--select__arrow) {
-	display: none !important;
-}
+	/* Ensure language selector is visible on mobile */
+	@media (max-width: 768px) {
+		.language-selector {
+			position: relative !important;
+			z-index: 1001 !important;
+		}
 
-:global(.bx--select-input) {
-	background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e") !important;
-	background-position: right 12px center !important;
-	background-repeat: no-repeat !important;
-	background-size: 16px 16px !important;
-}
+		:global(.language-btn) {
+			min-width: 35px !important;
+			padding: 6px 10px !important;
+			font-size: 13px !important;
+			margin: 0 2px !important;
+		}
+
+		/* Ensure header nav items are visible on mobile */
+		:global(.bx--header__nav) {
+			display: flex !important;
+			align-items: center !important;
+		}
+
+		:global(.bx--header__nav-item) {
+			display: inline-block !important;
+			visibility: visible !important;
+		}
+	}
+
+	/* Tablet adjustments */
+	@media (max-width: 1024px) and (min-width: 769px) {
+		:global(.language-btn) {
+			min-width: 38px !important;
+			padding: 7px 11px !important;
+			font-size: 13px !important;
+		}
+	}
+
+	/* Fix dropdown to show only one chevron */
+	:global(.bx--select__arrow) {
+		display: none !important;
+	}
+
+	:global(.bx--select-input) {
+		background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e") !important;
+		background-position: right 12px center !important;
+		background-repeat: no-repeat !important;
+		background-size: 16px 16px !important;
+	}
 </style>
