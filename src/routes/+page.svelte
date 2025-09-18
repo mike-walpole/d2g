@@ -246,27 +246,28 @@
 			? '连接亚洲与欧洲的可靠、高效、专业的运输服务'
 			: 'Reliable, efficient, and professional shipping services connecting Asia to Europe';
 
+	// Define CAPTCHA callbacks globally before onMount
+	globalThis.handleTurnstileSuccess = (token) => {
+		captchaToken = token;
+		console.log('✅ CAPTCHA completed with token:', token);
+	};
+
+	globalThis.handleTurnstileError = (error) => {
+		captchaToken = '';
+		console.error('❌ CAPTCHA error:', error);
+		console.error('Error details:', {
+			error,
+			siteKey: '0x4AAAAAAB12UeOd4h-pzqW1',
+			domain: window.location.hostname
+		});
+	};
+
+	globalThis.handleTurnstileExpired = () => {
+		captchaToken = '';
+		console.log('⏰ CAPTCHA expired');
+	};
+
 	onMount(async () => {
-		// Setup CAPTCHA callbacks
-		window.onTurnstileSuccess = (token) => {
-			captchaToken = token;
-			console.log('✅ CAPTCHA completed with token:', token);
-		};
-
-		window.onTurnstileError = (error) => {
-			captchaToken = '';
-			console.error('❌ CAPTCHA error:', error);
-			console.error('Error details:', {
-				error,
-				siteKey: '0x4AAAAAB12UeQd4h-pzqW1',
-				domain: window.location.hostname
-			});
-		};
-
-		window.onTurnstileExpired = () => {
-			captchaToken = '';
-			console.log('⏰ CAPTCHA expired');
-		};
 
 		// Debug: Check if Turnstile is loaded
 		const checkTurnstile = () => {
@@ -280,6 +281,15 @@
 
 		// Check immediately and then wait if needed
 		setTimeout(checkTurnstile, 100);
+
+		// Debug CAPTCHA token state
+		setInterval(() => {
+			console.log('🔍 CAPTCHA token status:', {
+				captchaToken,
+				hasToken: !!captchaToken,
+				buttonDisabled: !captchaToken
+			});
+		}, 5000);
 
 		// Load config data and schema in parallel for faster loading
 		const configModule = await import('$lib/stores/config.js');
@@ -710,11 +720,12 @@
 						<!-- CAPTCHA -->
 						<div style="margin-bottom: 24px; display: flex; justify-content: center;">
 							<div
+								id="turnstile-widget"
 								class="cf-turnstile"
 								data-sitekey="0x4AAAAAAB12UeOd4h-pzqW1"
-								data-callback="onTurnstileSuccess"
-								data-error-callback="onTurnstileError"
-								data-expired-callback="onTurnstileExpired"
+								data-callback="handleTurnstileSuccess"
+								data-error-callback="handleTurnstileError"
+								data-expired-callback="handleTurnstileExpired"
 								data-theme="light"
 							></div>
 						</div>
