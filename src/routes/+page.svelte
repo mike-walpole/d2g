@@ -269,10 +269,33 @@
 
 	onMount(async () => {
 
-		// Debug: Check if Turnstile is loaded
+		// Debug: Check if Turnstile is loaded and render widget
 		const checkTurnstile = () => {
 			if (window.turnstile) {
 				console.log('✅ Turnstile API loaded successfully');
+
+				// Explicitly render the widget
+				try {
+					window.turnstile.render('#turnstile-widget', {
+						sitekey: '0x4AAAAAAB12UeOd4h-pzqW1',
+						callback: (token) => {
+							captchaToken = token;
+							console.log('✅ CAPTCHA completed with token:', token);
+						},
+						'error-callback': (error) => {
+							captchaToken = '';
+							console.error('❌ CAPTCHA error:', error);
+						},
+						'expired-callback': () => {
+							captchaToken = '';
+							console.log('⏰ CAPTCHA expired');
+						},
+						theme: 'light'
+					});
+					console.log('✅ Turnstile widget rendered explicitly');
+				} catch (error) {
+					console.error('❌ Failed to render Turnstile widget:', error);
+				}
 			} else {
 				console.log('⏳ Waiting for Turnstile API to load...');
 				setTimeout(checkTurnstile, 1000);
@@ -719,15 +742,7 @@
 					<Column sm={4} md={8} lg={16}>
 						<!-- CAPTCHA -->
 						<div style="margin-bottom: 24px; display: flex; justify-content: center;">
-							<div
-								id="turnstile-widget"
-								class="cf-turnstile"
-								data-sitekey="0x4AAAAAAB12UeOd4h-pzqW1"
-								data-callback="handleTurnstileSuccess"
-								data-error-callback="handleTurnstileError"
-								data-expired-callback="handleTurnstileExpired"
-								data-theme="light"
-							></div>
+							<div id="turnstile-widget"></div>
 						</div>
 					</Column>
 
