@@ -711,7 +711,7 @@
 						<div style="margin-bottom: 24px; display: flex; justify-content: center;">
 							<div
 								class="cf-turnstile"
-								data-sitekey="0x4AAAAAB12UeOd4h-pzqW1"
+								data-sitekey="0x4AAAAAAB12UeOd4h-pzqW1"
 								data-callback="onTurnstileSuccess"
 								data-error-callback="onTurnstileError"
 								data-expired-callback="onTurnstileExpired"
