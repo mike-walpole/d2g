@@ -1,129 +1,129 @@
 {
-  "formId": "config",
-  "version": "translations",
-  "schema": {
-    "translations": {
-      "en": {
-        "site_title": "Dock2Gdansk",
-        "site_tagline": "Professional Cargo Transportation Between China and Poland",
-        "navigation": {
-          "home": "Home",
-          "services": "Services",
-          "about": "About",
-          "contact": "Contact",
-          "admin": "Admin"
-        },
-        "hero": {
-          "title": "Your Trusted Partner for China-Poland Cargo Transportation",
-          "subtitle": "Reliable, efficient, and professional shipping services connecting Asia to Europe",
-          "cta": "Submit Inquiry"
-        },
-        "form": {
-          "title": "Submit Your Inquiry",
-          "description": "Fill out the form below and we'll get back to you with details",
-          "company": "Company Name",
-          "company_placeholder": "Enter your company name",
-          "email": "Email Address",
-          "email_placeholder": "Enter your email address",
-          "phone_prefix": "Phone Prefix",
-          "phone": "Phone Number",
-          "phone_placeholder": "Enter your phone number (e.g., 13712345678)",
-          "cargo_type": "Cargo Type",
-          "cargo_type_placeholder": "Select cargo type",
-          "inquiry_content": "Inquiry Details",
-          "inquiry_content_placeholder": "Please describe your shipping requirements in detail",
-          "privacy_consent": "Privacy Policy Consent",
-          "privacy_consent_text": "I have read and agree to the Privacy Policy and consent to the processing of my personal data for handling this inquiry, in accordance with PIPL and GDPR.",
-          "terms_consent": "Terms of Service",
-          "terms_consent_text": "I accept the terms of service",
-          "cross_border_consent": "Cross-border Data Transfer Consent",
-          "cross_border_consent_text": "I consent to the transfer of my personal data to Poland for the purpose of handling this inquiry",
-          "submit": "Submit Inquiry",
-          "submitting": "Submitting...",
-          "success": "Thank you! Your inquiry has been submitted successfully.",
-          "error": "An error occurred. Please try again."
-        },
-        "admin": {
-          "login": "Admin Login",
-          "email": "Email",
-          "password": "Password",
-          "login_button": "Login",
-          "dashboard": "Dashboard",
-          "submissions": "Form Submissions",
-          "schemas": "Form Schemas",
-          "cargo_types": "Cargo Types",
-          "team_members": "Team Members",
-          "logout": "Logout"
-        },
-        "footer": {
-          "copyright": "© 2024 Dock2Gdansk. All rights reserved.",
-          "port_website": "Port of Gdańsk",
-          "privacy": "Privacy Policy",
-          "terms": "Terms of Service"
-        }
-      },
-      "zh": {
-        "site_title": "码头到格但斯克",
-        "site_tagline": "中国至波兰专业货物运输",
-        "navigation": {
-          "home": "首页",
-          "services": "服务",
-          "about": "关于我们",
-          "contact": "联系我们",
-          "admin": "管理员"
-        },
-        "hero": {
-          "title": "您值得信赖的中波货运合作伙伴",
-          "subtitle": "可靠、高效、专业的运输服务，连接亚洲与欧洲",
-          "cta": "提交询盘"
-        },
-        "form": {
-          "title": "提交您的询盘",
-          "description": "请填写下方表格，我们将为您提供详细信息",
-          "company": "公司名称",
-          "company_placeholder": "请输入您的公司名称",
-          "email": "电子邮箱",
-          "email_placeholder": "请输入您的电子邮箱",
-          "phone_prefix": "电话区号",
-          "phone": "电话号码",
-          "phone_placeholder": "请输入您的电话号码（例如：13712345678）",
-          "cargo_type": "货物类型",
-          "cargo_type_placeholder": "请选择货物类型",
-          "inquiry_content": "询盘详情",
-          "inquiry_content_placeholder": "请详细描述您的运输需求",
-          "privacy_consent": "隐私政策同意",
-          "privacy_consent_text": "我已阅读并同意隐私政策，同意为处理此询盘而处理我的个人数据，符合PIPL和GDPR规定。",
-          "terms_consent": "服务条款",
-          "terms_consent_text": "我接受服务条款",
-          "cross_border_consent": "跨境数据传输同意",
-          "cross_border_consent_text": "我同意将我的个人数据传输到波兰以处理此询盘",
-          "submit": "提交询盘",
-          "submitting": "提交中...",
-          "success": "谢谢！您的询盘已成功提交。",
-          "error": "发生错误，请重试。"
-        },
-        "admin": {
-          "login": "管理员登录",
-          "email": "邮箱",
-          "password": "密码",
-          "login_button": "登录",
-          "dashboard": "仪表板",
-          "submissions": "表单提交",
-          "schemas": "表单模式",
-          "cargo_types": "货物类型",
-          "team_members": "团队成员",
-          "logout": "退出"
-        },
-        "footer": {
-          "copyright": "© 2024 码头到格但斯克。保留所有权利。",
-          "port_website": "格但斯克港",
-          "privacy": "隐私政策",
-          "terms": "服务条款"
-        }
-      }
-    }
-  },
-  "createdAt": "2024-01-01T00:00:00Z",
-  "isActive": true,
-  "description": "Multilingual translations for Dock2Gdansk"
+	"formId": "config",
+	"version": "translations",
+	"schema": {
+		"translations": {
+			"en": {
+				"site_title": "Dock2Gdansk",
+				"site_tagline": "Professional Cargo Transportation Between China and Poland",
+				"navigation": {
+					"home": "Home",
+					"services": "Services",
+					"about": "About",
+					"contact": "Contact",
+					"admin": "Admin"
+				},
+				"hero": {
+					"title": "Your Trusted Partner for China-Poland Cargo Transportation",
+					"subtitle": "Reliable, efficient, and professional shipping services connecting Asia to Europe",
+					"cta": "Submit Inquiry"
+				},
+				"form": {
+					"title": "Submit Your Inquiry",
+					"description": "Fill out the form below and we'll get back to you with details",
+					"company": "Company Name",
+					"company_placeholder": "Enter your company name",
+					"email": "Email Address",
+					"email_placeholder": "Enter your email address",
+					"phone_prefix": "Phone Prefix",
+					"phone": "Phone Number",
+					"phone_placeholder": "Enter your phone number (e.g., 13712345678)",
+					"cargo_type": "Cargo Type",
+					"cargo_type_placeholder": "Select cargo type",
+					"inquiry_content": "Inquiry Details",
+					"inquiry_content_placeholder": "Please describe your shipping requirements in detail",
+					"privacy_consent": "Privacy Policy Consent",
+					"privacy_consent_text": "I have read and agree to the Privacy Policy and consent to the processing of my personal data for handling this inquiry, in accordance with PIPL and GDPR.",
+					"terms_consent": "Terms of Service",
+					"terms_consent_text": "I accept the terms of service",
+					"cross_border_consent": "Cross-border Data Transfer Consent",
+					"cross_border_consent_text": "I consent to the transfer of my personal data to Poland for the purpose of handling this inquiry",
+					"submit": "Submit Inquiry",
+					"submitting": "Submitting...",
+					"success": "Thank you! Your inquiry has been submitted successfully.",
+					"error": "An error occurred. Please try again."
+				},
+				"admin": {
+					"login": "Admin Login",
+					"email": "Email",
+					"password": "Password",
+					"login_button": "Login",
+					"dashboard": "Dashboard",
+					"submissions": "Form Submissions",
+					"schemas": "Form Schemas",
+					"cargo_types": "Cargo Types",
+					"team_members": "Team Members",
+					"logout": "Logout"
+				},
+				"footer": {
+					"copyright": "© 2024 Dock2Gdansk. All rights reserved.",
+					"port_website": "Port of Gdańsk",
+					"privacy": "Privacy Policy",
+					"terms": "Terms of Service"
+				}
+			},
+			"zh": {
+				"site_title": "码头到格但斯克",
+				"site_tagline": "中国至波兰专业货物运输",
+				"navigation": {
+					"home": "首页",
+					"services": "服务",
+					"about": "关于我们",
+					"contact": "联系我们",
+					"admin": "管理员"
+				},
+				"hero": {
+					"title": "您值得信赖的中波货运合作伙伴",
+					"subtitle": "可靠、高效、专业的运输服务，连接亚洲与欧洲",
+					"cta": "提交询盘"
+				},
+				"form": {
+					"title": "提交您的询盘",
+					"description": "请填写下方表格，我们将为您提供详细信息",
+					"company": "公司名称",
+					"company_placeholder": "请输入您的公司名称",
+					"email": "电子邮箱",
+					"email_placeholder": "请输入您的电子邮箱",
+					"phone_prefix": "电话区号",
+					"phone": "电话号码",
+					"phone_placeholder": "请输入您的电话号码（例如：13712345678）",
+					"cargo_type": "货物类型",
+					"cargo_type_placeholder": "请选择货物类型",
+					"inquiry_content": "询盘详情",
+					"inquiry_content_placeholder": "请详细描述您的运输需求",
+					"privacy_consent": "隐私政策同意",
+					"privacy_consent_text": "我已阅读并同意隐私政策，同意为处理此询盘而处理我的个人数据，符合PIPL和GDPR规定。",
+					"terms_consent": "服务条款",
+					"terms_consent_text": "我接受服务条款",
+					"cross_border_consent": "跨境数据传输同意",
+					"cross_border_consent_text": "我同意将我的个人数据传输到波兰以处理此询盘",
+					"submit": "提交询盘",
+					"submitting": "提交中...",
+					"success": "谢谢！您的询盘已成功提交。",
+					"error": "发生错误，请重试。"
+				},
+				"admin": {
+					"login": "管理员登录",
+					"email": "邮箱",
+					"password": "密码",
+					"login_button": "登录",
+					"dashboard": "仪表板",
+					"submissions": "表单提交",
+					"schemas": "表单模式",
+					"cargo_types": "货物类型",
+					"team_members": "团队成员",
+					"logout": "退出"
+				},
+				"footer": {
+					"copyright": "© 2024 码头到格但斯克。保留所有权利。",
+					"port_website": "格但斯克港",
+					"privacy": "隐私政策",
+					"terms": "服务条款"
+				}
+			}
+		}
+	},
+	"createdAt": "2024-01-01T00:00:00Z",
+	"isActive": true,
+	"description": "Multilingual translations for Dock2Gdansk"
 }

@@ -10,7 +10,7 @@ const GEOLOCATION_APIS = [
 		transform: (data) => data?.country_code
 	},
 	{
-		name: 'ipify + ipinfo.io', 
+		name: 'ipify + ipinfo.io',
 		url: 'https://ipinfo.io/json',
 		transform: (data) => data?.country
 	},
@@ -30,18 +30,18 @@ export async function detectCountryClient() {
 	for (const api of GEOLOCATION_APIS) {
 		try {
 			console.log(`🌍 Trying ${api.name} for geolocation...`);
-			
+
 			const response = await fetch(api.url, {
 				method: 'GET',
 				headers: {
-					'Accept': 'application/json',
-				},
+					Accept: 'application/json'
+				}
 			});
-			
+
 			if (response.ok) {
 				const data = await response.json();
 				const countryCode = api.transform(data);
-				
+
 				if (countryCode) {
 					console.log(`✅ ${api.name} detected country:`, countryCode);
 					return countryCode.toUpperCase();
@@ -52,7 +52,7 @@ export async function detectCountryClient() {
 			continue;
 		}
 	}
-	
+
 	console.warn('⚠️ All geolocation APIs failed, using default language');
 	return null;
 }
@@ -64,12 +64,12 @@ export async function detectCountryClient() {
  */
 export function getLanguageFromCountry(countryCode) {
 	if (!countryCode) return 'en';
-	
+
 	const country = countryCode.toUpperCase();
-	
+
 	// Chinese-speaking regions
 	const chineseCountries = ['CN', 'HK', 'MO', 'TW', 'SG'];
-	
+
 	if (chineseCountries.includes(country)) {
 		console.log(`🇨🇳 Country ${country} maps to Chinese`);
 		return 'zh';
@@ -87,14 +87,13 @@ export async function detectLanguageFromGeolocation() {
 	try {
 		// Try client-side detection
 		const countryCode = await detectCountryClient();
-		
+
 		if (countryCode) {
 			return getLanguageFromCountry(countryCode);
 		}
-		
+
 		console.log('📍 Geolocation detection failed, using English as default');
 		return 'en';
-		
 	} catch (error) {
 		console.error('💥 Error in geolocation detection:', error);
 		return 'en'; // Safe fallback

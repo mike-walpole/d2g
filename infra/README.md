@@ -6,13 +6,13 @@ This directory contains the AWS CDK infrastructure for the Dock2Gdansk project, 
 
 The infrastructure includes:
 
-- **DynamoDB**: 
+- **DynamoDB**:
   - `d2g-form-submissions`: Table for storing form submissions
   - `d2g-form-schemas`: Table for storing form schemas with versioning and cargo types
 - **Cognito**: User authentication with admin group for kapitanat dashboard
 - **SES**: Email service for notifications
 - **API Gateway**: HTTP API for form submission, schema management, and admin dashboard
-- **Lambda Functions**: 
+- **Lambda Functions**:
   - `submit_form`: Handles form submissions and stores data in DynamoDB
   - `get_schema`: Returns form schema from DynamoDB
   - `manage_schema`: CRUD operations for form schemas with versioning
@@ -28,16 +28,19 @@ The infrastructure includes:
 ## Setup
 
 1. **Activate the virtual environment**:
+
    ```bash
    source venv/bin/activate
    ```
 
 2. **Install dependencies**:
+
    ```bash
    pip install -r requirements.txt
    ```
 
 3. **Configure AWS credentials** (if not already done):
+
    ```bash
    aws configure
    ```
@@ -50,16 +53,19 @@ The infrastructure includes:
 ## Deployment
 
 1. **Bootstrap CDK** (first time only):
+
    ```bash
    cdk bootstrap
    ```
 
 2. **Deploy the stack**:
+
    ```bash
    cdk deploy
    ```
 
 3. **Initialize default schema** (after deployment):
+
    ```bash
    python init_schema.py
    ```
@@ -89,16 +95,19 @@ The API Gateway is configured with CORS enabled for all origins (`*`). For produ
 After deployment, you'll get the following endpoints:
 
 ### Public Endpoints
+
 - **POST** `/submit-form` - Submit form data
 - **GET** `/schema` - Get form schema (default: dock2gdansk-main form)
 
 ### Schema Management (Public)
-- **GET** `/manage-schema` - Get schema versions 
+
+- **GET** `/manage-schema` - Get schema versions
 - **POST** `/manage-schema` - Create new schema version
 - **PUT** `/manage-schema` - Update existing schema
 - **DELETE** `/manage-schema` - Delete schema version
 
 ### Admin Endpoints (Protected - Requires Cognito Auth)
+
 - **GET** `/kapitanat/dashboard` - Admin dashboard overview
 - **GET** `/kapitanat/submissions` - View form submissions
 - **DELETE** `/kapitanat/submissions` - Delete submissions
@@ -117,28 +126,29 @@ After deployment, you'll get the following endpoints:
 ### Usage Examples
 
 #### Form Submission with Schema Version Tracking
+
 ```javascript
 const response = await fetch('YOUR_API_ENDPOINT/submit-form', {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json',
-  },
-  body: JSON.stringify({
-    formData: {
-      company: 'ABC Logistics',
-      email: 'contact@abc-logistics.com',
-      phone_prefix: '+86',
-      phone: '13712345678',
-      cargo_type: '100', // Foodstuff
-      inquiry_content: 'I need to ship containers from Shanghai to Gdansk...',
-      privacy_consent: true,
-      terms_consent: true,
-      cross_border_consent: true
-    },
-    userEmail: 'contact@abc-logistics.com',
-    formId: 'dock2gdansk-main',        // Optional - defaults to dock2gdansk-main
-    schemaVersion: '1.2.0'             // Optional - auto-detected if not provided
-  })
+	method: 'POST',
+	headers: {
+		'Content-Type': 'application/json'
+	},
+	body: JSON.stringify({
+		formData: {
+			company: 'ABC Logistics',
+			email: 'contact@abc-logistics.com',
+			phone_prefix: '+86',
+			phone: '13712345678',
+			cargo_type: '100', // Foodstuff
+			inquiry_content: 'I need to ship containers from Shanghai to Gdansk...',
+			privacy_consent: true,
+			terms_consent: true,
+			cross_border_consent: true
+		},
+		userEmail: 'contact@abc-logistics.com',
+		formId: 'dock2gdansk-main', // Optional - defaults to dock2gdansk-main
+		schemaVersion: '1.2.0' // Optional - auto-detected if not provided
+	})
 });
 
 // Response includes submission with schema version tracking
@@ -153,6 +163,7 @@ const result = await response.json();
 ```
 
 #### Get Form Schema
+
 ```javascript
 // Get latest Dock2Gdansk form schema
 const response = await fetch('YOUR_API_ENDPOINT/schema?formId=dock2gdansk-main');
@@ -160,82 +171,83 @@ const { schema, metadata } = await response.json();
 ```
 
 #### Admin Dashboard (Requires Authentication)
+
 ```javascript
 // Login first to get JWT token
 const authResponse = await fetch('YOUR_API_ENDPOINT/auth/login', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({ email: 'admin@dock2gdansk.com', password: 'password' })
+	method: 'POST',
+	headers: { 'Content-Type': 'application/json' },
+	body: JSON.stringify({ email: 'admin@dock2gdansk.com', password: 'password' })
 });
 const { token } = await authResponse.json();
 
 // Access admin dashboard
 const dashboardResponse = await fetch('YOUR_API_ENDPOINT/kapitanat/dashboard', {
-  headers: { 'Authorization': `Bearer ${token}` }
+	headers: { Authorization: `Bearer ${token}` }
 });
 const dashboard = await dashboardResponse.json();
 
 // Manage cargo types
 const newCargoType = await fetch('YOUR_API_ENDPOINT/kapitanat/cargo-types', {
-  method: 'POST',
-  headers: {
-    'Authorization': `Bearer ${token}`,
-    'Content-Type': 'application/json'
-  },
-  body: JSON.stringify({ name: 'New Cargo Type' })
+	method: 'POST',
+	headers: {
+		Authorization: `Bearer ${token}`,
+		'Content-Type': 'application/json'
+	},
+	body: JSON.stringify({ name: 'New Cargo Type' })
 });
 
 // Admin Schema Management with Version Control
 // List all schema versions
 const schemasResponse = await fetch('YOUR_API_ENDPOINT/kapitanat/schemas', {
-  headers: { 'Authorization': `Bearer ${token}` }
+	headers: { Authorization: `Bearer ${token}` }
 });
 const { schemas } = await schemasResponse.json();
 
 // Get specific form versions
 const formVersions = await fetch('YOUR_API_ENDPOINT/kapitanat/schemas?formId=dock2gdansk-main', {
-  headers: { 'Authorization': `Bearer ${token}` }
+	headers: { Authorization: `Bearer ${token}` }
 });
 
 // Create new schema version (auto-increments version)
 const newSchemaVersion = await fetch('YOUR_API_ENDPOINT/kapitanat/schemas', {
-  method: 'POST',
-  headers: {
-    'Authorization': `Bearer ${token}`,
-    'Content-Type': 'application/json'
-  },
-  body: JSON.stringify({
-    formId: 'dock2gdansk-main',
-    description: 'Added new field for delivery date',
-    schema: {
-      title: 'Updated Dock2Gdansk Form',
-      fields: [
-        // ... existing fields ...
-        {
-          id: 'delivery_date',
-          type: 'date',
-          label: 'Preferred Delivery Date',
-          required: false
-        }
-      ]
-    }
-  })
+	method: 'POST',
+	headers: {
+		Authorization: `Bearer ${token}`,
+		'Content-Type': 'application/json'
+	},
+	body: JSON.stringify({
+		formId: 'dock2gdansk-main',
+		description: 'Added new field for delivery date',
+		schema: {
+			title: 'Updated Dock2Gdansk Form',
+			fields: [
+				// ... existing fields ...
+				{
+					id: 'delivery_date',
+					type: 'date',
+					label: 'Preferred Delivery Date',
+					required: false
+				}
+			]
+		}
+	})
 });
 // Creates version 1.1.0 automatically
 
 // Update existing schema version
 const updateSchema = await fetch('YOUR_API_ENDPOINT/kapitanat/schemas', {
-  method: 'PUT',
-  headers: {
-    'Authorization': `Bearer ${token}`,
-    'Content-Type': 'application/json'
-  },
-  body: JSON.stringify({
-    formId: 'dock2gdansk-main',
-    version: '1.1.0',
-    isActive: false,  // Deactivate this version
-    description: 'Deprecated - use v1.2.0 instead'
-  })
+	method: 'PUT',
+	headers: {
+		Authorization: `Bearer ${token}`,
+		'Content-Type': 'application/json'
+	},
+	body: JSON.stringify({
+		formId: 'dock2gdansk-main',
+		version: '1.1.0',
+		isActive: false, // Deactivate this version
+		description: 'Deprecated - use v1.2.0 instead'
+	})
 });
 ```
 

@@ -5,17 +5,20 @@ This document explains how the Dock2Gdansk infrastructure supports complete sche
 ## ✅ **Admin Schema Management Features**
 
 ### **1. 🔐 Admin Authentication**
+
 - Cognito User Pool with admin group
 - JWT token-based authentication for all admin endpoints
 - Protected `/kapitanat/*` routes
 
 ### **2. 📊 Version Control System**
+
 - **Semantic Versioning**: `major.minor.patch` (e.g., 1.2.3)
 - **Auto-incrementing**: Admin creates new versions, system handles numbering
 - **Active/Inactive**: Control which versions are available
 - **Audit Trail**: Track creation dates, descriptions, and changes
 
 ### **3. 📝 Form Submission Tracking**
+
 - **Schema Version**: Every submission records which schema was used
 - **Form ID**: Track which form type was submitted
 - **Timestamp**: When submission occurred
@@ -24,6 +27,7 @@ This document explains how the Dock2Gdansk infrastructure supports complete sche
 ## 🚀 **Admin Workflow**
 
 ### **Creating New Schema Versions**
+
 ```javascript
 // Admin creates new version
 POST /kapitanat/schemas
@@ -39,6 +43,7 @@ POST /kapitanat/schemas
 ```
 
 ### **Managing Existing Versions**
+
 ```javascript
 // List all schemas and versions
 GET /kapitanat/schemas
@@ -60,6 +65,7 @@ DELETE /kapitanat/schemas?formId=dock2gdansk-main&version=1.0.0
 ```
 
 ### **Cargo Types Management**
+
 ```javascript
 // Admin can dynamically update cargo types
 POST /kapitanat/cargo-types
@@ -80,6 +86,7 @@ PUT /kapitanat/cargo-types
 ## 📋 **Form Submission with Version Tracking**
 
 ### **Frontend Integration**
+
 ```javascript
 // Option 1: Let backend auto-detect latest version
 const response = await fetch('/submit-form', {
@@ -114,6 +121,7 @@ const result = await response.json();
 ```
 
 ### **Submission Data Structure**
+
 ```json
 {
   "id": "submission-uuid",
@@ -135,6 +143,7 @@ const result = await response.json();
 ## 🎯 **Key Benefits**
 
 ### **For Admins:**
+
 1. **Easy Form Updates**: Change forms without code deployment
 2. **Version Control**: Track what changed and when
 3. **A/B Testing**: Deploy multiple versions simultaneously
@@ -142,12 +151,14 @@ const result = await response.json();
 5. **Audit Trail**: See complete history of form changes
 
 ### **For Data Analysis:**
+
 1. **Version Tracking**: Know which form version generated each submission
 2. **Migration Planning**: Understand impact of form changes
 3. **Historical Analysis**: Compare data across form versions
 4. **Quality Control**: Identify issues with specific versions
 
 ### **For Users:**
+
 1. **Seamless Experience**: Always get latest active form
 2. **Consistency**: Forms work even during admin updates
 3. **No Downtime**: Updates happen without service interruption
@@ -155,12 +166,14 @@ const result = await response.json();
 ## 🔄 **Version Management Rules**
 
 ### **Version Number Generation:**
+
 - **New Form**: Starts at `1.0.0`
 - **Minor Update**: `1.0.0` → `1.1.0` (new fields, changes)
 - **Patch Update**: `1.1.0` → `1.1.1` (copy from existing with minor fixes)
 - **Major Update**: Manual increment when significant changes
 
 ### **Protection Rules:**
+
 - ✅ Can create unlimited versions
 - ✅ Can deactivate versions (sets `isActive: false`)
 - ✅ Can update descriptions and metadata
@@ -168,6 +181,7 @@ const result = await response.json();
 - ❌ Cannot delete versions with submissions (future enhancement)
 
 ### **Schema Inheritance:**
+
 - New versions can copy from existing versions
 - Cargo types are global config (shared across all forms)
 - Form-specific settings maintained per version
@@ -175,18 +189,21 @@ const result = await response.json();
 ## 📊 **Admin Dashboard Views**
 
 ### **Schema Management Panel:**
+
 - List all forms and their versions
 - See active/inactive status
 - View creation dates and descriptions
 - Quick actions: activate, deactivate, create new version
 
 ### **Submission Analytics:**
+
 - Group submissions by schema version
 - Show version adoption rates
 - Identify popular/problematic versions
 - Export data with version information
 
 ### **Cargo Types Management:**
+
 - Add/edit/disable cargo types
 - See usage statistics per type
 - Bulk operations for updates

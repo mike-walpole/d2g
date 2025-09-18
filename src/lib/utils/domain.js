@@ -19,7 +19,7 @@ const DOMAIN_CONFIG = {
 		region: 'poland',
 		title: 'Dock2Gdansk - Professional Cargo Transportation',
 		description: 'Reliable cargo transportation between China and Poland'
-	},
+	}
 	// Add more domains as needed - all will use geolocation
 };
 
@@ -31,7 +31,7 @@ const DOMAIN_CONFIG = {
 export function getDomainConfig(hostname) {
 	// Remove www prefix if present
 	const cleanDomain = hostname.replace(/^www\./, '');
-	
+
 	// Return specific config or default
 	return DOMAIN_CONFIG[cleanDomain] || DOMAIN_CONFIG['dock2gdansk.com'];
 }

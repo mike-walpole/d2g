@@ -9,9 +9,9 @@ export async function load({ locals }) {
 		detectedLanguage: 'en',
 		isChineseRegion: false
 	};
-	
+
 	console.log('📤 Layout server load - sending geolocation to client:', geolocation);
-	
+
 	return {
 		geolocation: {
 			...geolocation,

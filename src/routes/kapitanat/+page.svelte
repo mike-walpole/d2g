@@ -1,7 +1,13 @@
 <script>
-	import { 
-		Button, TextInput, Tile, Grid, Column, Loading, 
-		InlineNotification, Form
+	import {
+		Button,
+		TextInput,
+		Tile,
+		Grid,
+		Column,
+		Loading,
+		InlineNotification,
+		Form
 	} from 'carbon-components-svelte';
 	// Removed carbon icons to avoid import issues
 	import { t } from '$lib/stores/config.js';
@@ -38,7 +44,7 @@
 		try {
 			// This would normally call AWS Cognito
 			// For now, simulate the login process
-			await new Promise(resolve => setTimeout(resolve, 1000));
+			await new Promise((resolve) => setTimeout(resolve, 1000));
 
 			// Mock successful login
 			const mockToken = 'mock-jwt-token-' + Date.now();
@@ -47,11 +53,10 @@
 
 			loginMessage = 'Login successful! Redirecting...';
 			loginStatus = 'success';
-			
+
 			setTimeout(() => {
 				goto('/kapitanat/dashboard');
 			}, 1000);
-
 		} catch (error) {
 			loginMessage = 'Login failed. Please check your credentials.';
 			loginStatus = 'error';
@@ -65,24 +70,20 @@
 	<title>{t('admin.login', 'Admin Login')} - Dock2Gdansk</title>
 </svelte:head>
 
-<div class="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4">
-	<div class="max-w-md w-full">
-		<div class="text-center mb-8">
-			<div class="text-5xl mb-4">🔐</div>
+<div class="flex min-h-screen items-center justify-center bg-gray-50 px-4 py-12">
+	<div class="w-full max-w-md">
+		<div class="mb-8 text-center">
+			<div class="mb-4 text-5xl">🔐</div>
 			<h1 class="text-3xl font-bold text-gray-900">
 				{t('admin.login', 'Admin Login')}
 			</h1>
-			<p class="text-gray-600 mt-2">Dock2Gdansk Administration Panel</p>
+			<p class="mt-2 text-gray-600">Dock2Gdansk Administration Panel</p>
 		</div>
 
 		<Tile class="p-8">
 			{#if loginMessage}
 				<div class="mb-6">
-					<InlineNotification 
-						kind={loginStatus}
-						title={loginMessage}
-						hideCloseButton
-					/>
+					<InlineNotification kind={loginStatus} title={loginMessage} hideCloseButton />
 				</div>
 			{/if}
 
@@ -106,11 +107,7 @@
 						disabled={isLoading}
 					/>
 
-					<Button 
-						type="submit"
-						class="w-full mt-4"
-						disabled={isLoading}
-					>
+					<Button type="submit" class="mt-4 w-full" disabled={isLoading}>
 						{#if isLoading}
 							<Loading withOverlay={false} small />
 							Logging in...
@@ -122,16 +119,12 @@
 			</Form>
 
 			<div class="mt-6 text-center">
-				<p class="text-sm text-gray-600">
-					For demo purposes, use any email and password
-				</p>
+				<p class="text-sm text-gray-600">For demo purposes, use any email and password</p>
 			</div>
 		</Tile>
 
 		<div class="mt-6 text-center">
-			<Button kind="ghost" href="/">
-				← Back to Homepage
-			</Button>
+			<Button kind="ghost" href="/">← Back to Homepage</Button>
 		</div>
 	</div>
 </div>

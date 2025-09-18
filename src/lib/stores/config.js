@@ -13,15 +13,15 @@ export const apiBaseUrl = writable('https://g753am6ace.execute-api.ap-east-1.ama
 // Load config data from AWS
 export async function loadConfig(language = 'en') {
 	if (!browser) return;
-	
+
 	try {
-		const apiUrl = await new Promise(resolve => {
-			apiBaseUrl.subscribe(url => resolve(url))();
+		const apiUrl = await new Promise((resolve) => {
+			apiBaseUrl.subscribe((url) => resolve(url))();
 		});
-		
+
 		const response = await fetch(`${apiUrl}/config?type=all&lang=${language}`);
 		const data = await response.json();
-		
+
 		if (data.success) {
 			configData.set(data);
 			return data;
@@ -44,25 +44,19 @@ export const translations = derived(
 );
 
 // Derived store for cargo types
-export const cargoTypes = derived(
-	configData,
-	($configData) => {
-		return $configData?.cargoTypes || [];
-	}
-);
+export const cargoTypes = derived(configData, ($configData) => {
+	return $configData?.cargoTypes || [];
+});
 
 // Derived store for referral sources
-export const referralSources = derived(
-	configData,
-	($configData) => {
-		return $configData?.referralSources || [];
-	}
-);
+export const referralSources = derived(configData, ($configData) => {
+	return $configData?.referralSources || [];
+});
 
 // Helper function to get translation
 export function t(key, fallback = '') {
 	let translation = fallback;
-	const unsubscribe = translations.subscribe(trans => {
+	const unsubscribe = translations.subscribe((trans) => {
 		const keys = key.split('.');
 		let current = trans;
 		for (const k of keys) {
@@ -83,7 +77,7 @@ export function t(key, fallback = '') {
 export function switchLanguage(lang) {
 	currentLanguage.set(lang);
 	loadConfig(lang);
-	
+
 	// Store language preference
 	if (browser) {
 		localStorage.setItem('preferred-language', lang);
@@ -95,7 +89,7 @@ if (browser) {
 	// Only use saved language if user has manually overridden geolocation
 	const userOverride = localStorage.getItem('language-override');
 	const savedLang = localStorage.getItem('preferred-language');
-	
+
 	if (userOverride && savedLang) {
 		console.log('🔧 User has overridden language, using saved preference:', savedLang);
 		currentLanguage.set(savedLang);
