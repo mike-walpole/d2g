@@ -149,13 +149,15 @@
 					// Map the API response to the expected format
 					const mappedSubmissions = data.submissions.map((submission) => ({
 						id: submission.id,
-						company: submission.formData.company,
-						email: submission.formData.email,
-						phone: `${submission.formData.phone_prefix === 'custom' ? submission.formData.custom_phone_prefix || submission.formData.phone_prefix : submission.formData.phone_prefix} ${submission.formData.phone}`,
-						cargoType: submission.formData.cargo_type,
+						company: submission.formData?.company || 'N/A',
+						email: submission.formData?.email || 'N/A',
+						phone: submission.formData?.phone_prefix && submission.formData?.phone
+							? `${submission.formData.phone_prefix === 'custom' ? submission.formData.custom_phone_prefix || submission.formData.phone_prefix : submission.formData.phone_prefix} ${submission.formData.phone}`
+							: 'N/A',
+						cargoType: submission.formData?.cargo_type || 'unknown',
 						hearAboutUs:
-							submission.formData.hear_about_us || submission.formData.referral_source || 'N/A',
-						inquiryContent: submission.formData.inquiry_content,
+							submission.formData?.hear_about_us || submission.formData?.referral_source || 'N/A',
+						inquiryContent: submission.formData?.inquiry_content || 'N/A',
 						timestamp: submission.timestamp
 					}));
 
@@ -247,9 +249,9 @@
 		...submission,
 		cargoType: getCargoTypeDisplay(submission),
 		inquiryContent:
-			submission.inquiryContent.length > 50
+			submission.inquiryContent && submission.inquiryContent.length > 50
 				? submission.inquiryContent.substring(0, 50) + '...'
-				: submission.inquiryContent,
+				: submission.inquiryContent || 'N/A',
 		timestamp: formatDate(submission.timestamp)
 	}));
 

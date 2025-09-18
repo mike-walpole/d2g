@@ -5,10 +5,10 @@ import { sequence } from '@sveltejs/kit/hooks';
 const handleSecurityHeaders = async ({ event, resolve }) => {
 	const response = await resolve(event);
 
-	// Content Security Policy
+	// Content Security Policy - relaxed for modal functionality
 	response.headers.set(
 		'Content-Security-Policy',
-		"default-src 'self'; " +
+		"default-src 'self' 'unsafe-inline' 'unsafe-eval'; " +
 			"script-src 'self' 'unsafe-inline' 'unsafe-eval' https://challenges.cloudflare.com; " +
 			"style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
 			"font-src 'self' https://fonts.gstatic.com https://1.www.s81c.com; " +
