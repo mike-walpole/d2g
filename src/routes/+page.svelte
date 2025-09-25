@@ -665,10 +665,18 @@
 															? '#da1e28'
 															: 'inherit'};"
 													>
-														{@html (field.description
-															? getLocalizedText(field.description, field.id)
-															: getLocalizedText(field.label, field.id)) +
-															(field.required ? ' *' : '')}
+														{#if field.id === 'privacy_consent'}
+															{@html 'I agree to the <a href="/terms" target="_blank" style="color: #0066cc; text-decoration: underline;">Terms of Use</a> and <a href="/privacy" target="_blank" style="color: #0066cc; text-decoration: underline;">Privacy Policy</a>.' + (field.required ? ' *' : '')}
+														{:else if field.id === 'terms_consent'}
+															{@html 'I explicitly consent to the sharing of my professional profile and contact information with other users of the platform for business matchmaking.' + (field.required ? ' *' : '')}
+														{:else if field.id === 'cross_border_consent'}
+															{@html 'I explicitly consent to the sharing of my data with third-party service providers (such as hosting and analytics companies) as described in the Privacy Policy.' + (field.required ? ' *' : '')}
+														{:else}
+															{@html (field.description
+																? getLocalizedText(field.description, field.id)
+																: getLocalizedText(field.label, field.id)) +
+																(field.required ? ' *' : '')}
+														{/if}
 													</label>
 													{#if showValidation && fieldErrors[field.id]}
 														<div style="color: #da1e28; font-size: 12px; margin-top: 4px;">
