@@ -617,4 +617,4 @@ W przypadku problemów:
 
 ## Changelog
 
-- **v1.0** (2025-01-15): Pierwsza wersja dokumentacji
+- **v1.0**: Pierwsza wersja dokumentacji
