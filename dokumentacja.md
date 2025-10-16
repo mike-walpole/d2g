@@ -26,7 +26,7 @@ Przed rozpoczęciem należy zainstalować następujące narzędzia:
 - **Python** (wersja 3.11 lub nowsza): [https://www.python.org/](https://www.python.org/)
 - **AWS CLI**: [https://aws.amazon.com/cli/](https://aws.amazon.com/cli/)
 - **AWS CDK**: `npm install -g aws-cdk`
-- **Git**: [https://git-scm.com/](https://git-scm.com/)
+- **Git**: [https://github.com/](https://github.com/)
 
 ### Konta
 

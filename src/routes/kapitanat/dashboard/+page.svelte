@@ -151,9 +151,10 @@
 						id: submission.id,
 						company: submission.formData?.company || 'N/A',
 						email: submission.formData?.email || 'N/A',
-						phone: submission.formData?.phone_prefix && submission.formData?.phone
-							? `${submission.formData.phone_prefix === 'custom' ? submission.formData.custom_phone_prefix || submission.formData.phone_prefix : submission.formData.phone_prefix} ${submission.formData.phone}`
-							: 'N/A',
+						phone:
+							submission.formData?.phone_prefix && submission.formData?.phone
+								? `${submission.formData.phone_prefix === 'custom' ? submission.formData.custom_phone_prefix || submission.formData.phone_prefix : submission.formData.phone_prefix} ${submission.formData.phone}`
+								: 'N/A',
 						cargoType: submission.formData?.cargo_type || 'unknown',
 						hearAboutUs:
 							submission.formData?.hear_about_us || submission.formData?.referral_source || 'N/A',
@@ -1443,6 +1444,107 @@ Please share these credentials securely with the new team member. They will be r
 			console.error('❌ Error downloading schema:', error);
 		}
 	}
+
+	// Download Data function
+	async function downloadData() {
+		try {
+			console.log('🔄 Downloading all submissions data...');
+
+			const response = await fetch(
+				'https://g753am6ace.execute-api.ap-east-1.amazonaws.com/kapitanat/submissions',
+				{
+					headers: {
+						Authorization: `Bearer ${localStorage.getItem('admin-token')}`
+					}
+				}
+			);
+
+			if (response.ok) {
+				const data = await response.json();
+				console.log('📡 Fetched data:', data);
+
+				if (data.success && Array.isArray(data.submissions)) {
+					// Map submissions to match dashboard format
+					const allSubmissions = data.submissions.map((submission) => ({
+						id: submission.id,
+						company: submission.formData?.company || 'N/A',
+						email: submission.formData?.email || 'N/A',
+						phone: submission.formData?.phone || 'N/A',
+						cargoType: getCargoTypeDisplay(submission),
+						hearAboutUs:
+							submission.formData?.hear_about_us || submission.formData?.referral_source || 'N/A',
+						inquiryContent: submission.formData?.inquiry_content || 'N/A',
+						timestamp: formatDate(submission.timestamp)
+					}));
+
+					// Convert to CSV format
+					const csvHeaders = [
+						'ID',
+						'Company',
+						'Email',
+						'Phone',
+						'Cargo Type',
+						'Where did you hear about us',
+						'Inquiry',
+						'Submitted'
+					];
+
+					// Escape CSV fields (handle commas, quotes, newlines)
+					const escapeCSVField = (field) => {
+						if (field === null || field === undefined) return '';
+						const stringField = String(field);
+						// If field contains comma, quote, or newline, wrap in quotes and escape internal quotes
+						if (
+							stringField.includes(',') ||
+							stringField.includes('"') ||
+							stringField.includes('\n')
+						) {
+							return `"${stringField.replace(/"/g, '""')}"`;
+						}
+						return stringField;
+					};
+
+					const csvRows = [
+						csvHeaders.join(','),
+						...allSubmissions.map((sub) =>
+							[
+								escapeCSVField(sub.id),
+								escapeCSVField(sub.company),
+								escapeCSVField(sub.email),
+								escapeCSVField(sub.phone),
+								escapeCSVField(sub.cargoType),
+								escapeCSVField(sub.hearAboutUs),
+								escapeCSVField(sub.inquiryContent),
+								escapeCSVField(sub.timestamp)
+							].join(',')
+						)
+					];
+
+					const csvContent = csvRows.join('\n');
+
+					// Create blob and download
+					const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+					const url = window.URL.createObjectURL(blob);
+					const a = document.createElement('a');
+					a.href = url;
+					const timestamp = new Date().toISOString().split('T')[0];
+					a.download = `d2g-submissions-${timestamp}.csv`;
+					document.body.appendChild(a);
+					a.click();
+					window.URL.revokeObjectURL(url);
+					document.body.removeChild(a);
+
+					console.log('✅ Data downloaded successfully:', allSubmissions.length, 'submissions');
+				} else {
+					console.error('❌ Invalid data format received');
+				}
+			} else {
+				console.error('❌ Failed to download data:', response.status, response.statusText);
+			}
+		} catch (error) {
+			console.error('❌ Error downloading data:', error);
+		}
+	}
 </script>
 
 <svelte:head>
@@ -1518,6 +1620,9 @@ Please share these credentials securely with the new team member. They will be r
 						</Button>
 						<Button kind="tertiary" on:click={downloadSchema} class="action-button">
 							Download Schema
+						</Button>
+						<Button kind="tertiary" on:click={downloadData} class="action-button">
+							Download Data
 						</Button>
 					</div>
 				</Tile>
