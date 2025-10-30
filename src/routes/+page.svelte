@@ -36,9 +36,9 @@
 	let submitMessage = '';
 	let submitStatus = 'info'; // 'success', 'error', 'info'
 
-	// CAPTCHA state
-	let captchaToken = '';
-	let captchaWidget = null;
+	// CAPTCHA DISABLED: Uncomment to re-enable Cloudflare Turnstile
+	// let captchaToken = '';
+	// let captchaWidget = null;
 
 	// Select all checkboxes functionality
 	let selectAllConsent = false;
@@ -246,73 +246,75 @@
 			? '连接亚洲与欧洲的可靠、高效、专业的运输服务'
 			: 'Reliable, efficient, and professional shipping services connecting Asia to Europe';
 
+	// CAPTCHA DISABLED: Uncomment to re-enable Cloudflare Turnstile
 	// Define CAPTCHA callbacks globally before onMount
-	globalThis.handleTurnstileSuccess = (token) => {
-		captchaToken = token;
-		console.log('✅ CAPTCHA completed with token:', token);
-	};
+	// globalThis.handleTurnstileSuccess = (token) => {
+	// 	captchaToken = token;
+	// 	console.log('✅ CAPTCHA completed with token:', token);
+	// };
 
-	globalThis.handleTurnstileError = (error) => {
-		captchaToken = '';
-		console.error('❌ CAPTCHA error:', error);
-		console.error('Error details:', {
-			error,
-			siteKey: '0x4AAAAAAB12UeOd4h-pzqW1',
-			domain: window.location.hostname
-		});
-	};
+	// globalThis.handleTurnstileError = (error) => {
+	// 	captchaToken = '';
+	// 	console.error('❌ CAPTCHA error:', error);
+	// 	console.error('Error details:', {
+	// 		error,
+	// 		siteKey: '0x4AAAAAAB12UeOd4h-pzqW1',
+	// 		domain: window.location.hostname
+	// 	});
+	// };
 
-	globalThis.handleTurnstileExpired = () => {
-		captchaToken = '';
-		console.log('⏰ CAPTCHA expired');
-	};
+	// globalThis.handleTurnstileExpired = () => {
+	// 	captchaToken = '';
+	// 	console.log('⏰ CAPTCHA expired');
+	// };
 
 	onMount(async () => {
 
+		// CAPTCHA DISABLED: Uncomment to re-enable Cloudflare Turnstile
 		// Debug: Check if Turnstile is loaded and render widget
-		const checkTurnstile = () => {
-			if (window.turnstile) {
-				console.log('✅ Turnstile API loaded successfully');
+		// const checkTurnstile = () => {
+		// 	if (window.turnstile) {
+		// 		console.log('✅ Turnstile API loaded successfully');
 
-				// Explicitly render the widget
-				try {
-					window.turnstile.render('#turnstile-widget', {
-						sitekey: '0x4AAAAAAB12UeOd4h-pzqW1',
-						callback: (token) => {
-							captchaToken = token;
-							console.log('✅ CAPTCHA completed with token:', token);
-						},
-						'error-callback': (error) => {
-							captchaToken = '';
-							console.error('❌ CAPTCHA error:', error);
-						},
-						'expired-callback': () => {
-							captchaToken = '';
-							console.log('⏰ CAPTCHA expired');
-						},
-						theme: 'light'
-					});
-					console.log('✅ Turnstile widget rendered explicitly');
-				} catch (error) {
-					console.error('❌ Failed to render Turnstile widget:', error);
-				}
-			} else {
-				console.log('⏳ Waiting for Turnstile API to load...');
-				setTimeout(checkTurnstile, 1000);
-			}
-		};
+		// 		// Explicitly render the widget
+		// 		try {
+		// 			window.turnstile.render('#turnstile-widget', {
+		// 				sitekey: '0x4AAAAAAB12UeOd4h-pzqW1',
+		// 				callback: (token) => {
+		// 					captchaToken = token;
+		// 					console.log('✅ CAPTCHA completed with token:', token);
+		// 				},
+		// 				'error-callback': (error) => {
+		// 					captchaToken = '';
+		// 					console.error('❌ CAPTCHA error:', error);
+		// 				},
+		// 				'expired-callback': () => {
+		// 					captchaToken = '';
+		// 					console.log('⏰ CAPTCHA expired');
+		// 				},
+		// 				theme: 'light'
+		// 			});
+		// 			console.log('✅ Turnstile widget rendered explicitly');
+		// 		} catch (error) {
+		// 			console.error('❌ Failed to render Turnstile widget:', error);
+		// 		}
+		// 	} else {
+		// 		console.log('⏳ Waiting for Turnstile API to load...');
+		// 		setTimeout(checkTurnstile, 1000);
+		// 	}
+		// };
 
 		// Check immediately and then wait if needed
-		setTimeout(checkTurnstile, 100);
+		// setTimeout(checkTurnstile, 100);
 
 		// Debug CAPTCHA token state
-		setInterval(() => {
-			console.log('🔍 CAPTCHA token status:', {
-				captchaToken,
-				hasToken: !!captchaToken,
-				buttonDisabled: !captchaToken
-			});
-		}, 5000);
+		// setInterval(() => {
+		// 	console.log('🔍 CAPTCHA token status:', {
+		// 		captchaToken,
+		// 		hasToken: !!captchaToken,
+		// 		buttonDisabled: !captchaToken
+		// 	});
+		// }, 5000);
 
 		// Load config data and schema in parallel for faster loading
 		const configModule = await import('$lib/stores/config.js');
@@ -357,13 +359,14 @@
 			return;
 		}
 
+		// CAPTCHA DISABLED: Uncomment to re-enable Cloudflare Turnstile
 		// Check CAPTCHA token
-		if (!captchaToken) {
-			submitMessage =
-				$currentLanguage === 'zh' ? '请完成验证码验证' : 'Please complete the CAPTCHA verification';
-			submitStatus = 'error';
-			return;
-		}
+		// if (!captchaToken) {
+		// 	submitMessage =
+		// 		$currentLanguage === 'zh' ? '请完成验证码验证' : 'Please complete the CAPTCHA verification';
+		// 	submitStatus = 'error';
+		// 	return;
+		// }
 
 		isSubmitting = true;
 		submitMessage = '';
@@ -381,8 +384,9 @@
 				body: JSON.stringify({
 					form_data: formData,
 					user_email: formData.email,
-					form_id: 'dock2gdansk-main',
-					captcha_token: captchaToken
+					form_id: 'dock2gdansk-main'
+					// CAPTCHA DISABLED: Uncomment to re-enable Cloudflare Turnstile
+					// captcha_token: captchaToken
 				})
 			});
 
@@ -403,10 +407,11 @@
 				fieldErrors = {};
 				fieldTouched = {};
 				showValidation = false;
-				captchaToken = '';
-				if (captchaWidget) {
-					window.turnstile?.reset(captchaWidget);
-				}
+				// CAPTCHA DISABLED: Uncomment to re-enable Cloudflare Turnstile
+				// captchaToken = '';
+				// if (captchaWidget) {
+				// 	window.turnstile?.reset(captchaWidget);
+				// }
 				initializeFormData();
 			} else {
 				throw new Error(result.error || 'Submission failed');
@@ -747,16 +752,17 @@
 						{/each}
 					{/if}
 
-					<Column sm={4} md={8} lg={16}>
-						<!-- CAPTCHA -->
+					<!-- CAPTCHA DISABLED: Uncomment to re-enable Cloudflare Turnstile -->
+					<!-- <Column sm={4} md={8} lg={16}>
 						<div style="margin-bottom: 24px; display: flex; justify-content: center;">
 							<div id="turnstile-widget"></div>
 						</div>
-					</Column>
+					</Column> -->
 
 					<Column sm={4} md={8} lg={16}>
 						<div class="submit-section">
-							<Button type="submit" size="lg" disabled={isSubmitting || !captchaToken}>
+							<!-- CAPTCHA DISABLED: Removed !captchaToken from disabled condition -->
+							<Button type="submit" size="lg" disabled={isSubmitting}>
 								{#if isSubmitting}
 									<Loading withOverlay={false} small />
 									{t('form.submitting', 'Submitting...')}
