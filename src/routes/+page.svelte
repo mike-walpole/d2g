@@ -239,12 +239,12 @@
 	// Reactive translations for hero section with direct language support
 	$: heroTitle =
 		$currentLanguage === 'zh'
-			? '您值得信赖的中波货运合作伙伴'
-			: 'Your Trusted Partner for China-Poland Cargo Transportation';
+			? '您值得信赖的国际货运合作伙伴'
+			: 'Your Trusted Partner for International Cargo Transportation to Poland';
 	$: heroSubtitle =
 		$currentLanguage === 'zh'
-			? '连接亚洲与欧洲的可靠、高效、专业的运输服务'
-			: 'Reliable, efficient, and professional shipping services connecting Asia to Europe';
+			? '可靠、高效、专业的运输服务，连接全球市场与中东欧地区'
+			: 'Reliable, efficient, and professional shipping services that connect global markets to Central and Eastern Europe';
 
 	// CAPTCHA DISABLED: Uncomment to re-enable Cloudflare Turnstile
 	// Define CAPTCHA callbacks globally before onMount
@@ -269,7 +269,6 @@
 	// };
 
 	onMount(async () => {
-
 		// CAPTCHA DISABLED: Uncomment to re-enable Cloudflare Turnstile
 		// Debug: Check if Turnstile is loaded and render widget
 		// const checkTurnstile = () => {
@@ -482,7 +481,7 @@
 		<img
 			src="/logo.png"
 			alt="Port of Gdańsk Logo"
-			style="height: 180px; width: auto; margin: 0 auto 40px auto; display: block;"
+			style="height: 360px; width: auto; margin: 0 auto 40px auto; display: block;"
 		/>
 
 		<h1 style="font-size: 48px; font-weight: normal; margin-bottom: 16px; line-height: 1.2;">
@@ -671,11 +670,14 @@
 															: 'inherit'};"
 													>
 														{#if field.id === 'privacy_consent'}
-															{@html 'I agree to the <a href="/terms" target="_blank" style="color: #0066cc; text-decoration: underline;">Terms of Use</a> and <a href="/privacy" target="_blank" style="color: #0066cc; text-decoration: underline;">Privacy Policy</a>.' + (field.required ? ' *' : '')}
+															{@html 'I agree to the <a href="/terms" target="_blank" style="color: #0066cc; text-decoration: underline;">Terms of Use</a> and <a href="/privacy" target="_blank" style="color: #0066cc; text-decoration: underline;">Privacy Policy</a>.' +
+																(field.required ? ' *' : '')}
 														{:else if field.id === 'terms_consent'}
-															{@html 'I explicitly consent to the sharing of my professional profile and contact information with other users of the platform for business matchmaking.' + (field.required ? ' *' : '')}
+															{@html 'I explicitly consent to the sharing of my professional profile and contact information with other users of the platform for business matchmaking.' +
+																(field.required ? ' *' : '')}
 														{:else if field.id === 'cross_border_consent'}
-															{@html 'I explicitly consent to the sharing of my data with third-party service providers (such as hosting and analytics companies) as described in the Privacy Policy.' + (field.required ? ' *' : '')}
+															{@html 'I explicitly consent to the sharing of my data with third-party service providers (such as hosting and analytics companies) as described in the Privacy Policy.' +
+																(field.required ? ' *' : '')}
 														{:else}
 															{@html (field.description
 																? getLocalizedText(field.description, field.id)
