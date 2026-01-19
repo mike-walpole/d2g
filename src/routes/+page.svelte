@@ -22,6 +22,7 @@
 		configData
 	} from '$lib/stores/config.js';
 	import { onMount } from 'svelte';
+	import { page } from '$app/stores';
 
 	// Responsive form handling
 	let innerWidth = 0;
@@ -179,16 +180,39 @@
 		return formSchema.fields.find((field) => field.id === fieldId);
 	};
 
+	// Country code to phone prefix mapping
+	const countryToPhonePrefix = {
+		CN: '+86', // China
+		HK: '+852', // Hong Kong
+		MO: '+853', // Macau
+		TW: '+886', // Taiwan
+		JP: '+81', // Japan
+		KR: '+82', // South Korea
+		IN: '+91', // India
+		MY: '+60', // Malaysia
+		TH: '+66', // Thailand
+		VN: '+84' // Vietnam
+	};
+
 	// Initialize form data from schema
 	function initializeFormData() {
 		if (!formSchema?.fields) return;
+
+		// Determine default phone prefix based on geolocation
+		const geolocation = $page.data?.geolocation;
+		const country = geolocation?.country?.toUpperCase();
+		const defaultPhonePrefix = countryToPhonePrefix[country] || '+48'; // Default to Poland
+		console.log('📍 Phone prefix based on geolocation:', {
+			country,
+			defaultPhonePrefix
+		});
 
 		const newFormData = {};
 		formSchema.fields.forEach((field) => {
 			if (field.type === 'checkbox') {
 				newFormData[field.id] = false;
 			} else if (field.type === 'select' && field.id === 'phone_prefix') {
-				newFormData[field.id] = '+86'; // Keep default phone prefix
+				newFormData[field.id] = defaultPhonePrefix;
 			} else if (field.type === 'select') {
 				// Other select fields (cargo_type, referral_source) start empty
 				newFormData[field.id] = '';

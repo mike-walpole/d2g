@@ -37,6 +37,9 @@
 				"defaultValue": "+86",
 				"options": [
 					{ "value": "+86", "label": { "en": "+86 (China)", "zh": "+86 (中国)" } },
+					{ "value": "+852", "label": { "en": "+852 (Hong Kong)", "zh": "+852 (香港)" } },
+					{ "value": "+853", "label": { "en": "+853 (Macau)", "zh": "+853 (澳门)" } },
+					{ "value": "+886", "label": { "en": "+886 (Taiwan)", "zh": "+886 (台湾)" } },
 					{ "value": "+48", "label": { "en": "+48 (Poland)", "zh": "+48 (波兰)" } },
 					{ "value": "+1", "label": { "en": "+1 (USA/Canada)", "zh": "+1 (美国/加拿大)" } },
 					{ "value": "+44", "label": { "en": "+44 (UK)", "zh": "+44 (英国)" } },
@@ -48,6 +51,9 @@
 					{ "value": "+81", "label": { "en": "+81 (Japan)", "zh": "+81 (日本)" } },
 					{ "value": "+82", "label": { "en": "+82 (South Korea)", "zh": "+82 (韩国)" } },
 					{ "value": "+91", "label": { "en": "+91 (India)", "zh": "+91 (印度)" } },
+					{ "value": "+60", "label": { "en": "+60 (Malaysia)", "zh": "+60 (马来西亚)" } },
+					{ "value": "+66", "label": { "en": "+66 (Thailand)", "zh": "+66 (泰国)" } },
+					{ "value": "+84", "label": { "en": "+84 (Vietnam)", "zh": "+84 (越南)" } },
 					{
 						"value": "custom",
 						"label": { "en": "Other (Enter your own)", "zh": "其他 (自定义输入)" }
