@@ -37,8 +37,8 @@
 
 			<!-- Attention Notice -->
 			<div class="bilingual-section attention-box">
-				<p><strong>Attention:</strong> These Terms of Use govern the services provided by Zarząd Morskiego Portu Gdańsk SA through dock2gdansk.com ("Dock2Gdansk") to users located within the territory of the People's Republic of China. For Terms applicable to users outside the PRC, please refer to the <a href="/terms">general Terms of Use</a>.</p>
-				<p class="chinese"><strong>请注意：</strong>本使用条款适用于Zarząd Morskiego Portu Gdańsk SA通过dock2gdansk.com（"Dock2Gdansk"）向中华人民共和国境内用户提供的服务。中华人民共和国境外用户的使用条款请参阅<a href="/terms">通用使用条款</a>。</p>
+				<p><strong>Attention:</strong> These Terms of Use govern the services provided by Zarząd Morskiego Portu Gdańsk SA through dock2gdansk.com ("Dock2Gdansk") to users located within the territory of the People's Republic of China. For Terms applicable to users outside the PRC, please refer to the <a href="/terms?region=global">general Terms of Use</a>.</p>
+				<p class="chinese"><strong>请注意：</strong>本使用条款适用于Zarząd Morskiego Portu Gdańsk SA通过dock2gdansk.com（"Dock2Gdansk"）向中华人民共和国境内用户提供的服务。中华人民共和国境外用户的使用条款请参阅<a href="/terms?region=global">通用使用条款</a>。</p>
 			</div>
 
 			<!-- Quick Summary -->
