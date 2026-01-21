@@ -41,13 +41,19 @@
 			Please read these terms carefully before using our B2B supplier matching platform.
 		</p>
 		<p style="font-size: 16px; color: #b3d4fc;">
-			<strong>Last Updated:</strong> August 2025
+			<strong>Last Updated:</strong> January 2026
 		</p>
 	</div>
 </section>
 
 <!-- Content Section -->
 <section class="terms-content">
+	<div class="china-notice-wrapper">
+		<div class="china-notice">
+			<p><strong>中华人民共和国境内用户请注意：</strong> 如果您位于中华人民共和国境内，请查阅我们专门针对中国用户的使用条款。<a href="/terms/china">点击此处查看中国使用条款 →</a></p>
+			<p><strong>Notice for Users in the People's Republic of China:</strong> If you are located within the PRC, please refer to our dedicated <a href="/terms/china">Terms of Use for China</a>.</p>
+		</div>
+	</div>
 	<div class="content-wrapper">
 		<div class="content-container">
 			<!-- Quick Summary -->
@@ -571,6 +577,37 @@
 		padding: 64px 0;
 		background: #f4f4f4;
 		min-height: calc(100vh - 200px);
+	}
+
+	.china-notice-wrapper {
+		max-width: 900px;
+		margin: 0 auto 24px auto;
+		padding: 0 16px;
+	}
+
+	.china-notice {
+		background: #fff8e1;
+		padding: 20px;
+		border-radius: 8px;
+		border-left: 4px solid #ffc107;
+	}
+
+	.china-notice p {
+		margin-bottom: 8px;
+	}
+
+	.china-notice p:last-child {
+		margin-bottom: 0;
+	}
+
+	.china-notice a {
+		color: #0062ff;
+		text-decoration: none;
+		font-weight: 500;
+	}
+
+	.china-notice a:hover {
+		text-decoration: underline;
 	}
 
 	.content-wrapper {

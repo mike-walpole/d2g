@@ -35,7 +35,12 @@
 		<div class="content-container">
 			<h1>PRIVACY POLICY</h1>
 
-			<p class="date">Last Updated: September 2025</p>
+			<p class="date">Last Updated: January 2026</p>
+
+			<div class="china-notice">
+				<p><strong>中华人民共和国境内用户请注意：</strong> 如果您位于中华人民共和国境内，请查阅我们专门针对中国用户的隐私政策。<a href="/privacy/china">点击此处查看中国隐私政策 →</a></p>
+				<p><strong>Notice for Users in the People's Republic of China:</strong> If you are located within the PRC, please refer to our dedicated <a href="/privacy/china">Privacy Policy for China</a>.</p>
+			</div>
 
 			<h2>Quick Summary - What This Means for You</h2>
 			<p>
@@ -376,7 +381,33 @@
 	.date {
 		font-style: italic;
 		color: #666;
+		margin-bottom: 24px;
+	}
+
+	.china-notice {
+		background: #fff8e1;
+		padding: 20px;
+		border-radius: 8px;
+		border-left: 4px solid #ffc107;
 		margin-bottom: 32px;
+	}
+
+	.china-notice p {
+		margin-bottom: 8px;
+	}
+
+	.china-notice p:last-child {
+		margin-bottom: 0;
+	}
+
+	.china-notice a {
+		color: #0062ff;
+		text-decoration: none;
+		font-weight: 500;
+	}
+
+	.china-notice a:hover {
+		text-decoration: underline;
 	}
 
 	/* Mobile responsive adjustments */
