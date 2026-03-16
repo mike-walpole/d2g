@@ -362,7 +362,14 @@
 	});
 
 	async function handleSubmit() {
-		console.log('📋 Form submission started');
+		console.log('📋 Form submission blocked - not accepting enquiries');
+
+		submitMessage =
+			$currentLanguage === 'zh'
+				? '我们目前暂不接受咨询，请稍后再试。'
+				: 'We are not currently accepting enquiries. Please try again later.';
+		submitStatus = 'error';
+		return;
 
 		// Show validation and validate all fields
 		showValidation = true;
