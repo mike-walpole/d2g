@@ -19,6 +19,21 @@ const DOMAIN_CONFIG = {
 		region: 'poland',
 		title: 'Port Gdańsk Connect - Professional Cargo Transportation',
 		description: 'Reliable cargo transportation between China and Poland'
+	},
+	'portgdanskconnect.com': {
+		region: 'international',
+		title: 'Port Gdańsk Connect - Professional Cargo Transportation',
+		description: 'Reliable cargo transportation between China and Poland'
+	},
+	'portgdanskconnect.cn': {
+		region: 'china',
+		title: 'Port Gdańsk Connect - Professional Cargo Transportation',
+		description: 'Reliable cargo transportation between China and Poland'
+	},
+	'portgdanskconnect.pl': {
+		region: 'poland',
+		title: 'Port Gdańsk Connect - Professional Cargo Transportation',
+		description: 'Reliable cargo transportation between China and Poland'
 	}
 	// Add more domains as needed - all will use geolocation
 };
