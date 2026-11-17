@@ -11,14 +11,14 @@
 </script>
 
 <svelte:head>
-	<title>Privacy Policy for China - Dock2Gdansk | 中华人民共和国境内用户隐私政策</title>
+	<title>Privacy Policy for China - Port Gdańsk Connect | 中华人民共和国境内用户隐私政策</title>
 	<meta
 		name="description"
-		content="Dock2Gdansk Privacy Policy for Users in the People's Republic of China - 中华人民共和国境内用户隐私政策"
+		content="Port Gdańsk Connect Privacy Policy for Users in the People's Republic of China - 中华人民共和国境内用户隐私政策"
 	/>
 </svelte:head>
 
-<Header company="Dock2Gdansk" platformName={t('site_tagline', 'Professional Cargo Transportation')}>
+<Header company="Port Gdańsk Connect" platformName={t('site_tagline', 'Professional Cargo Transportation')}>
 	<HeaderNav>
 		<HeaderNavItem href="/" text={t('nav.home', 'Home')} />
 		<HeaderNavItem onclick={() => handleLanguageSwitch('en')} text={t('EN', 'EN')} />
@@ -29,21 +29,21 @@
 <section class="privacy-content">
 	<div class="content-wrapper">
 		<div class="content-container">
-			<h1>Dock2Gdansk Privacy Policy for Users in the People's Republic of China</h1>
-			<h1 class="chinese-title">Dock2Gdansk中华人民共和国境内用户隐私政策</h1>
+			<h1>Port Gdańsk Connect Privacy Policy for Users in the People's Republic of China</h1>
+			<h1 class="chinese-title">Port Gdańsk Connect中华人民共和国境内用户隐私政策</h1>
 
 			<p class="date">Last Updated: January 2026 / 最后更新：2026年1月</p>
 
 			<!-- Attention Section -->
 			<div class="bilingual-section attention-box">
-				<p><strong>Attention:</strong> This Privacy Policy governs the services provided by Zarząd Morskiego Portu Gdańsk SA, address: Zamknięta street no. 18, Postal Code 80-545 Gdansk, NIP (Taxpayer Identification Number): 583-24-61-866, Registered in District Court Gdansk-Polnoc in Gdansk VII Commercial Division of the National Court Register No. KRS 0000040398. Share / paid up capital: PLN 2,109,250 ("we" or "us") through dock2gdansk.dagodigital.com ("Dock2Gdansk") exclusively to users located within the territory of the People's Republic of China. It does not apply to services provided by Dock2Gdansk to users outside the territory of the People's Republic of China via any digital platform. For the Privacy Policy applicable to users outside the PRC, please refer to the dedicated policy accessible <a href="/privacy?region=global">here</a>.</p>
-				<p class="chinese"><strong>请注意：</strong>本政策适用于由Zarząd Morskiego Portu Gdańsk SA地址：波兰格但斯克（Gdańsk）Zamknięta街18号，邮政编码：80-545，税号（NIP）：583-24-61-866，注册于：格但斯克北区地方法院第七商事部国家法院注册处（KRS）编号 0000040398注册资本 / 实缴资本：2,109,250 波兰兹罗提（PLN）（以下简称"我们"）开发并向中华人民共和国境内用户以网站dock2gdansk.com（以下简称"Dock2Gdansk"）形态提供的各项服务。本政策不适用于Dock2Gdansk向中华人民共和国境内以外的用户以网站形态提供的各项产服务。中华人民共和国境内以外的用户的隐私政策请<a href="/privacy?region=global">点此查看</a>。</p>
+				<p><strong>Attention:</strong> This Privacy Policy governs the services provided by Zarząd Morskiego Portu Gdańsk SA, address: Zamknięta street no. 18, Postal Code 80-545 Gdansk, NIP (Taxpayer Identification Number): 583-24-61-866, Registered in District Court Gdansk-Polnoc in Gdansk VII Commercial Division of the National Court Register No. KRS 0000040398. Share / paid up capital: PLN 2,109,250 ("we" or "us") through dock2gdansk.dagodigital.com ("Port Gdańsk Connect") exclusively to users located within the territory of the People's Republic of China. It does not apply to services provided by Port Gdańsk Connect to users outside the territory of the People's Republic of China via any digital platform. For the Privacy Policy applicable to users outside the PRC, please refer to the dedicated policy accessible <a href="/privacy?region=global">here</a>.</p>
+				<p class="chinese"><strong>请注意：</strong>本政策适用于由Zarząd Morskiego Portu Gdańsk SA地址：波兰格但斯克（Gdańsk）Zamknięta街18号，邮政编码：80-545，税号（NIP）：583-24-61-866，注册于：格但斯克北区地方法院第七商事部国家法院注册处（KRS）编号 0000040398注册资本 / 实缴资本：2,109,250 波兰兹罗提（PLN）（以下简称"我们"）开发并向中华人民共和国境内用户以网站dock2gdansk.com（以下简称"Port Gdańsk Connect"）形态提供的各项服务。本政策不适用于Port Gdańsk Connect向中华人民共和国境内以外的用户以网站形态提供的各项产服务。中华人民共和国境内以外的用户的隐私政策请<a href="/privacy?region=global">点此查看</a>。</p>
 			</div>
 
 			<!-- Welcome Section -->
 			<div class="bilingual-section">
-				<p><strong>Welcome to our Services!</strong> We recognize the importance of your personal information to you, and your trust is of utmost importance to us. In compliance with applicable laws and regulations and guided by industry best practices, we are committed to providing robust protection for the security of your personal information. To this end, we have formulated the Dock2Gdansk Privacy Policy for Users in the People's Republic of China ("Privacy Policy" or "this Policy") to ensure you fully understand: How we collect, use, process, share, transfer, disclose, store, and protect your personal information during your use of Dock2Gdansk Services; and the rights and mechanisms available to you for managing your personal information. We encourage you to read this Policy in conjunction with our <a href="/terms/china">Terms of Use</a>.</p>
-				<p class="chinese"><strong>欢迎您使用我们的服务！</strong>我们深知用户信息对您的重要性，您的信任对我们非常重要，我们将根据法律法规要求并参照行业最佳实践为您的用户信息安全提供充分保障。为此，我们制定本《Dock2Gdansk中华人民共和国境内用户隐私政策》（下称"本隐私政策"或"本政策"）以便您充分了解，在您使用Dock2Gdansk的服务的过程中，我们会如何收集、使用、委托处理、共享、转移、公开、存储和保护您的用户信息，以及您可以如何管理您的用户信息。请您结合Dock2Gdansk的<a href="/terms/china">《使用条款》</a>阅读本政策。</p>
+				<p><strong>Welcome to our Services!</strong> We recognize the importance of your personal information to you, and your trust is of utmost importance to us. In compliance with applicable laws and regulations and guided by industry best practices, we are committed to providing robust protection for the security of your personal information. To this end, we have formulated the Port Gdańsk Connect Privacy Policy for Users in the People's Republic of China ("Privacy Policy" or "this Policy") to ensure you fully understand: How we collect, use, process, share, transfer, disclose, store, and protect your personal information during your use of Port Gdańsk Connect Services; and the rights and mechanisms available to you for managing your personal information. We encourage you to read this Policy in conjunction with our <a href="/terms/china">Terms of Use</a>.</p>
+				<p class="chinese"><strong>欢迎您使用我们的服务！</strong>我们深知用户信息对您的重要性，您的信任对我们非常重要，我们将根据法律法规要求并参照行业最佳实践为您的用户信息安全提供充分保障。为此，我们制定本《Port Gdańsk Connect中华人民共和国境内用户隐私政策》（下称"本隐私政策"或"本政策"）以便您充分了解，在您使用Port Gdańsk Connect的服务的过程中，我们会如何收集、使用、委托处理、共享、转移、公开、存储和保护您的用户信息，以及您可以如何管理您的用户信息。请您结合Port Gdańsk Connect的<a href="/terms/china">《使用条款》</a>阅读本政策。</p>
 			</div>
 
 			<!-- EU Data Protection Notice -->
@@ -54,8 +54,8 @@
 
 			<!-- Platform Description -->
 			<div class="bilingual-section">
-				<p>Dock2Gdansk is a business-to-business (B2B) platform (or "Platform") that connects and enables transactions between users and potential business partners for the buying and selling of services. We help businesses find suppliers and connect with them. To do this, we collect personal information about business representatives (like names and contact details) and business requirements. We share relevant information between potential business partners to facilitate connections. You have full control over your data and can access, correct, or delete it at any time. We comply with privacy laws, including GDPR and PIPL, and we never sell your personal information.</p>
-				<p class="chinese">Dock2Gdansk是一个企业对企业（B2B）平台（或"平台"），其连接并促进用户和潜在商业伙伴之间的服务买卖。我们帮助企业寻找供应商，同时也为供应商提供商业对接服务。为此，我们会收集企业代表的个人信息（包括姓名、联系方式）及业务需求。通过在潜在合作伙伴之间共享相关信息，促进双方建立联系。您对个人数据拥有完全控制权，可随时访问、修改或删除信息。我们严格遵守《通用数据保护条例》（GDPR）、《个人信息保护法》（PIPL）等隐私法规，并承诺绝不出售您的个人信息。</p>
+				<p>Port Gdańsk Connect is a business-to-business (B2B) platform (or "Platform") that connects and enables transactions between users and potential business partners for the buying and selling of services. We help businesses find suppliers and connect with them. To do this, we collect personal information about business representatives (like names and contact details) and business requirements. We share relevant information between potential business partners to facilitate connections. You have full control over your data and can access, correct, or delete it at any time. We comply with privacy laws, including GDPR and PIPL, and we never sell your personal information.</p>
+				<p class="chinese">Port Gdańsk Connect是一个企业对企业（B2B）平台（或"平台"），其连接并促进用户和潜在商业伙伴之间的服务买卖。我们帮助企业寻找供应商，同时也为供应商提供商业对接服务。为此，我们会收集企业代表的个人信息（包括姓名、联系方式）及业务需求。通过在潜在合作伙伴之间共享相关信息，促进双方建立联系。您对个人数据拥有完全控制权，可随时访问、修改或删除信息。我们严格遵守《通用数据保护条例》（GDPR）、《个人信息保护法》（PIPL）等隐私法规，并承诺绝不出售您的个人信息。</p>
 			</div>
 
 			<!-- Important Notice -->
@@ -96,12 +96,12 @@
 			<h2>1. Scope of Application / 适用范围</h2>
 			<div class="bilingual-section">
 				<p>This Policy applies to all services provided by this platform to users in the People's Republic of China via the website and any new forms that may arise from technological developments. We and our affiliates have separate privacy policies or similar legal documents for the services they provide to you, and those services are governed by those privacy policies or similar legal documents.</p>
-				<p class="chinese">本政策适用于Dock2Gdansk向中华人民共和国境内用户以网站以形态提供的各项服务。我们及关联公司就其向您提供的服务单独设有隐私政策或类似法律文件，相应服务适用相应隐私政策或类似法律文件。</p>
+				<p class="chinese">本政策适用于Port Gdańsk Connect向中华人民共和国境内用户以网站以形态提供的各项服务。我们及关联公司就其向您提供的服务单独设有隐私政策或类似法律文件，相应服务适用相应隐私政策或类似法律文件。</p>
 			</div>
 
 			<div class="bilingual-section">
-				<p>This Policy does not apply to services provided to you by other third parties. Other services are governed by their separately disclosed rules regarding personal information collection and use. For example, if a third party provides you with services based on Dock2Gdansk, this Policy does not apply to the information you provide to the third party.</p>
-				<p class="chinese">本政策不适用于其他第三方向您提供的服务，其他服务适用其向您另行说明的个人信息收集使用规则。例如，第三方基于Dock2Gdansk向您提供服务时，您向第三方提供的信息不适用本政策。</p>
+				<p>This Policy does not apply to services provided to you by other third parties. Other services are governed by their separately disclosed rules regarding personal information collection and use. For example, if a third party provides you with services based on Port Gdańsk Connect, this Policy does not apply to the information you provide to the third party.</p>
+				<p class="chinese">本政策不适用于其他第三方向您提供的服务，其他服务适用其向您另行说明的个人信息收集使用规则。例如，第三方基于Port Gdańsk Connect向您提供服务时，您向第三方提供的信息不适用本政策。</p>
 			</div>
 
 			<!-- Section 2: Collection and Use -->
@@ -160,8 +160,8 @@
 			<h3>2.5. Other Regulations on the Collection and Use of Personal Information / 收集和使用个人信息的其他规则</h3>
 			<h4>2.5.1.</h4>
 			<div class="bilingual-section">
-				<p>If the information you provide contains Personal Information of other individuals, you must ensure that you have obtained lawful authorization prior to providing such personal information to Dock2Gdansk.</p>
-				<p class="chinese">若您提供的信息中含有其他用户的个人信息，在Dock2Gdansk提供这些个人信息之前，您需确保您已经取得合法的授权。</p>
+				<p>If the information you provide contains Personal Information of other individuals, you must ensure that you have obtained lawful authorization prior to providing such personal information to Port Gdańsk Connect.</p>
+				<p class="chinese">若您提供的信息中含有其他用户的个人信息，在Port Gdańsk Connect提供这些个人信息之前，您需确保您已经取得合法的授权。</p>
 			</div>
 
 			<h4>2.5.2.</h4>
@@ -188,8 +188,8 @@
 
 			<h3>3.1. When and Why We Share your Information / 何时以及为何共享您的信息</h3>
 			<div class="bilingual-section">
-				<p>We do not share your personal information with any company, organization or individual other than the service provider of the Dock2Gdansk platform, except in the following circumstances:</p>
-				<p class="chinese">我们不会与Dock2Gdansk平台的服务提供商以外的任何公司、组织或个人共享您的个人信息，以下情况除外：</p>
+				<p>We do not share your personal information with any company, organization or individual other than the service provider of the Port Gdańsk Connect platform, except in the following circumstances:</p>
+				<p class="chinese">我们不会与Port Gdańsk Connect平台的服务提供商以外的任何公司、组织或个人共享您的个人信息，以下情况除外：</p>
 			</div>
 
 			<h4>3.1.1. Legal Requirements / 法定情形</h4>
@@ -205,7 +205,7 @@
 
 			<h4>3.1.2. With Explicit Consent / 通过明确的同意</h4>
 			<div class="bilingual-section">
-				<p><strong>Sharing with affiliated companies</strong> to facilitate our joint provision of services to you based on associated companies, we will provide services to you based on the Dock2Gdansk account, identify abnormal inquiries, and protect the personal and property safety of Dock2Gdansk affiliated companies, other users or the public from being infringed upon. Your personal information may be shared with our affiliated companies and/or the service providers designated by them. We will only share necessary personal information and be bound by the purposes stated in this policy. If we share your sensitive personal information or if an affiliated company changes the purpose of using and processing your personal information, we will seek your authorization and consent again.</p>
+				<p><strong>Sharing with affiliated companies</strong> to facilitate our joint provision of services to you based on associated companies, we will provide services to you based on the Port Gdańsk Connect account, identify abnormal inquiries, and protect the personal and property safety of Port Gdańsk Connect affiliated companies, other users or the public from being infringed upon. Your personal information may be shared with our affiliated companies and/or the service providers designated by them. We will only share necessary personal information and be bound by the purposes stated in this policy. If we share your sensitive personal information or if an affiliated company changes the purpose of using and processing your personal information, we will seek your authorization and consent again.</p>
 				<p class="chinese"><strong>与关联公司共享</strong>为便于与关联公司共同为您提供服务，我们将基于Dock2格但斯克账户为您提供服务，识别异常账户，并保护Dock2格但斯克关联公司、其他用户或公众的个人及财产安全不受侵害。您的个人信息可能会与我们的关联公司及其指定的服务提供商共享。我们仅会共享必要的个人信息，并严格遵守本政策所述目的。若涉及敏感个人信息共享，或关联公司变更使用处理您个人信息的目的时，我们将再次征求您的授权同意。</p>
 			</div>
 
@@ -220,8 +220,8 @@
 			</div>
 
 			<div class="bilingual-section">
-				<p>You can view the data sharing situation description below of Dock2Gdansk platform:</p>
-				<p class="chinese">您可查看以下Dock2Gdansk平台的数据共享情况说明：</p>
+				<p>You can view the data sharing situation description below of Port Gdańsk Connect platform:</p>
+				<p class="chinese">您可查看以下Port Gdańsk Connect平台的数据共享情况说明：</p>
 				<p>The partners or suppliers with whom we share data are as follows:</p>
 				<ol type="a">
 					<li>comprehensive business warehousing and transport services in Gdańsk, specializing in efficient logistics solutions for both storage and transportation needs;</li>
@@ -266,12 +266,12 @@
 
 			<h3>3.4. When and Why We Publicly Disclose your Information / 何时以及为何公开您的信息</h3>
 			<div class="bilingual-section">
-				<p>Dock2Gdansk platform attaches great importance to protecting your personal information. We do not disclose it to irrelevant third parties, nor will we publicly disclose your personal information, except in the following circumstances:</p>
-				<p class="chinese">Dock2Gdansk平台非常重视保护您的个人信息。我们不会向无关的第三方披露您的个人信息，也不会公开披露您的个人信息，除非在以下情况下：</p>
+				<p>Port Gdańsk Connect platform attaches great importance to protecting your personal information. We do not disclose it to irrelevant third parties, nor will we publicly disclose your personal information, except in the following circumstances:</p>
+				<p class="chinese">Port Gdańsk Connect平台非常重视保护您的个人信息。我们不会向无关的第三方披露您的个人信息，也不会公开披露您的个人信息，除非在以下情况下：</p>
 				<ol type="a">
 					<li>Based on your active choice and other separate consents, we may publicly disclose your personal information.<br/>根据您的主动选择和其他单独的同意，我们可能会公开披露您的个人信息。</li>
 					<li>In cases where it is necessary to provide your personal information in accordance with the requirements of laws and regulations, mandatory administrative law enforcement or judicial requirements, we may publicly disclose your personal information in the required type and manner of disclosure.<br/>根据法律法规要求、行政强制执行或者司法要求，需要提供个人信息的，我们可能会按照要求的方式公开您的个人信息。</li>
-					<li>If we determine that you have violated laws and regulations or seriously breached the relevant agreements and rules of Dock2Gdansk platform, or to protect the personal and property safety of Dock2Gdansk platform users or the public from being infringed upon, we may disclose your personal information, including the relevant violations and the measures that Dock2Gdansk platform has taken against you.<br/>如果我们确定您有违反法律法规或严重违反Dock2Gdansk平台相关协议和规则，或者为保护Dock2Gdansk平台用户或公众的人身、财产安全免受侵害，我们可能会披露您的个人信息，包括相关的违规行为以及Dock2Gdansk平台针对您采取的措施。</li>
+					<li>If we determine that you have violated laws and regulations or seriously breached the relevant agreements and rules of Port Gdańsk Connect platform, or to protect the personal and property safety of Port Gdańsk Connect platform users or the public from being infringed upon, we may disclose your personal information, including the relevant violations and the measures that Port Gdańsk Connect platform has taken against you.<br/>如果我们确定您有违反法律法规或严重违反Port Gdańsk Connect平台相关协议和规则，或者为保护Port Gdańsk Connect平台用户或公众的人身、财产安全免受侵害，我们可能会披露您的个人信息，包括相关的违规行为以及Port Gdańsk Connect平台针对您采取的措施。</li>
 				</ol>
 			</div>
 
@@ -319,8 +319,8 @@
 			<!-- Section 5: Storage and Protection -->
 			<h2>5. Storage and Protection of Information / 信息的储存与保护</h2>
 			<div class="bilingual-section">
-				<p>We keep your information only as long as necessary for our services in Dock2Gdansk platform and legal requirements. Information related to active inquiries is maintained for a reasonable period for service provision. Business requests and matching data are typically kept for 5 years to support ongoing business relationships and ensure legal compliance. Communication records are maintained for a period of 2 years for customer service purposes. Technical logs and analytics data are kept for 12 months for security and improvement purposes.</p>
-				<p class="chinese">我们仅在Dock2Gdansk平台服务及法律要求所必需的期限内保存您的信息。账户有效期内将保留活跃账户信息，同时保留合理的服务提供时间。业务请求及匹配数据通常保存5年，以支持持续业务关系并确保法律合规。通信记录为客户服务目的保存2年。技术日志与分析数据为安全维护及优化目的保存12个月。</p>
+				<p>We keep your information only as long as necessary for our services in Port Gdańsk Connect platform and legal requirements. Information related to active inquiries is maintained for a reasonable period for service provision. Business requests and matching data are typically kept for 5 years to support ongoing business relationships and ensure legal compliance. Communication records are maintained for a period of 2 years for customer service purposes. Technical logs and analytics data are kept for 12 months for security and improvement purposes.</p>
+				<p class="chinese">我们仅在Port Gdańsk Connect平台服务及法律要求所必需的期限内保存您的信息。账户有效期内将保留活跃账户信息，同时保留合理的服务提供时间。业务请求及匹配数据通常保存5年，以支持持续业务关系并确保法律合规。通信记录为客户服务目的保存2年。技术日志与分析数据为安全维护及优化目的保存12个月。</p>
 			</div>
 
 			<div class="bilingual-section">
@@ -351,8 +351,8 @@
 			</div>
 
 			<div class="bilingual-section">
-				<p>For major changes, we will also provide more prominent notifications (including through public announcements on the Dock2Gdansk platform or by offering you pop-up prompts).</p>
-				<p class="chinese">对于重大变更，我们也将提供更突出的通知（包括通过Dock2Gdansk平台上的公共公告或向您提供弹出提示）。</p>
+				<p>For major changes, we will also provide more prominent notifications (including through public announcements on the Port Gdańsk Connect platform or by offering you pop-up prompts).</p>
+				<p class="chinese">对于重大变更，我们也将提供更突出的通知（包括通过Port Gdańsk Connect平台上的公共公告或向您提供弹出提示）。</p>
 			</div>
 
 			<div class="bilingual-section">
@@ -369,8 +369,8 @@
 			</div>
 
 			<div class="bilingual-section">
-				<p>We will also archive previous versions of this policy on a dedicated page on Dock2Gdansk platform for your reference.</p>
-				<p class="chinese">我们还将本政策的先前版本存档在Dock2Gdansk平台的专用页面上，以供您参考。</p>
+				<p>We will also archive previous versions of this policy on a dedicated page on Port Gdańsk Connect platform for your reference.</p>
+				<p class="chinese">我们还将本政策的先前版本存档在Port Gdańsk Connect平台的专用页面上，以供您参考。</p>
 			</div>
 
 			<!-- Section 7: Protection of Minors -->

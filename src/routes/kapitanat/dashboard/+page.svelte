@@ -1548,7 +1548,7 @@ Please share these credentials securely with the new team member. They will be r
 </script>
 
 <svelte:head>
-	<title>{t('admin.dashboard', 'Dashboard')} - Dock2Gdansk Admin</title>
+	<title>{t('admin.dashboard', 'Dashboard')} - Port Gdańsk Connect Admin</title>
 </svelte:head>
 
 {#if isLoggedIn}

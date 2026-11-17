@@ -56,7 +56,7 @@
 </script>
 
 <svelte:head>
-	<title>Geolocation Debug - Dock2Gdansk</title>
+	<title>Geolocation Debug - Port Gdańsk Connect</title>
 </svelte:head>
 
 <div style="max-width: 800px; margin: 100px auto 50px; padding: 20px; font-family: monospace;">
@@ -103,7 +103,7 @@
 					<p><strong>Active Language:</strong> {geolocationResults.currentLanguage}</p>
 					<p>
 						<strong>Translation Test:</strong>
-						{t('site_title', 'Dock2Gdansk')} - {t(
+						{t('site_title', 'Port Gdańsk Connect')} - {t(
 							'site_tagline',
 							'Professional Cargo Transportation'
 						)}

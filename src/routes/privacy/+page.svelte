@@ -14,14 +14,14 @@
 </script>
 
 <svelte:head>
-	<title>Privacy Policy - Dock2Gdansk</title>
+	<title>Privacy Policy - Port Gdańsk Connect</title>
 	<meta
 		name="description"
-		content="Privacy Policy for Dock2Gdansk - Professional Cargo Transportation Services"
+		content="Privacy Policy for Port Gdańsk Connect - Professional Cargo Transportation Services"
 	/>
 </svelte:head>
 
-<Header company="Dock2Gdansk" platformName={t('site_tagline', 'Professional Cargo Transportation')}>
+<Header company="Port Gdańsk Connect" platformName={t('site_tagline', 'Professional Cargo Transportation')}>
 	<HeaderNav>
 		<HeaderNavItem href="/" text={t('nav.home', 'Home')} />
 		<HeaderNavItem onclick={() => handleLanguageSwitch('en')} text={t('EN', 'EN')} />
@@ -53,7 +53,7 @@
 				Before you start using our services, please be sure to carefully read and understand the policy as follows, especially the terms marked in bold/bold underlined, and ensure that you fully understand and agree before starting to use them.
 			</p>
 			<p>
-				Your agreement to the Dock2Gdansk platform Privacy Policy(Policy) indicates that you have understood the services we provide, as well as the necessary user information required for the operation of the corresponding service functions, and you have given the corresponding collection and use authorization.
+				Your agreement to the Port Gdańsk Connect platform Privacy Policy(Policy) indicates that you have understood the services we provide, as well as the necessary user information required for the operation of the corresponding service functions, and you have given the corresponding collection and use authorization.
 			</p>
 			<p>
 				Given that our services are intended to help you or your company find business cooperation opportunities, we will share the information you provide with potential partners. Prior to sharing such information, we will obtain your separate consent to confirm your approval. However, it does not mean that you have separately agreed to enable extended business functions and process non-essential personal information.
@@ -73,7 +73,7 @@
 
 			<h2>Who We Are and How to Reach Us</h2>
 			<p>
-				Zarząd Morskiego Portu Gdańsk Spółka Akcyjna operates a B2B supplier matching platform ("Dock2Gdansk") connecting businesses with potential suppliers globally. We act as the data controller for personal information processed through our services.
+				Zarząd Morskiego Portu Gdańsk Spółka Akcyjna operates a B2B supplier matching platform ("Port Gdańsk Connect") connecting businesses with potential suppliers globally. We act as the data controller for personal information processed through our services.
 			</p>
 
 			<h3>Contact Us About Privacy:</h3>
@@ -91,7 +91,7 @@
 				This Policy applies to all services provided by this platform to users in the European Union and the People's Republic of China via the website and new forms arising from technological developments. We and our affiliates have separate privacy policies or similar legal documents for the services they provide to you, and those services are governed by those privacy policies or similar legal documents.
 			</p>
 			<p>
-				This Policy does not apply to services provided to you by other third parties. Other services are governed by their separately disclosed personal information collection and use rules. For example, if a third party offers you services based on Dock2Gdansk, please note that this Policy doesn't cover the information you share directly with them.
+				This Policy does not apply to services provided to you by other third parties. Other services are governed by their separately disclosed personal information collection and use rules. For example, if a third party offers you services based on Port Gdańsk Connect, please note that this Policy doesn't cover the information you share directly with them.
 			</p>
 
 			<h2>What Personal Information We Collect</h2>
@@ -143,7 +143,7 @@
 				<strong>For China Users (PIPL):</strong> We collect and use your personal information based on the following:
 			</p>
 			<p>
-				If the information you provide contains personal information of other users, before providing such personal information to Dock2Gdansk, you must ensure that you have obtained legal authorization.
+				If the information you provide contains personal information of other users, before providing such personal information to Port Gdańsk Connect, you must ensure that you have obtained legal authorization.
 			</p>
 			<p>
 				B. If we use the information for purposes not specified in this Policy or use the information collected for a specific purpose for other purposes, we will obtain your consent in advance.
@@ -164,7 +164,7 @@
 
 			<h2>When and Why We Share Your Information</h2>
 			<p>
-				We do not share your personal information with any company, organization, or individual other than the service provider of the Dock2Gdansk platform, except in the following circumstances
+				We do not share your personal information with any company, organization, or individual other than the service provider of the Port Gdańsk Connect platform, except in the following circumstances
 			</p>
 
 			<h3>Legal Requirements</h3>
@@ -177,7 +177,7 @@
 
 			<h3>With Explicit Consent</h3>
 			<p>
-				<strong>Sharing with affiliated companies</strong> to facilitate our joint provision of services to you based on associated accounts, we will provide services to you based on the Dock2Gdansk account, identify abnormal accounts, and protect the personal and property safety of Dock2Gdansk affiliated companies, other users, or the public from being infringed upon. Your personal information may be shared with our affiliated companies and/or the service providers designated by them. We will only share necessary personal information and be bound by the purposes stated in this policy. If we share your sensitive personal information or if an affiliated company changes the purpose for which we use and process your personal information, we will seek your authorization and consent again.
+				<strong>Sharing with affiliated companies</strong> to facilitate our joint provision of services to you based on associated accounts, we will provide services to you based on the Port Gdańsk Connect account, identify abnormal accounts, and protect the personal and property safety of Port Gdańsk Connect affiliated companies, other users, or the public from being infringed upon. Your personal information may be shared with our affiliated companies and/or the service providers designated by them. We will only share necessary personal information and be bound by the purposes stated in this policy. If we share your sensitive personal information or if an affiliated company changes the purpose for which we use and process your personal information, we will seek your authorization and consent again.
 			</p>
 			<p>
 				<strong>Sharing your personal information with other parties only after obtaining your separate consent:</strong> The core of our service involves sharing relevant information between potential business partners. When we identify a good match, we share business contact information, relevant product or service specifications, general company information, and location details necessary for initial business discussions. We only share what's necessary for the potential business relationship.
@@ -219,7 +219,7 @@
 
 			<h3>Public Disclosure</h3>
 			<p>
-				Dock2Gdansk platform attaches great importance to protecting your personal information. We do not disclose it to irrelevant third parties, nor will we publicly disclose your personal information, except in the following circumstances
+				Port Gdańsk Connect platform attaches great importance to protecting your personal information. We do not disclose it to irrelevant third parties, nor will we publicly disclose your personal information, except in the following circumstances
 			</p>
 			<p>
 				Based on your active choice and other separate consents, we may publicly disclose your personal information.
@@ -228,7 +228,7 @@
 				In cases where it is necessary to provide your personal information in accordance with the requirements of laws and regulations, mandatory administrative law enforcement, or judicial requirements, we may publicly disclose your personal information in the required type and manner of disclosure.
 			</p>
 			<p>
-				If we determine that you have violated laws and regulations or seriously breached the relevant agreements and rules of Dock2Gdansk platform, or to protect the personal and property safety of Dock2Gdansk platform users or the public from being infringed upon, we may disclose your personal information, including the relevant violations and the measures that Dock2Gdansk platform has taken against you.
+				If we determine that you have violated laws and regulations or seriously breached the relevant agreements and rules of Port Gdańsk Connect platform, or to protect the personal and property safety of Port Gdańsk Connect platform users or the public from being infringed upon, we may disclose your personal information, including the relevant violations and the measures that Port Gdańsk Connect platform has taken against you.
 			</p>
 
 			<h2>International Data Transfers</h2>
@@ -286,7 +286,7 @@
 				To provide you with a better product and service experience, we are constantly striving to improve our products, services, and technologies. When there are new services or changes to business processes, we may update our privacy policy to inform you of the specific changes. However, without your explicit consent, we will not restrict the rights you enjoy under this policy.
 			</p>
 			<p>
-				For major changes, we will also provide more prominent notifications (including through public announcements on Dock2Gdansk platform or by offering you pop-up prompts).
+				For major changes, we will also provide more prominent notifications (including through public announcements on Port Gdańsk Connect platform or by offering you pop-up prompts).
 			</p>
 			<p>
 				The major changes referred to in this policy include, but are not limited to:
@@ -300,7 +300,7 @@
 				When the personal information protection impact assessment report indicates that the product has a significant impact on an individual's rights and interests.
 			</p>
 			<p>
-				We will also archive previous versions of this policy on a dedicated page on Dock2Gdansk platform for your reference.
+				We will also archive previous versions of this policy on a dedicated page on Port Gdańsk Connect platform for your reference.
 			</p>
 
 			<h2>Children's Privacy</h2>

@@ -7,17 +7,17 @@ const DOMAIN_CONFIG = {
 	// Primary domains - all use geolocation for language detection
 	'dock2gdansk.com': {
 		region: 'international',
-		title: 'Dock2Gdansk - Professional Cargo Transportation',
+		title: 'Port Gdańsk Connect - Professional Cargo Transportation',
 		description: 'Reliable cargo transportation between China and Poland'
 	},
 	'dock2gdansk.cn': {
 		region: 'china',
-		title: 'Dock2Gdansk - Professional Cargo Transportation',
+		title: 'Port Gdańsk Connect - Professional Cargo Transportation',
 		description: 'Reliable cargo transportation between China and Poland'
 	},
 	'dock2gdansk.pl': {
 		region: 'poland',
-		title: 'Dock2Gdansk - Professional Cargo Transportation',
+		title: 'Port Gdańsk Connect - Professional Cargo Transportation',
 		description: 'Reliable cargo transportation between China and Poland'
 	}
 	// Add more domains as needed - all will use geolocation

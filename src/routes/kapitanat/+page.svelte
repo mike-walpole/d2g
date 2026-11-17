@@ -67,7 +67,7 @@
 </script>
 
 <svelte:head>
-	<title>{t('admin.login', 'Admin Login')} - Dock2Gdansk</title>
+	<title>{t('admin.login', 'Admin Login')} - Port Gdańsk Connect</title>
 </svelte:head>
 
 <div class="flex min-h-screen items-center justify-center bg-gray-50 px-4 py-12">
@@ -77,7 +77,7 @@
 			<h1 class="text-3xl font-bold text-gray-900">
 				{t('admin.login', 'Admin Login')}
 			</h1>
-			<p class="mt-2 text-gray-600">Dock2Gdansk Administration Panel</p>
+			<p class="mt-2 text-gray-600">Port Gdańsk Connect Administration Panel</p>
 		</div>
 
 		<Tile class="p-8">

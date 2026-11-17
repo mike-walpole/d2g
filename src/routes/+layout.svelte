@@ -123,7 +123,7 @@
 	<link rel="icon" href={favicon} />
 	<title
 		>{domainMetadata.title ||
-			t('site_title', 'Dock2Gdansk') +
+			t('site_title', 'Port Gdańsk Connect') +
 				' - ' +
 				t('site_tagline', 'Professional Cargo Transportation')}</title
 	>
@@ -135,7 +135,7 @@
 				'Reliable, efficient, and professional shipping services connecting Asia to Europe'
 			)}
 	/>
-	<meta property="og:title" content={domainMetadata.title || t('site_title', 'Dock2Gdansk')} />
+	<meta property="og:title" content={domainMetadata.title || t('site_title', 'Port Gdańsk Connect')} />
 	<meta
 		property="og:description"
 		content={domainMetadata.description ||
@@ -150,7 +150,7 @@
 	{/if}
 </svelte:head>
 
-<Header company="Dock2Gdansk" platformName="">
+<Header company="Port Gdańsk Connect" platformName="">
 	<HeaderNav>
 		<div class="language-selector">
 			<HeaderNavItem
@@ -176,7 +176,7 @@
 <footer style="background: #f1f1f1; border-top: 1px solid #ddd; padding: 32px 0;">
 	<div style="max-width: 1200px; margin: 0 auto; padding: 0 16px; text-align: center;">
 		<p style="font-size: 14px; color: #666;">
-			{t('footer.copyright', '© 2025 Dock2Gdansk. All rights reserved.')}
+			{t('footer.copyright', '© 2025 Port Gdańsk Connect. All rights reserved.')}
 		</p>
 		<div style="display: flex; justify-content: center; gap: 16px; margin-top: 8px;">
 			<a

@@ -14,14 +14,14 @@
 </script>
 
 <svelte:head>
-	<title>Terms of Use - Dock2Gdansk</title>
+	<title>Terms of Use - Port Gdańsk Connect</title>
 	<meta
 		name="description"
-		content="Terms of Use for Dock2Gdansk - Professional Cargo Transportation Services"
+		content="Terms of Use for Port Gdańsk Connect - Professional Cargo Transportation Services"
 	/>
 </svelte:head>
 
-<Header company="Dock2Gdansk" platformName={t('site_tagline', 'Professional Cargo Transportation')}>
+<Header company="Port Gdańsk Connect" platformName={t('site_tagline', 'Professional Cargo Transportation')}>
 	<HeaderNav>
 		<HeaderNavItem href="/" text={t('nav.home', 'Home')} />
 		<HeaderNavItem onclick={() => handleLanguageSwitch('en')} text={t('EN', 'EN')} />
@@ -87,9 +87,9 @@
 			<div class="section">
 				<h2>1. Acceptance of Terms and Governing Law</h2>
 				<p>
-					By accessing or using Dock2Gdansk's B2B supplier matching platform (the "Platform"), you
+					By accessing or using Port Gdańsk Connect's B2B supplier matching platform (the "Platform"), you
 					agree to be bound by these Terms of Use ("Terms"). These Terms form a legally binding
-					agreement between you and Dock2Gdansk ("we," "us," or "our").
+					agreement between you and Port Gdańsk Connect ("we," "us," or "our").
 				</p>
 				<p>
 					If you're using the Platform on behalf of a business or organization, you represent that
