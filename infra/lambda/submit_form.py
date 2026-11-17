@@ -61,7 +61,6 @@ def validate_form_data(form_data: Dict[str, Any]) -> Tuple[bool, str, Dict[str, 
         'company': 'Company name',
         'email': 'Email',
         'phone': 'Phone number',
-        'contact_person': 'Contact person',
         'inquiry_content': 'Inquiry content'
     }
 
@@ -266,8 +265,11 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         submission_id = generate_submission_id()
         timestamp = datetime.utcnow().isoformat()
         
-        # Get cargo type name for the record
+        # Get cargo type name for the record.
+        # Types with mapsTo == "others" have no match in the client's database, so the
+        # downstream name is "Others"; the visitor's actual pick is kept in cargo_type_selected.
         cargo_type_name = "Unknown Cargo"
+        cargo_type_selected = None
         if 'cargo_type' in form_data and form_data['cargo_type']:
             try:
                 # Get cargo types from config
@@ -283,6 +285,9 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                                 cargo_type_name = cargo['name'].get('en', cargo['name'].get('zh', 'Unknown Cargo'))
                             else:
                                 cargo_type_name = cargo['name']
+                            if cargo.get('mapsTo') == 'others':
+                                cargo_type_selected = cargo_type_name
+                                cargo_type_name = 'Others'
                             break
             except Exception as e:
                 print(f"Warning: Could not get cargo type name: {str(e)}")
@@ -300,6 +305,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             'companyName': processed_form_data.get('company', ''),  # Added companyName
             'cargoTypeName': cargo_type_name  # Changed from 'cargo_type_name' to 'cargoTypeName'
         }
+        if cargo_type_selected:
+            item['cargoTypeSelected'] = cargo_type_selected
         
         # Store in DynamoDB
         table = dynamodb.Table(os.environ['DYNAMODB_TABLE'])
@@ -316,6 +323,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             current_time = datetime.utcnow()
             date_str = current_time.strftime('%d/%m/%Y')
             
+            # Subject is a machine token (likely parsed downstream) - brand intentionally NOT renamed here
             # Create subject line with format: "Dock2Gdansk:submission_id@wersja:1.0.0"
             subject = f"Dock2Gdansk:{submission_id}@wersja:{schema_version}"
             
@@ -329,11 +337,14 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 'form_data': processed_form_data,
                 'cargo_type_name': cargo_type_name
             }
+            if cargo_type_selected:
+                json_data['cargo_type_selected'] = cargo_type_selected
             
             # Create email body with full JSON included
-            email_body = f"""New Dock2Gdansk submission received:
+            cargo_line = f"{cargo_type_name} (selected: {cargo_type_selected})" if cargo_type_selected else cargo_type_name
+            email_body = f"""New Port Gdańsk Connect submission received:
 
-Cargo Type: {cargo_type_name}
+Cargo Type: {cargo_line}
 Company: {company_name}
 Date: {date_str}
 Submission ID: {submission_id}
@@ -355,7 +366,7 @@ FULL SUBMISSION DATA (JSON):
             for recipient in recipients:
                 try:
                     admin_email_data = {
-                        'from': 'Dock2Gdansk <re-reply@comm.dagodigital.com>',
+                        'from': 'Port Gdańsk Connect <re-reply@comm.dagodigital.com>',
                         'to': [recipient],
                         'subject': subject,
                         'text': email_body,

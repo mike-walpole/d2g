@@ -60,11 +60,14 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                         else:
                             name = cargo['name']  # Fallback for old format
                         
-                        transformed_cargo_types.append({
+                        entry = {
                             'id': cargo['id'],
                             'name': name,
                             'value': cargo['id']
-                        })
+                        }
+                        if cargo.get('mapsTo'):
+                            entry['mapsTo'] = cargo['mapsTo']
+                        transformed_cargo_types.append(entry)
                 
                 result['cargoTypes'] = transformed_cargo_types
             else:
