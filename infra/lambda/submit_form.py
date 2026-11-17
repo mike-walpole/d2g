@@ -3,7 +3,10 @@ import boto3
 import uuid
 import os
 import re
-import requests
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from email.mime.application import MIMEApplication
+from email.utils import formataddr, formatdate, make_msgid
 from datetime import datetime
 from typing import Dict, Any, Tuple
 
@@ -11,9 +14,26 @@ from typing import Dict, Any, Tuple
 dynamodb = boto3.resource('dynamodb')
 cognito = boto3.client('cognito-idp')
 
-# Resend configuration
-RESEND_API_KEY = os.environ.get('RESEND_API_KEY', '')
-RESEND_API_URL = 'https://api.resend.com/emails'
+# Email via Amazon SES (no SES in ap-east-1, so a cross-region client). Required env, fail loud if missing.
+SES_REGION = os.environ['SES_REGION']
+SES_FROM_ADDRESS = os.environ['SES_FROM_ADDRESS']
+SES_FROM = formataddr(('Port Gdańsk Connect', SES_FROM_ADDRESS), charset='utf-8')
+ses = boto3.client('sesv2', region_name=SES_REGION)
+
+
+def build_admin_email(recipient: str, subject: str, body: str, attachment_name: str, attachment_json: str) -> bytes:
+    msg = MIMEMultipart('mixed')
+    msg['From'] = SES_FROM
+    msg['To'] = recipient
+    msg['Subject'] = subject
+    msg['Date'] = formatdate(localtime=False)
+    msg['Message-ID'] = make_msgid(domain=SES_FROM_ADDRESS.split('@')[1])
+    msg.attach(MIMEText(body, 'plain', 'utf-8'))
+    part = MIMEApplication(attachment_json.encode('utf-8'), _subtype='json')
+    # RFC 2231 filename so non-ASCII (e.g. Chinese) company names survive
+    part.add_header('Content-Disposition', 'attachment', filename=('utf-8', '', attachment_name))
+    msg.attach(part)
+    return msg.as_bytes()
 
 def get_admin_email_addresses():
     """
@@ -355,49 +375,26 @@ FULL SUBMISSION DATA (JSON):
 {json.dumps(json_data, indent=2, ensure_ascii=False)}
 """
             
-            # Convert JSON to base64 for attachment
-            import base64
             json_content = json.dumps(json_data, indent=2, ensure_ascii=False)
-            json_base64 = base64.b64encode(json_content.encode('utf-8')).decode('utf-8')
-            
-            # Get admin email addresses from Cognito User Pool
+            attachment_name = f'dock2gdansk_{company_name.replace(" ", "_")}_{submission_id}.json'
+
             recipients = get_admin_email_addresses()
-            
+
             for recipient in recipients:
                 try:
-                    admin_email_data = {
-                        'from': 'Port Gdańsk Connect <re-reply@comm.dagodigital.com>',
-                        'to': [recipient],
-                        'subject': subject,
-                        'text': email_body,
-                        'attachments': [
-                            {
-                                'filename': f'dock2gdansk_{company_name.replace(" ", "_")}_{submission_id}.json',
-                                'content': json_base64
-                            }
-                        ]
-                    }
-                    
-                    response = requests.post(
-                        RESEND_API_URL,
-                        headers={
-                            'Authorization': f'Bearer {RESEND_API_KEY}',
-                            'Content-Type': 'application/json'
-                        },
-                        json=admin_email_data
+                    raw = build_admin_email(recipient, subject, email_body, attachment_name, json_content)
+                    result = ses.send_email(
+                        FromEmailAddress=SES_FROM,
+                        Destination={'ToAddresses': [recipient]},
+                        Content={'Raw': {'Data': raw}},
                     )
-                    
-                    if response.status_code == 200:
-                        print(f"Admin notification email sent successfully to {recipient}")
-                    else:
-                        print(f"Failed to send admin email to {recipient}: {response.status_code} - {response.text}")
-                        
+                    print(f"Admin notification email sent to {recipient}: {result['MessageId']}")
                 except Exception as recipient_error:
-                    print(f"Failed to send email to {recipient}: {recipient_error}")
-                    # Continue with other recipients even if one fails
-            
+                    # Submission is already stored; don't fail the visitor's request, but log loudly
+                    print(f"ERROR admin email to {recipient} failed for {submission_id}: {type(recipient_error).__name__}: {recipient_error}")
+
         except Exception as admin_email_error:
-            print(f"Failed to send admin email: {admin_email_error}")
+            print(f"ERROR admin email block failed for {submission_id}: {type(admin_email_error).__name__}: {admin_email_error}")
             # Don't fail the entire request if email fails
         
         # Return success response

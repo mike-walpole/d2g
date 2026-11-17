@@ -13,6 +13,12 @@ from aws_cdk import (
 )
 from constructs import Construct
 
+
+# Admin notification email (verified SES identity with DKIM in eu-central-1)
+SES_REGION = "eu-central-1"
+SES_IDENTITY = "reports.dagodigital.com"
+SES_FROM_ADDRESS = f"noreply@{SES_IDENTITY}"
+
 class D2GStack(Stack):
     def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
@@ -130,7 +136,9 @@ class D2GStack(Stack):
                 "DYNAMODB_TABLE": self.form_submissions_table.table_name,
                 "SCHEMAS_TABLE": self.form_schemas_table.table_name,
                 "USER_POOL_ID": self.user_pool.user_pool_id,
-                "USER_POOL_CLIENT_ID": self.user_pool_client.user_pool_client_id
+                "USER_POOL_CLIENT_ID": self.user_pool_client.user_pool_client_id,
+                "SES_REGION": SES_REGION,
+                "SES_FROM_ADDRESS": SES_FROM_ADDRESS
             }
         )
 
@@ -207,7 +215,14 @@ class D2GStack(Stack):
         self.form_submissions_table.grant_full_access(self.admin_kapitanat_lambda)
         self.form_schemas_table.grant_full_access(self.admin_kapitanat_lambda)
 
-        # Note: Removed SES permissions since we're now using Resend for email
+        # Admin notification email via SES (eu-central-1: no SES in ap-east-1). Raw MIME (JSON attachment) needs SendRawEmail.
+        self.submit_form_lambda.add_to_role_policy(
+            iam.PolicyStatement(
+                effect=iam.Effect.ALLOW,
+                actions=["ses:SendEmail", "ses:SendRawEmail"],
+                resources=[f"arn:aws:ses:{SES_REGION}:{self.account}:identity/{SES_IDENTITY}"]
+            )
+        )
 
         # Grant Cognito permissions to admin lambda
         self.admin_kapitanat_lambda.add_to_role_policy(
