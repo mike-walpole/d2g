@@ -175,7 +175,11 @@ export async function loadStats(fetchFn, days) {
 				FROM events WHERE ${range} AND event IN ('form_started','form_submitted')
 				GROUP BY day ORDER BY day`
 		),
-		hogql(fetchFn, `SELECT min(timestamp) FROM events WHERE ${PROD_ONLY} AND event = 'form_viewed'`)
+		// min() over zero rows returns the 1970 epoch in ClickHouse, not NULL
+		hogql(
+			fetchFn,
+			`SELECT if(count() = 0, NULL, min(timestamp)) FROM events WHERE ${PROD_ONLY} AND event = 'form_viewed'`
+		)
 	]);
 
 	const f = funnelRows[0] ?? [];
