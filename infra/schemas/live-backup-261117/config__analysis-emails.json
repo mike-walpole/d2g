@@ -1,0 +1,74 @@
+{
+    "Item": {
+        "emails": {
+            "L": [
+                {
+                    "M": {
+                        "name": {
+                            "S": "xyz123"
+                        },
+                        "active": {
+                            "BOOL": true
+                        },
+                        "addedAt": {
+                            "S": "2025-09-15T08:09:00.667533"
+                        },
+                        "id": {
+                            "S": "1"
+                        },
+                        "email": {
+                            "S": "xyz123@portgdansk.pl"
+                        }
+                    }
+                },
+                {
+                    "M": {
+                        "name": {
+                            "S": "oliwia.walter"
+                        },
+                        "active": {
+                            "BOOL": true
+                        },
+                        "addedAt": {
+                            "S": "2025-10-07T09:36:15.347961"
+                        },
+                        "id": {
+                            "S": "2"
+                        },
+                        "email": {
+                            "S": "oliwia.walter@portgdansk.pl"
+                        }
+                    }
+                },
+                {
+                    "M": {
+                        "name": {
+                            "S": "michal.stupak"
+                        },
+                        "active": {
+                            "BOOL": true
+                        },
+                        "addedAt": {
+                            "S": "2025-11-05T07:19:00.433279"
+                        },
+                        "id": {
+                            "S": "3"
+                        },
+                        "email": {
+                            "S": "michal.stupak@portgdansk.pl"
+                        }
+                    }
+                }
+            ]
+        },
+        "formId": {
+            "S": "config"
+        },
+        "updatedAt": {
+            "S": "2025-11-05T07:19:00.433290"
+        },
+        "version": {
+            "S": "analysis-emails"
+        }
+    }
+}
