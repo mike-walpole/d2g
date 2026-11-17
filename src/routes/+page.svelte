@@ -23,6 +23,7 @@
 	} from '$lib/stores/config.js';
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
+	import { initAnalytics, setAnalyticsLanguage, track } from '$lib/analytics.js';
 
 	// Responsive form handling
 	let innerWidth = 0;
@@ -292,6 +293,31 @@
 	// 	console.log('⏰ CAPTCHA expired');
 	// };
 
+	onMount(() => {
+		initAnalytics({
+			country: $page.data?.geolocation?.country,
+			language: $currentLanguage
+		});
+		const formEl = document.getElementById('inquiry-form');
+		const observer = new IntersectionObserver(
+			(entries) => {
+				if (!formViewed && entries.some((en) => en.isIntersecting)) {
+					formViewed = true;
+					track('form_viewed');
+					observer.disconnect();
+				}
+			},
+			{ threshold: 0.2 }
+		);
+		if (formEl) observer.observe(formEl);
+		// pagehide fires on tab close, navigation away and mobile backgrounding
+		window.addEventListener('pagehide', sendAbandon);
+		return () => {
+			observer.disconnect();
+			window.removeEventListener('pagehide', sendAbandon);
+		};
+	});
+
 	onMount(async () => {
 		// CAPTCHA DISABLED: Uncomment to re-enable Cloudflare Turnstile
 		// Debug: Check if Turnstile is loaded and render widget
@@ -362,18 +388,14 @@
 	});
 
 	async function handleSubmit() {
-		console.log('📋 Form submission blocked - not accepting enquiries');
-
-		submitMessage =
-			$currentLanguage === 'zh'
-				? '我们目前暂不接受咨询，请稍后再试。'
-				: 'We are not currently accepting enquiries. Please try again later.';
-		submitStatus = 'error';
-		return;
-
 		// Show validation and validate all fields
 		showValidation = true;
 		const isValid = validateAllFields();
+		track('submit_clicked', {
+			valid: isValid,
+			error_fields: Object.keys(fieldErrors),
+			ms_since_start: formStartedAt ? Date.now() - formStartedAt : null
+		});
 
 		if (!isValid) {
 			// Find the first error field and scroll to it
@@ -414,7 +436,8 @@
 				body: JSON.stringify({
 					form_data: formData,
 					user_email: formData.email,
-					form_id: 'dock2gdansk-main'
+					form_id: 'dock2gdansk-main',
+					schema_version: formSchema?.version
 					// CAPTCHA DISABLED: Uncomment to re-enable Cloudflare Turnstile
 					// captcha_token: captchaToken
 				})
@@ -423,6 +446,11 @@
 			const result = await response.json();
 
 			if (result.success) {
+				formSubmitted = true;
+				track('form_submitted', {
+					...cargoProps(),
+					ms_since_start: formStartedAt ? Date.now() - formStartedAt : null
+				});
 				// Success message
 				const successMessages = {
 					en: 'Thank you! Your inquiry has been submitted successfully.',
@@ -444,6 +472,11 @@
 				// }
 				initializeFormData();
 			} else {
+				track('form_submit_failed', {
+					http_status: response.status,
+					error: result.error || 'unknown',
+					error_fields: Object.keys(result.field_errors || {})
+				});
 				throw new Error(result.error || 'Submission failed');
 			}
 		} catch (error) {
@@ -460,6 +493,99 @@
 			isSubmitting = false;
 		}
 	}
+
+	// ---------- Form analytics (no field values are ever sent) ----------
+	// Unit of analysis = one page load. Question being answered: does the long cargo list cause drop-off?
+	let formViewed = false;
+	let formStartedAt = 0;
+	let formSubmitted = false;
+	let abandonSent = false;
+	let lastField = null;
+	const completedFields = new Set();
+	let cargoFirstFocusAt = 0;
+	let cargoFocusCount = 0;
+	let cargoChangeCount = 0;
+
+	function fieldIndex(id) {
+		return formSchema?.fields?.findIndex((f) => f.id === id) ?? -1;
+	}
+
+	function cargoProps(id = formData.cargo_type) {
+		if (!id) return { cargo_type: null };
+		const list = $cargoTypes;
+		const idx = list.findIndex((c) => c.id === id);
+		return {
+			cargo_type: id,
+			cargo_name: idx >= 0 ? list[idx].name : id,
+			cargo_maps_to_others: idx >= 0 ? list[idx].mapsTo === 'others' || id === 'others' : null,
+			cargo_list_position: idx >= 0 ? idx + 1 : null,
+			cargo_list_length: list.length
+		};
+	}
+
+	// Read the DOM element, not formData: Carbon's bind:selected propagates after this handler runs.
+	function isFilled(el) {
+		if (el.type === 'checkbox') return el.checked;
+		return typeof el.value === 'string' && el.value.trim() !== '';
+	}
+
+	function markStarted(id) {
+		if (formStartedAt) return;
+		formStartedAt = Date.now();
+		track('form_started', { first_field: id });
+	}
+
+	function handleFormFocusIn(e) {
+		const id = e.target?.id;
+		if (!id || fieldIndex(id) < 0) return;
+		markStarted(id);
+		lastField = id;
+		if (id === 'cargo_type') {
+			cargoFocusCount += 1;
+			if (!cargoFirstFocusAt) {
+				cargoFirstFocusAt = Date.now();
+				track('cargo_focused', { cargo_list_length: $cargoTypes.length });
+			}
+		}
+	}
+
+	function handleFormFieldDone(e) {
+		const id = e.target?.id;
+		if (!id || fieldIndex(id) < 0) return;
+		if (e.type === 'change') markStarted(id);
+		if (id === 'cargo_type' && e.type === 'change' && e.target.value) {
+			cargoChangeCount += 1;
+			track('cargo_selected', {
+				...cargoProps(e.target.value),
+				ms_to_select: cargoFirstFocusAt ? Date.now() - cargoFirstFocusAt : null,
+				focus_count: cargoFocusCount,
+				change_count: cargoChangeCount
+			});
+		}
+		if (!completedFields.has(id) && isFilled(e.target)) {
+			completedFields.add(id);
+			track('field_completed', { field: id, field_index: fieldIndex(id) + 1 });
+		}
+	}
+
+	function sendAbandon() {
+		if (!formStartedAt || formSubmitted || abandonSent) return;
+		abandonSent = true;
+		track(
+			'form_abandoned',
+			{
+				last_field: lastField,
+				last_field_index: lastField ? fieldIndex(lastField) + 1 : null,
+				fields_completed: completedFields.size,
+				reached_cargo: cargoFirstFocusAt > 0,
+				cargo_selected: Boolean(formData.cargo_type),
+				ms_since_start: Date.now() - formStartedAt
+			},
+			{ beacon: true }
+		);
+	}
+
+	$: setAnalyticsLanguage($currentLanguage);
 
 	// Handle select all consent checkboxes
 	function handleSelectAllConsent() {
@@ -489,7 +615,7 @@
 
 <svelte:head>
 	<title
-		>{t('site_title', 'Dock2Gdansk')} - {t(
+		>{t('site_title', 'Port Gdańsk Connect')} - {t(
 			'site_tagline',
 			'Professional Cargo Transportation'
 		)}</title
@@ -543,7 +669,13 @@
 					: t('form.description', 'Fill out the form below')}
 			</p>
 
-			<form on:submit|preventDefault={handleSubmit} class="space-y-6">
+			<form
+				on:submit|preventDefault={handleSubmit}
+				on:focusin={handleFormFocusIn}
+				on:focusout={handleFormFieldDone}
+				on:change={handleFormFieldDone}
+				class="space-y-6"
+			>
 				<Grid condensed>
 					{#if formSchema?.fields}
 						{#each formSchema.fields as field, index}

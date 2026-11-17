@@ -1,6 +1,18 @@
 {
 	"rewrites": [
 		{
+			"source": "/pgc-e/static/:path(.*)",
+			"destination": "https://eu-assets.i.posthog.com/static/:path"
+		},
+		{
+			"source": "/pgc-e/array/:path(.*)",
+			"destination": "https://eu-assets.i.posthog.com/array/:path"
+		},
+		{
+			"source": "/pgc-e/:path(.*)",
+			"destination": "https://eu.i.posthog.com/:path"
+		},
+		{
 			"source": "/(.*)",
 			"destination": "/"
 		}

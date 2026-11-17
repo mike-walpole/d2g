@@ -34,6 +34,7 @@
 	"dependencies": {
 		"@inlang/paraglide-js": "^2.0.0",
 		"carbon-components-svelte": "^0.89.6",
-		"carbon-icons-svelte": "^13.5.0"
+		"carbon-icons-svelte": "^13.5.0",
+		"posthog-js": "^1.450.0"
 	}
 }
