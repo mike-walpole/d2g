@@ -1,0 +1,51 @@
+{
+  "schema": {
+    "referralSources": [
+      {
+        "name": {
+          "en": "China Representative Office",
+          "zh": "中国代表处"
+        },
+        "active": true,
+        "id": "china_representative"
+      },
+      {
+        "name": {
+          "en": "CILF 2025 Conference",
+          "zh": "深圳物流展 CILF 2025"
+        },
+        "active": true,
+        "description": "",
+        "lastUpdated": "2025-09-11T11:07:38.015822",
+        "id": "clif_2025"
+      },
+      {
+        "name": {
+          "en": "Port of Gdańsk Website",
+          "zh": "格但斯克港网站"
+        },
+        "active": true,
+        "id": "website"
+      },
+      {
+        "name": {
+          "en": "Media",
+          "zh": "媒体"
+        },
+        "active": true,
+        "id": "media"
+      },
+      {
+        "name": {
+          "en": "Business Referral",
+          "zh": "商业推荐"
+        },
+        "active": true,
+        "id": "referral"
+      }
+    ],
+    "lastUpdated": "2025-09-15T13:49:51.6N"
+  },
+  "formId": "config",
+  "version": "referral-sources"
+}

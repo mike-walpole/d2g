@@ -1,0 +1,311 @@
+{
+  "createdAt": "2025-09-10T12:30:06.894653",
+  "isActive": true,
+  "changeType": "cargo_type_updated",
+  "schema": {
+    "submitButton": {
+      "en": "Submit Inquiry",
+      "zh": "提交询价"
+    },
+    "metadata": {
+      "lastUpdated": "2025-09-10T12:30:06.893692",
+      "createdAt": "2025-09-10T12:30:06.894645",
+      "components": [
+        "formFields",
+        "cargoTypes",
+        "referralSources"
+      ],
+      "changeType": "cargo_type_updated",
+      "version": 2,
+      "changedComponent": "cargoTypes",
+      "changeDetails": "Updated cargo type: Dry Containers (ID: 1)"
+    },
+    "cargoTypes": [
+      {
+        "name": {
+          "en": "Dry Containers",
+          "zh": "干货集装箱"
+        },
+        "active": true,
+        "description": "",
+        "lastUpdated": "2025-09-10T12:30:06.833417",
+        "id": "1"
+      },
+      {
+        "name": {
+          "en": "Reefer Containers",
+          "zh": "冷藏集装箱"
+        },
+        "active": true,
+        "id": "reefer_containers"
+      },
+      {
+        "name": {
+          "en": "Tank Containers",
+          "zh": "罐式集装箱"
+        },
+        "active": true,
+        "id": "tank_containers"
+      },
+      {
+        "name": {
+          "en": "Solid Bulk Cargo",
+          "zh": "固体散货"
+        },
+        "active": true,
+        "id": "solid_bulk"
+      },
+      {
+        "name": {
+          "en": "Liquid Bulk Cargo",
+          "zh": "液体散货"
+        },
+        "active": true,
+        "id": "liquid_bulk"
+      },
+      {
+        "name": {
+          "en": "Ro-Ro Cargo (Roll-on/Roll-off)",
+          "zh": "滚装货物"
+        },
+        "active": true,
+        "id": "roro_cargo"
+      },
+      {
+        "name": {
+          "en": "Project / Oversized Cargo",
+          "zh": "项目/超限货物"
+        },
+        "active": true,
+        "id": "project_oversized"
+      }
+    ],
+    "referralSources": [
+      {
+        "name": {
+          "en": "China Representative Office",
+          "zh": "中国代表处"
+        },
+        "active": true,
+        "id": "china_representative"
+      },
+      {
+        "name": {
+          "en": "CLIF 2025 Conference",
+          "zh": "深圳物流展 CILF 2025"
+        },
+        "active": true,
+        "id": "clif_2025"
+      },
+      {
+        "name": {
+          "en": "Port Website",
+          "zh": "港口网站"
+        },
+        "active": true,
+        "id": "website"
+      },
+      {
+        "name": {
+          "en": "Business Referral",
+          "zh": "商业推荐"
+        },
+        "active": true,
+        "id": "referral"
+      }
+    ],
+    "description": {
+      "en": "Fill out the form below and we will get back to you within 24 hours",
+      "zh": "填写下面的表单，我们将在24小时内回复您"
+    },
+    "formFields": [
+      {
+        "name": "company",
+        "id": "company",
+        "label": {
+          "en": "Company Name",
+          "zh": "公司名称"
+        },
+        "placeholder": {
+          "en": "Enter your company name",
+          "zh": "请输入您的公司名称"
+        },
+        "type": "text",
+        "required": true
+      },
+      {
+        "name": "email",
+        "id": "email",
+        "label": {
+          "en": "Email Address",
+          "zh": "电子邮箱"
+        },
+        "placeholder": {
+          "en": "Enter your email address",
+          "zh": "请输入您的电子邮箱"
+        },
+        "type": "email",
+        "required": true
+      },
+      {
+        "name": "phone_prefix",
+        "options": [
+          {
+            "value": "+86",
+            "label": {
+              "en": "+86 (China)",
+              "zh": "+86 (中国)"
+            }
+          },
+          {
+            "value": "+48",
+            "label": {
+              "en": "+48 (Poland)",
+              "zh": "+48 (波兰)"
+            }
+          },
+          {
+            "value": "+1",
+            "label": {
+              "en": "+1 (USA/Canada)",
+              "zh": "+1 (美国/加拿大)"
+            }
+          },
+          {
+            "value": "+44",
+            "label": {
+              "en": "+44 (UK)",
+              "zh": "+44 (英国)"
+            }
+          }
+        ],
+        "id": "phone_prefix",
+        "label": {
+          "en": "Country Code",
+          "zh": "国家代码"
+        },
+        "type": "select",
+        "required": true
+      },
+      {
+        "name": "phone",
+        "id": "phone",
+        "label": {
+          "en": "Phone Number",
+          "zh": "电话号码"
+        },
+        "placeholder": {
+          "en": "Enter your phone number",
+          "zh": "请输入您的电话号码"
+        },
+        "type": "tel",
+        "required": true
+      },
+      {
+        "name": "cargo_type",
+        "id": "cargo_type",
+        "label": {
+          "en": "Cargo Type",
+          "zh": "货物类型"
+        },
+        "placeholder": {
+          "en": "Please select cargo type",
+          "zh": "请选择货物类型"
+        },
+        "type": "select",
+        "required": true
+      },
+      {
+        "name": "imo_cargo",
+        "description": {
+          "en": "Check this if your cargo contains IMO/dangerous goods",
+          "zh": "如果您的货物包含IMO危险品，请勾选此项"
+        },
+        "id": "imo_cargo",
+        "label": {
+          "en": "IMO/Dangerous Goods",
+          "zh": "IMO危险品"
+        },
+        "type": "checkbox",
+        "required": false
+      },
+      {
+        "name": "inquiry_content",
+        "id": "inquiry_content",
+        "label": {
+          "en": "Inquiry Details",
+          "zh": "询价详情"
+        },
+        "placeholder": {
+          "en": "Describe cargo in detail: Name of cargo, HS Code, Volume, Consignee address, other services you need (trucking, custom clearance, warehouse or depot etc.)",
+          "zh": "请描述您的具体需求：品名、海关代码、型号及箱量、收货门点、具体所需服务如拖车、报关、仓储或堆场等"
+        },
+        "rows": 4,
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "privacy_consent",
+        "description": {
+          "en": "I agree to the processing of my personal data according to the Privacy Policy",
+          "zh": "我同意根据隐私政策处理我的个人数据"
+        },
+        "id": "privacy_consent",
+        "label": {
+          "en": "Privacy Policy Consent",
+          "zh": "隐私政策同意"
+        },
+        "type": "checkbox",
+        "required": true
+      },
+      {
+        "name": "terms_consent",
+        "description": {
+          "en": "I agree to the Terms of Service",
+          "zh": "我同意服务条款"
+        },
+        "id": "terms_consent",
+        "label": {
+          "en": "Terms of Service Consent",
+          "zh": "服务条款同意"
+        },
+        "type": "checkbox",
+        "required": true
+      },
+      {
+        "name": "cross_border_consent",
+        "description": {
+          "en": "I consent to the cross-border transfer of my data for processing this inquiry",
+          "zh": "我同意跨境传输我的数据以处理此询价"
+        },
+        "id": "cross_border_consent",
+        "label": {
+          "en": "Cross-Border Data Transfer Consent",
+          "zh": "跨境数据传输同意"
+        },
+        "type": "checkbox",
+        "required": true
+      },
+      {
+        "name": "referral_source",
+        "id": "referral_source",
+        "label": {
+          "en": "How did you hear about us?",
+          "zh": "您是如何了解我们的？"
+        },
+        "placeholder": {
+          "en": "Please select (optional)",
+          "zh": "请选择（可选）"
+        },
+        "type": "select",
+        "required": false
+      }
+    ],
+    "title": {
+      "en": "Submit Your Cargo Inquiry",
+      "zh": "格但斯克港货物运输询盘"
+    }
+  },
+  "formId": "homepage-form",
+  "version": "2"
+}

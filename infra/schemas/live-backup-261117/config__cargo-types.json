@@ -1,0 +1,69 @@
+{
+  "schema": {
+    "lastUpdated": "2025-09-15T08:28:51.992996",
+    "cargoTypes": [
+      {
+        "name": {
+          "en": "Dry Containers",
+          "zh": "干货集装箱"
+        },
+        "active": true,
+        "description": "",
+        "lastUpdated": "2025-09-15T08:28:51.992986",
+        "id": "1"
+      },
+      {
+        "name": {
+          "en": "Reefer Containers",
+          "zh": "冷藏集装箱"
+        },
+        "active": true,
+        "description": "",
+        "lastUpdated": "2025-09-11T11:30:33.056636",
+        "id": "2"
+      },
+      {
+        "name": {
+          "en": "Tank Containers",
+          "zh": "罐式集装箱"
+        },
+        "active": true,
+        "id": "tank_containers"
+      },
+      {
+        "name": {
+          "en": "Solid Bulk Cargo",
+          "zh": "固体散货"
+        },
+        "active": true,
+        "id": "solid_bulk"
+      },
+      {
+        "name": {
+          "en": "Liquid Bulk Cargo",
+          "zh": "液体散货"
+        },
+        "active": true,
+        "id": "liquid_bulk"
+      },
+      {
+        "name": {
+          "en": "Ro-Ro Cargo (Roll-on/Roll-off)",
+          "zh": "滚装货物"
+        },
+        "active": true,
+        "id": "roro_cargo"
+      },
+      {
+        "name": {
+          "en": "Project / Oversized Cargo",
+          "zh": "项目/超限货物"
+        },
+        "active": true,
+        "id": "project_oversized"
+      }
+    ]
+  },
+  "formId": "config",
+  "version": "cargo-types"
+}

@@ -12,7 +12,7 @@ dynamodb = boto3.resource('dynamodb')
 cognito = boto3.client('cognito-idp')
 
 # Resend configuration
-RESEND_API_KEY = 're_TbtKRqSo_CKVpSvn6vpTVu4UTHR2fAzqB'
+RESEND_API_KEY = os.environ.get('RESEND_API_KEY', '')
 RESEND_API_URL = 'https://api.resend.com/emails'
 
 def get_admin_email_addresses():
