@@ -1,0 +1,360 @@
+{
+    "Item": {
+        "createdAt": {
+            "S": "2024-01-01T00:00:00Z"
+        },
+        "isActive": {
+            "BOOL": true
+        },
+        "description": {
+            "S": "Multilingual translations for Port Gdańsk Connect"
+        },
+        "schema": {
+            "M": {
+                "lastUpdated": {
+                    "S": "2025-09-15T13:53:51.281723Z"
+                },
+                "translations": {
+                    "M": {
+                        "en": {
+                            "M": {
+                                "admin": {
+                                    "M": {
+                                        "cargo_types": {
+                                            "S": "Cargo Types"
+                                        },
+                                        "dashboard": {
+                                            "S": "Dashboard"
+                                        },
+                                        "email": {
+                                            "S": "Email"
+                                        },
+                                        "login": {
+                                            "S": "Admin Login"
+                                        },
+                                        "login_button": {
+                                            "S": "Login"
+                                        },
+                                        "logout": {
+                                            "S": "Logout"
+                                        },
+                                        "password": {
+                                            "S": "Password"
+                                        },
+                                        "schemas": {
+                                            "S": "Form Schemas"
+                                        },
+                                        "submissions": {
+                                            "S": "Form Submissions"
+                                        },
+                                        "team_members": {
+                                            "S": "Team Members"
+                                        }
+                                    }
+                                },
+                                "footer": {
+                                    "M": {
+                                        "copyright": {
+                                            "S": "© 2024 Port Gdańsk Connect. All rights reserved."
+                                        },
+                                        "port_website": {
+                                            "S": "Port of Gdańsk"
+                                        },
+                                        "privacy": {
+                                            "S": "Privacy Policy"
+                                        },
+                                        "terms": {
+                                            "S": "Terms of Service"
+                                        }
+                                    }
+                                },
+                                "form": {
+                                    "M": {
+                                        "cargo_type": {
+                                            "S": "Cargo Type"
+                                        },
+                                        "cargo_type_placeholder": {
+                                            "S": "Select cargo type"
+                                        },
+                                        "company": {
+                                            "S": "Company Name"
+                                        },
+                                        "company_placeholder": {
+                                            "S": "Enter your company name"
+                                        },
+                                        "cross_border_consent": {
+                                            "S": "Cross-border Data Transfer Consent"
+                                        },
+                                        "cross_border_consent_text": {
+                                            "S": "I consent to the transfer of my personal data to Poland for the purpose of handling this inquiry"
+                                        },
+                                        "description": {
+                                            "S": "Fill out the form below and we'll get back to you with details"
+                                        },
+                                        "email": {
+                                            "S": "Email Address"
+                                        },
+                                        "email_placeholder": {
+                                            "S": "Enter your email address"
+                                        },
+                                        "error": {
+                                            "S": "An error occurred. Please try again."
+                                        },
+                                        "inquiry_content": {
+                                            "S": "Inquiry Details"
+                                        },
+                                        "inquiry_content_placeholder": {
+                                            "S": "Please describe your shipping requirements in detail"
+                                        },
+                                        "phone": {
+                                            "S": "Phone Number"
+                                        },
+                                        "phone_placeholder": {
+                                            "S": "Enter your phone number (e.g., 13712345678)"
+                                        },
+                                        "phone_prefix": {
+                                            "S": "Phone Prefix"
+                                        },
+                                        "privacy_consent": {
+                                            "S": "Privacy Policy Consent"
+                                        },
+                                        "privacy_consent_text": {
+                                            "S": "I have read and agree to the Privacy Policy and consent to the processing of my personal data for handling this inquiry, in accordance with PIPL and GDPR."
+                                        },
+                                        "submit": {
+                                            "S": "Submit Inquiry"
+                                        },
+                                        "submitting": {
+                                            "S": "Submitting..."
+                                        },
+                                        "success": {
+                                            "S": "Thank you! Your inquiry has been submitted successfully."
+                                        },
+                                        "terms_consent": {
+                                            "S": "Terms of Service"
+                                        },
+                                        "terms_consent_text": {
+                                            "S": "I accept the terms of service"
+                                        },
+                                        "title": {
+                                            "S": "Submit Your Inquiry"
+                                        }
+                                    }
+                                },
+                                "hero": {
+                                    "M": {
+                                        "cta": {
+                                            "S": "Submit Inquiry"
+                                        },
+                                        "subtitle": {
+                                            "S": "Reliable, efficient, and professional shipping services connecting Asia to Europe"
+                                        },
+                                        "title": {
+                                            "S": "Your Trusted Partner for China-Poland Cargo Transportation"
+                                        }
+                                    }
+                                },
+                                "navigation": {
+                                    "M": {
+                                        "about": {
+                                            "S": "About"
+                                        },
+                                        "admin": {
+                                            "S": "Admin"
+                                        },
+                                        "contact": {
+                                            "S": "Contact"
+                                        },
+                                        "home": {
+                                            "S": "Home"
+                                        },
+                                        "services": {
+                                            "S": "Services"
+                                        }
+                                    }
+                                },
+                                "site_tagline": {
+                                    "S": "Professional Cargo Transportation Between China and Poland"
+                                },
+                                "site_title": {
+                                    "S": "Port Gdańsk Connect"
+                                }
+                            }
+                        },
+                        "zh": {
+                            "M": {
+                                "admin": {
+                                    "M": {
+                                        "cargo_types": {
+                                            "S": "货物类型"
+                                        },
+                                        "dashboard": {
+                                            "S": "仪表板"
+                                        },
+                                        "email": {
+                                            "S": "邮箱"
+                                        },
+                                        "login": {
+                                            "S": "管理员登录"
+                                        },
+                                        "login_button": {
+                                            "S": "登录"
+                                        },
+                                        "logout": {
+                                            "S": "退出"
+                                        },
+                                        "password": {
+                                            "S": "密码"
+                                        },
+                                        "schemas": {
+                                            "S": "表单模式"
+                                        },
+                                        "submissions": {
+                                            "S": "表单提交"
+                                        },
+                                        "team_members": {
+                                            "S": "团队成员"
+                                        }
+                                    }
+                                },
+                                "footer": {
+                                    "M": {
+                                        "copyright": {
+                                            "S": "© 2024 Port Gdańsk Connect。保留所有权利。"
+                                        },
+                                        "port_website": {
+                                            "S": "格但斯克港"
+                                        },
+                                        "privacy": {
+                                            "S": "隐私政策"
+                                        },
+                                        "terms": {
+                                            "S": "服务条款"
+                                        }
+                                    }
+                                },
+                                "form": {
+                                    "M": {
+                                        "cargo_type": {
+                                            "S": "货物类型"
+                                        },
+                                        "cargo_type_placeholder": {
+                                            "S": "请选择货物类型"
+                                        },
+                                        "company": {
+                                            "S": "公司名称"
+                                        },
+                                        "company_placeholder": {
+                                            "S": "请输入您的公司名称"
+                                        },
+                                        "cross_border_consent": {
+                                            "S": "跨境数据传输同意"
+                                        },
+                                        "cross_border_consent_text": {
+                                            "S": "我同意将我的个人数据传输到波兰以处理此询盘"
+                                        },
+                                        "description": {
+                                            "S": "请填写下方表格，我们将为您提供详细信息"
+                                        },
+                                        "email": {
+                                            "S": "电子邮箱"
+                                        },
+                                        "email_placeholder": {
+                                            "S": "请输入您的电子邮箱"
+                                        },
+                                        "error": {
+                                            "S": "发生错误，请重试。"
+                                        },
+                                        "inquiry_content": {
+                                            "S": "询盘详情"
+                                        },
+                                        "inquiry_content_placeholder": {
+                                            "S": "请详细描述您的运输需求"
+                                        },
+                                        "phone": {
+                                            "S": "电话号码"
+                                        },
+                                        "phone_placeholder": {
+                                            "S": "请输入您的电话号码（例如：13712345678）"
+                                        },
+                                        "phone_prefix": {
+                                            "S": "电话区号"
+                                        },
+                                        "privacy_consent": {
+                                            "S": "隐私政策同意"
+                                        },
+                                        "privacy_consent_text": {
+                                            "S": "我已阅读并同意隐私政策，同意为处理此询盘而处理我的个人数据，符合PIPL和GDPR规定。"
+                                        },
+                                        "submit": {
+                                            "S": "提交询盘"
+                                        },
+                                        "submitting": {
+                                            "S": "提交中..."
+                                        },
+                                        "success": {
+                                            "S": "谢谢！您的询盘已成功提交。"
+                                        },
+                                        "terms_consent": {
+                                            "S": "服务条款"
+                                        },
+                                        "terms_consent_text": {
+                                            "S": "我接受服务条款"
+                                        },
+                                        "title": {
+                                            "S": "提交您的询盘"
+                                        }
+                                    }
+                                },
+                                "hero": {
+                                    "M": {
+                                        "cta": {
+                                            "S": "提交询盘"
+                                        },
+                                        "subtitle": {
+                                            "S": "可靠、高效、专业的运输服务，连接亚洲与欧洲"
+                                        },
+                                        "title": {
+                                            "S": "您值得信赖的中波货运合作伙伴"
+                                        }
+                                    }
+                                },
+                                "navigation": {
+                                    "M": {
+                                        "about": {
+                                            "S": "关于我们"
+                                        },
+                                        "admin": {
+                                            "S": "管理员"
+                                        },
+                                        "contact": {
+                                            "S": "联系我们"
+                                        },
+                                        "home": {
+                                            "S": "首页"
+                                        },
+                                        "services": {
+                                            "S": "服务"
+                                        }
+                                    }
+                                },
+                                "site_tagline": {
+                                    "S": "中国至波兰专业货物运输"
+                                },
+                                "site_title": {
+                                    "S": "Port Gdańsk Connect"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "formId": {
+            "S": "config"
+        },
+        "version": {
+            "S": "translations"
+        }
+    }
+}
