@@ -5,6 +5,7 @@
 		TextArea,
 		Select,
 		SelectItem,
+		ComboBox,
 		Checkbox,
 		Grid,
 		Column,
@@ -552,19 +553,67 @@
 	function handleFormFieldDone(e) {
 		const id = e.target?.id;
 		if (!id || fieldIndex(id) < 0) return;
+		// The cargo combobox input holds the typed search text, not the selected id: tracked in handleCargoSelect.
+		if (id === 'cargo_type') return;
 		if (e.type === 'change') markStarted(id);
-		if (id === 'cargo_type' && e.type === 'change' && e.target.value) {
-			cargoChangeCount += 1;
-			track('cargo_selected', {
-				...cargoProps(e.target.value),
-				ms_to_select: cargoFirstFocusAt ? Date.now() - cargoFirstFocusAt : null,
-				focus_count: cargoFocusCount,
-				change_count: cargoChangeCount
-			});
-		}
 		if (!completedFields.has(id) && isFilled(e.target)) {
 			completedFields.add(id);
 			track('field_completed', { field: id, field_index: fieldIndex(id) + 1 });
+		}
+	}
+
+	// Cargo combobox: typing filters the list ("c" -> Coal, Container, ...).
+	let cargoQuery = '';
+	let cargoSearchUsed = false;
+	$: cargoAll = $cargoTypes.map((c) => ({ id: c.id, text: c.name }));
+	$: if (cargoQuery && !cargoAll.some((i) => i.text === cargoQuery)) cargoSearchUsed = true;
+
+	/** 0 = name starts with query, 1 = a word starts with it, 2 = contains it (3+ chars), 9 = no match */
+	function cargoRank(item, value) {
+		const q = (value ?? '').trim().toLowerCase();
+		if (!q) return 0;
+		// Reopening a filled field shows the whole list, not just the current pick
+		const picked = cargoAll.find((i) => i.id === formData.cargo_type);
+		if (picked && picked.text.toLowerCase() === q) return 0;
+		const name = item.text.toLowerCase();
+		if (name.startsWith(q)) return 0;
+		if (name.split(/[\s/(),+-]+/).some((w) => w.startsWith(q))) return 1;
+		return q.length >= 3 && name.includes(q) ? 2 : 9;
+	}
+	// "Others" always stays available, at the end
+	const cargoMatches = (item, value) => item.id === 'others' || cargoRank(item, value) < 9;
+	$: cargoItems = [...cargoAll].sort(
+		(a, b) =>
+			(a.id === 'others') - (b.id === 'others') ||
+			cargoRank(a, cargoQuery) - cargoRank(b, cargoQuery)
+	);
+
+	function validateCargo(field) {
+		fieldTouched[field.id] = true;
+		const error = validateField(field);
+		if (error) fieldErrors[field.id] = error;
+		else delete fieldErrors[field.id];
+		fieldErrors = fieldErrors;
+	}
+
+	function handleCargoSelect(field, e) {
+		const id = e.detail?.selectedId;
+		if (!id) return;
+		formData[field.id] = id;
+		validateCargo(field);
+		markStarted(field.id);
+		cargoChangeCount += 1;
+		track('cargo_selected', {
+			...cargoProps(id),
+			ms_to_select: cargoFirstFocusAt ? Date.now() - cargoFirstFocusAt : null,
+			focus_count: cargoFocusCount,
+			change_count: cargoChangeCount,
+			used_search: cargoSearchUsed
+		});
+		cargoSearchUsed = false;
+		if (!completedFields.has(field.id)) {
+			completedFields.add(field.id);
+			track('field_completed', { field: field.id, field_index: fieldIndex(field.id) + 1 });
 		}
 	}
 
@@ -751,6 +800,23 @@
 													fieldErrors = fieldErrors; // trigger reactivity
 												}}
 											/>
+										{:else if field.type === 'select' && field.id === 'cargo_type'}
+											<ComboBox
+												id={field.id}
+												titleText={getLocalizedText(field.label, field.id) +
+													(field.required ? ' *' : '')}
+												placeholder={$currentLanguage === 'zh'
+													? '输入或选择货物类型'
+													: 'Type or select cargo type'}
+												items={cargoItems}
+												shouldFilterItem={cargoMatches}
+												bind:selectedId={formData[field.id]}
+												bind:value={cargoQuery}
+												invalid={showValidation && fieldErrors[field.id]}
+												invalidText={fieldErrors[field.id]}
+												on:select={(e) => handleCargoSelect(field, e)}
+												on:clear={() => validateCargo(field)}
+											/>
 										{:else if field.type === 'select'}
 											<Select
 												id={field.id}
@@ -773,19 +839,7 @@
 													fieldErrors = fieldErrors; // trigger reactivity
 												}}
 											>
-												{#if field.id === 'cargo_type'}
-													<!-- Add placeholder option for cargo type -->
-													<SelectItem
-														value=""
-														text={$currentLanguage === 'zh'
-															? '请选择货物类型'
-															: 'Please select cargo type'}
-														disabled
-													/>
-													{#each $cargoTypes as cargoType}
-														<SelectItem value={cargoType.id} text={cargoType.name} />
-													{/each}
-												{:else if field.id === 'referral_source'}
+												{#if field.id === 'referral_source'}
 													<!-- Add placeholder option for referral source -->
 													<SelectItem
 														value=""
