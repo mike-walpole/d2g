@@ -73,12 +73,12 @@ async function runHogql(fetchFn, query) {
 }
 
 const FUNNEL_STEPS = [
-	{ key: 'viewed', label: 'Saw the form' },
-	{ key: 'started', label: 'Started filling it in' },
-	{ key: 'cargo_focused', label: 'Reached the cargo list' },
-	{ key: 'cargo_selected', label: 'Picked a cargo type' },
-	{ key: 'submit_clicked', label: 'Clicked submit' },
-	{ key: 'submitted', label: 'Submitted successfully' }
+	{ key: 'viewed', label: 'Wyświetlenie formularza' },
+	{ key: 'started', label: 'Rozpoczęcie wypełniania' },
+	{ key: 'cargo_focused', label: 'Otwarcie listy ładunków' },
+	{ key: 'cargo_selected', label: 'Wybór ładunku' },
+	{ key: 'submit_clicked', label: 'Kliknięcie „Wyślij”' },
+	{ key: 'submitted', label: 'Wysłanie zakończone' }
 ];
 
 /** @param {typeof fetch} fetchFn @param {number} days */

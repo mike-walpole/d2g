@@ -25,8 +25,8 @@ const DOMAIN_CONFIG = {
 		title: 'Port Gdańsk Connect - Professional Cargo Transportation',
 		description: 'Reliable cargo transportation between China and Poland'
 	},
-	'portgdanskconnect.cn': {
-		region: 'china',
+	'portgdanskconnect.eu': {
+		region: 'international',
 		title: 'Port Gdańsk Connect - Professional Cargo Transportation',
 		description: 'Reliable cargo transportation between China and Poland'
 	},
